@@ -57,6 +57,29 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
+        /* --- AUTH SCREEN --- */
+        #auth-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: 24px;
+            background-color: var(--wa-light);
+            text-align: center;
+        }
+        .auth-logo { width: 80px; height: 80px; background: var(--wa-primary); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+        .auth-logo svg { color: #fff; width: 40px; height: 40px; }
+        .auth-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .auth-sub { font-size: 14px; color: var(--wa-text-muted); margin-bottom: 32px; }
+        .auth-input { width: 100%; max-width: 320px; background: var(--wa-bg); border: 1px solid var(--wa-border); color: var(--wa-text-main); padding: 14px 16px; border-radius: 8px; font-size: 15px; margin-bottom: 12px; outline: none; }
+        .auth-input:focus { border-color: var(--wa-primary); }
+        .auth-btn { width: 100%; max-width: 320px; background: var(--wa-primary); color: #fff; border: none; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .auth-btn.outline { background: transparent; color: var(--wa-text-main); border: 1px solid var(--wa-border); }
+
+        /* Main App Wrapper */
+        #main-app { display: none; flex: 1; flex-direction: column; height: 100%; }
+
         /* --- HEADER & TABS --- */
         .wa-header-container {
             background-color: var(--wa-primary);
@@ -65,7 +88,7 @@
             flex-direction: column;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             z-index: 100;
-            position: relative; /* Needed for absolute search overlay */
+            position: relative; 
         }
 
         .wa-top-bar {
@@ -75,189 +98,86 @@
             padding: calc(env(safe-area-inset-top) + 12px) 16px 12px;
         }
 
-        .wa-title {
-            font-size: 20px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .wa-icons {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
+        .wa-title { font-size: 20px; font-weight: 600; letter-spacing: 0.5px; }
+        .wa-icons { display: flex; gap: 20px; align-items: center; }
         .wa-icons svg { width: 22px; height: 22px; cursor: pointer; }
-
         .gb-wifi { transform: rotate(45deg); }
 
-        .wa-tabs {
-            display: flex;
-            align-items: center;
-        }
-
+        .wa-tabs { display: flex; align-items: center; }
         .wa-tab {
-            flex: 1;
-            text-align: center;
-            padding: 12px 0;
-            font-size: 14px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-            text-transform: uppercase;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
+            flex: 1; text-align: center; padding: 12px 0; font-size: 13px; font-weight: 600;
+            color: rgba(255, 255, 255, 0.5); cursor: pointer; text-transform: uppercase;
+            border-bottom: 3px solid transparent; transition: all 0.2s;
         }
-
-        .wa-tab.camera-tab { flex: 0.3; }
-        .wa-tab.active {
-            color: #ffffff;
-            border-bottom: 3px solid #ffffff;
-        }
+        .wa-tab.active { color: #ffffff; border-bottom: 3px solid #ffffff; }
 
         /* --- SEARCH OVERLAY --- */
         .search-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: var(--wa-primary);
-            display: none;
-            align-items: center;
-            padding: calc(env(safe-area-inset-top) + 8px) 16px 8px;
-            gap: 16px;
-            z-index: 110;
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--wa-primary); display: none; align-items: center;
+            padding: calc(env(safe-area-inset-top) + 8px) 16px 8px; gap: 16px; z-index: 110;
         }
         .search-overlay.active { display: flex; animation: fadeIn 0.2s; }
         .search-overlay svg { color: #ffffff; cursor: pointer; width: 24px; height: 24px; }
         
         .search-input-wrapper {
-            flex: 1;
-            background-color: var(--wa-light);
-            border-radius: 24px;
-            display: flex;
-            align-items: center;
-            padding: 6px 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            flex: 1; background-color: var(--wa-light); border-radius: 24px; display: flex;
+            align-items: center; padding: 6px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .search-input-wrapper input {
-            flex: 1;
-            border: none;
-            outline: none;
-            background: transparent;
-            color: var(--wa-text-main);
-            font-size: 15px;
+            flex: 1; border: none; outline: none; background: transparent;
+            color: var(--wa-text-main); font-size: 15px;
         }
 
         /* --- MAIN VIEWS --- */
-        .view-container {
-            display: none;
-            flex: 1;
-            overflow-y: auto;
-            background-color: var(--wa-light);
-        }
+        .view-container { display: none; flex: 1; overflow-y: auto; background-color: var(--wa-light); }
         .view-container.active { display: block; animation: fadeIn 0.2s; }
-
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* --- CHATS LIST --- */
-        .chat-list-item {
-            display: flex;
-            padding: 12px 16px;
-            align-items: center;
-            cursor: pointer;
-            transition: background 0.15s;
-        }
+        .chat-list-item { display: flex; padding: 12px 16px; align-items: center; cursor: pointer; transition: background 0.15s; }
         .chat-list-item:active { background-color: var(--wa-bg); }
         
-        .avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 14px;
-        }
+        .avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; margin-right: 14px; }
 
-        .chat-info {
-            flex: 1;
-            border-bottom: 1px solid var(--wa-border);
-            padding-bottom: 12px;
-        }
-
-        .chat-name-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 4px;
-        }
-
+        .chat-info { flex: 1; border-bottom: 1px solid var(--wa-border); padding-bottom: 12px; }
+        .chat-name-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
         .chat-name { font-size: 16px; font-weight: 600; }
         .chat-time { font-size: 12px; color: var(--wa-text-muted); }
-
-        .chat-msg-row {
-            display: flex;
-            align-items: center;
-            font-size: 14px;
-            color: var(--wa-text-muted);
-            gap: 4px;
-        }
-
+        .chat-msg-row { display: flex; align-items: center; font-size: 14px; color: var(--wa-text-muted); gap: 4px; }
         .tick-icon { width: 16px; height: 16px; color: var(--wa-blue-tick); }
 
         /* --- STATUS LIST --- */
-        .status-section-title {
-            padding: 16px;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--wa-text-muted);
-            background: var(--wa-bg);
-        }
-        .status-ring {
-            padding: 2px;
-            border: 2px solid var(--wa-status-ring);
-            border-radius: 50%;
-        }
+        .status-section-title { padding: 16px; font-size: 14px; font-weight: 600; color: var(--wa-text-muted); background: var(--wa-bg); }
+        .status-ring { padding: 2px; border: 2px solid var(--wa-status-ring); border-radius: 50%; }
+
+        /* --- PROFILE VIEW --- */
+        .profile-header { padding: 30px 20px; display: flex; align-items: center; gap: 20px; border-bottom: 1px solid var(--wa-border); background: var(--wa-bg); }
+        .profile-avatar { width: 72px; height: 72px; border-radius: 50%; background: var(--wa-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; }
+        .profile-id { font-size: 22px; font-weight: 700; color: var(--wa-text-main); margin-bottom: 4px; }
+        .profile-email { font-size: 14px; color: var(--wa-text-muted); }
 
         /* --- FLOATING ACTION BUTTON --- */
         .fab {
-            position: fixed;
-            bottom: calc(env(safe-area-inset-bottom) + 20px);
-            right: 20px;
-            width: 56px;
-            height: 56px;
-            background-color: var(--wa-text-main);
-            color: var(--wa-light);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            cursor: pointer;
-            z-index: 90;
-            transition: transform 0.1s;
+            position: fixed; bottom: calc(env(safe-area-inset-bottom) + 20px); right: 20px;
+            width: 56px; height: 56px; background-color: var(--wa-text-main); color: var(--wa-light);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 90; transition: transform 0.1s;
         }
         .fab:active { transform: scale(0.95); }
 
         /* --- CHAT ROOM (SLIDE OVER) --- */
         .chat-room {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: var(--wa-chat-bg);
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--wa-chat-bg);
             background-image: url('data:image/svg+xml,%3Csvg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M10 10h10v10H10V10z" fill="rgba(0,0,0,0.02)"/%3E%3C/svg%3E'); 
-            z-index: 200;
-            display: flex;
-            flex-direction: column;
-            transform: translateX(100%);
+            z-index: 200; display: flex; flex-direction: column; transform: translateX(100%);
             transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
         .chat-room.open { transform: translateX(0); }
 
         .chat-room-header {
-            background-color: var(--wa-primary);
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            padding: calc(env(safe-area-inset-top) + 8px) 16px 8px;
-            gap: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background-color: var(--wa-primary); color: #ffffff; display: flex; align-items: center;
+            padding: calc(env(safe-area-inset-top) + 8px) 16px 8px; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .back-btn { display: flex; align-items: center; cursor: pointer; margin-left: -8px; }
@@ -270,122 +190,58 @@
 
         /* --- MESSAGES --- */
         .messages-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+            flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 4px;
         }
 
-        .message-wrapper {
-            display: flex;
-            flex-direction: column;
-            max-width: 85%;
-        }
+        .message-wrapper { display: flex; flex-direction: column; max-width: 85%; }
         .message-wrapper.sent { align-self: flex-end; }
         .message-wrapper.recv { align-self: flex-start; }
 
-        .sender-name {
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 2px;
-            padding-left: 4px;
-        }
-
+        .sender-name { font-size: 12px; font-weight: 600; margin-bottom: 2px; padding-left: 4px; }
         .bubble {
-            padding: 6px 8px 8px 10px;
-            border-radius: 8px;
-            font-size: 15px;
-            position: relative;
-            box-shadow: 0 1px 1px rgba(0,0,0,0.1);
-            line-height: 1.3;
+            padding: 6px 8px 8px 10px; border-radius: 8px; font-size: 15px;
+            position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1); line-height: 1.3;
         }
 
-        .sent .bubble {
-            background-color: var(--wa-bubble-sent);
-            border-top-right-radius: 0;
-        }
-        
-        .recv .bubble {
-            background-color: var(--wa-bubble-recv);
-            border-top-left-radius: 0;
-        }
+        .sent .bubble { background-color: var(--wa-bubble-sent); border-top-right-radius: 0; }
+        .recv .bubble { background-color: var(--wa-bubble-recv); border-top-left-radius: 0; }
 
         .msg-time-ticks {
-            float: right;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            margin-top: 4px;
-            margin-left: 12px;
-            font-size: 11px;
-            color: var(--wa-text-muted);
+            float: right; display: flex; align-items: center; gap: 4px;
+            margin-top: 4px; margin-left: 12px; font-size: 11px; color: var(--wa-text-muted);
         }
 
         /* --- INPUT AREA --- */
         .chat-input-area {
-            display: flex;
-            align-items: flex-end;
-            padding: 8px;
+            display: flex; align-items: flex-end; padding: 8px;
             padding-bottom: calc(env(safe-area-inset-bottom) + 8px);
-            background-color: transparent;
-            gap: 8px;
+            background-color: transparent; gap: 8px;
         }
 
         .input-bar {
-            flex: 1;
-            background-color: var(--wa-light);
-            border-radius: 24px;
-            display: flex;
-            align-items: center;
-            padding: 8px 12px;
-            box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+            flex: 1; background-color: var(--wa-light); border-radius: 24px;
+            display: flex; align-items: center; padding: 8px 12px; box-shadow: 0 1px 1px rgba(0,0,0,0.1);
         }
 
         .input-bar svg { color: var(--wa-text-muted); width: 24px; height: 24px; cursor: pointer; }
-        
         .input-bar input {
-            flex: 1;
-            border: none;
-            outline: none;
-            font-size: 16px;
-            padding: 4px 12px;
-            background: transparent;
-            color: var(--wa-text-main);
+            flex: 1; border: none; outline: none; font-size: 16px; padding: 4px 12px;
+            background: transparent; color: var(--wa-text-main);
         }
 
         .mic-btn {
-            width: 48px;
-            height: 48px;
-            background-color: var(--wa-text-main);
-            color: var(--wa-light);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-            border: none;
-            cursor: pointer;
-            flex-shrink: 0;
+            width: 48px; height: 48px; background-color: var(--wa-text-main); color: var(--wa-light);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2); border: none; cursor: pointer; flex-shrink: 0;
             transition: opacity 0.2s;
         }
         .mic-btn:active { opacity: 0.8; }
 
         /* GB Settings Menu */
         .gb-menu {
-            position: absolute;
-            top: 50px;
-            right: 16px;
-            background: var(--wa-light);
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            display: none;
-            flex-direction: column;
-            z-index: 200;
-            overflow: hidden;
-            width: 200px;
-            color: var(--wa-text-main);
+            position: absolute; top: 50px; right: 16px; background: var(--wa-light); border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: none; flex-direction: column;
+            z-index: 200; overflow: hidden; width: 200px; color: var(--wa-text-main);
         }
         .gb-menu.active { display: flex; }
         .gb-menu-item { padding: 14px 16px; font-size: 15px; cursor: pointer; }
@@ -401,8 +257,7 @@
         .dialog-box {
             background: var(--wa-light); color: var(--wa-text-main);
             width: 85%; max-width: 320px; border-radius: 12px; padding: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            transform: scale(0.9); transition: transform 0.2s;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: scale(0.9); transition: transform 0.2s;
         }
         .dialog-overlay.active .dialog-box { transform: scale(1); }
         .dialog-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
@@ -415,93 +270,139 @@
         }
         .dialog-btn:active { background: var(--wa-bg); }
 
-        /* Hide scrollbars */
         ::-webkit-scrollbar { display: none; }
 
     </style>
 </head>
 <body>
 
-<!-- MAIN HEADER & TABS -->
-<div class="wa-header-container">
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+    <div class="auth-logo"><i data-feather="cpu"></i></div>
+    <div class="auth-title">Vynix GB</div>
+    <div class="auth-sub">Stealth Communication Network</div>
     
-    <!-- Search Overlay -->
-    <div class="search-overlay" id="search-overlay">
-        <i data-feather="arrow-left" onclick="closeSearch()"></i>
-        <div class="search-input-wrapper">
-            <input type="text" id="global-search-input" placeholder="Search..." onkeypress="if(event.key==='Enter'){ handleGlobalSearch(); }">
-        </div>
-    </div>
+    <input type="email" id="auth-email" class="auth-input" placeholder="Email Address">
+    <input type="password" id="auth-password" class="auth-input" placeholder="Password">
+    
+    <button class="auth-btn" onclick="handleLogin()">Login</button>
+    <button class="auth-btn outline" onclick="handleSignUp()">Create Account</button>
+</div>
 
-    <div class="wa-top-bar">
-        <div class="wa-title">Vynix GB</div>
-        <div class="wa-icons">
-            <i data-feather="wifi" class="gb-wifi" onclick="showCustomDialog('Ghost Mode', 'Airplane / Ghost Mode Activated. Your status is now hidden.')"></i>
-            <i data-feather="moon" onclick="toggleTheme()"></i>
-            <i data-feather="search" id="search-trigger" onclick="openSearch()"></i>
-            <i data-feather="more-vertical" onclick="document.getElementById('gb-menu').classList.toggle('active')"></i>
+<!-- MAIN APP -->
+<div id="main-app">
+    <!-- MAIN HEADER & TABS -->
+    <div class="wa-header-container">
+        
+        <!-- Search Overlay -->
+        <div class="search-overlay" id="search-overlay">
+            <i data-feather="arrow-left" onclick="closeSearch()"></i>
+            <div class="search-input-wrapper">
+                <input type="text" id="global-search-input" placeholder="Search Vynix Network..." onkeypress="if(event.key==='Enter'){ handleGlobalSearch(); }">
+            </div>
+        </div>
+
+        <div class="wa-top-bar">
+            <div class="wa-title">Vynix GB</div>
+            <div class="wa-icons">
+                <i data-feather="wifi" class="gb-wifi" onclick="showCustomDialog('Ghost Mode', 'Airplane / Ghost Mode Activated. Your status is now hidden.')"></i>
+                <i data-feather="moon" onclick="toggleTheme()"></i>
+                <i data-feather="search" id="search-trigger" onclick="openSearch()"></i>
+                <i data-feather="more-vertical" onclick="document.getElementById('gb-menu').classList.toggle('active')"></i>
+            </div>
+            
+            <div class="gb-menu" id="gb-menu">
+                <div class="gb-menu-item" style="font-weight: bold;">GB Settings</div>
+                <div class="gb-menu-item">Message Scheduler</div>
+                <div class="gb-menu-item">Auto Reply</div>
+                <div class="gb-menu-item" onclick="handleLogout()">Log Out</div>
+            </div>
         </div>
         
-        <!-- GB Settings Dropdown -->
-        <div class="gb-menu" id="gb-menu">
-            <div class="gb-menu-item" style="font-weight: bold;">GB Settings</div>
-            <div class="gb-menu-item">Restart Vynix</div>
-            <div class="gb-menu-item">Message Scheduler</div>
-            <div class="gb-menu-item">Auto Reply</div>
-            <div class="gb-menu-item">Settings</div>
+        <div class="wa-tabs">
+            <div class="wa-tab active" onclick="switchTab('chats')">CHATS</div>
+            <div class="wa-tab" onclick="switchTab('status')">STATUS</div>
+            <div class="wa-tab" onclick="switchTab('calls')">CALLS</div>
+            <div class="wa-tab" onclick="switchTab('profile')">PROFILE</div>
         </div>
     </div>
-    
-    <div class="wa-tabs">
-        <div class="wa-tab camera-tab"><i data-feather="camera" style="width: 20px; height: 20px;"></i></div>
-        <div class="wa-tab active" onclick="switchTab('chats')">CHATS</div>
-        <div class="wa-tab" onclick="switchTab('status')">STATUS</div>
-        <div class="wa-tab" onclick="switchTab('calls')">CALLS</div>
-    </div>
-</div>
 
-<!-- CHATS TAB -->
-<div id="tab-chats" class="view-container active">
-    <!-- Pinned Global Chat -->
-    <div class="chat-list-item" onclick="openChatRoom()">
-        <img class="avatar" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png" style="background: var(--wa-text-main);">
-        <div class="chat-info" style="border-bottom: none;">
-            <div class="chat-name-row">
-                <span class="chat-name">Vynix Mainnet (Global)</span>
-                <span class="chat-time" id="last-msg-time">Just now</span>
-            </div>
-            <div class="chat-msg-row">
-                <i data-feather="check-all" class="tick-icon"></i>
-                <span id="last-msg-text">Tap to enter global chat...</span>
+    <!-- CHATS TAB -->
+    <div id="tab-chats" class="view-container active">
+        <!-- Pinned Global Chat -->
+        <div class="chat-list-item" onclick="openChatRoom()">
+            <img class="avatar" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png" style="background: var(--wa-text-main);">
+            <div class="chat-info" style="border-bottom: none;">
+                <div class="chat-name-row">
+                    <span class="chat-name">Vynix Mainnet (Global)</span>
+                    <span class="chat-time" id="last-msg-time">Just now</span>
+                </div>
+                <div class="chat-msg-row">
+                    <i data-feather="check-all" class="tick-icon"></i>
+                    <span id="last-msg-text">Tap to enter global chat...</span>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- STATUS TAB -->
-<div id="tab-status" class="view-container">
-    <div class="chat-list-item" onclick="showCustomDialog('Status', 'Adding statuses will be available soon.')">
-        <img class="avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A8A8A8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='background-color:%23EFEFEF'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E">
-        <div class="chat-info" style="border-bottom: none;">
-            <div class="chat-name-row"><span class="chat-name">My status</span></div>
-            <div class="chat-msg-row"><span>Tap to add status update</span></div>
+    <!-- STATUS TAB -->
+    <div id="tab-status" class="view-container">
+        <div class="chat-list-item" onclick="showCustomDialog('Status', 'Adding statuses will be available soon.')">
+            <img class="avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A8A8A8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='background-color:%23EFEFEF'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E">
+            <div class="chat-info" style="border-bottom: none;">
+                <div class="chat-name-row"><span class="chat-name">My status</span></div>
+                <div class="chat-msg-row"><span>Tap to add status update</span></div>
+            </div>
+        </div>
+        <div class="status-section-title">Recent updates</div>
+        <div id="status-list"></div>
+    </div>
+
+    <!-- CALLS TAB -->
+    <div id="tab-calls" class="view-container">
+        <div style="padding: 40px; text-align: center; color: var(--wa-text-muted);">
+            To call contacts on Vynix, open a chat and tap the phone icon.
         </div>
     </div>
-    <div class="status-section-title">Recent updates</div>
-    <!-- Dynamically loaded statuses go here -->
-    <div id="status-list"></div>
-</div>
 
-<!-- CALLS TAB -->
-<div id="tab-calls" class="view-container">
-    <div style="padding: 40px; text-align: center; color: var(--wa-text-muted);">
-        To call contacts on Vynix, open a chat and tap the call icon.
+    <!-- PROFILE TAB -->
+    <div id="tab-profile" class="view-container">
+        <div class="profile-header">
+            <div class="profile-avatar" id="profile-letter">V</div>
+            <div>
+                <div class="profile-id" id="display-vynix-id">Loading...</div>
+                <div class="profile-email" id="display-email">loading@email.com</div>
+            </div>
+        </div>
+        
+        <div class="status-section-title">Account Actions</div>
+        
+        <div class="chat-list-item" onclick="copyVynixID()">
+            <i data-feather="copy" style="color: var(--wa-text-main);"></i>
+            <div class="chat-info" style="border-bottom: none; margin-left: 16px; padding-bottom: 0;">
+                <div class="chat-name" style="font-weight: 400;">Copy Vynix ID to Invite Friends</div>
+            </div>
+        </div>
+        
+        <div class="chat-list-item" onclick="showCustomDialog('Privacy', 'Your Vynix ID keeps your real phone number hidden from other users.')">
+            <i data-feather="shield" style="color: var(--wa-text-main);"></i>
+            <div class="chat-info" style="border-bottom: none; margin-left: 16px; padding-bottom: 0;">
+                <div class="chat-name" style="font-weight: 400;">Privacy & Security</div>
+            </div>
+        </div>
+        
+        <div class="chat-list-item" onclick="handleLogout()">
+            <i data-feather="log-out" style="color: #ef4444;"></i>
+            <div class="chat-info" style="border-bottom: none; margin-left: 16px; padding-bottom: 0;">
+                <div class="chat-name" style="font-weight: 400; color: #ef4444;">Log Out</div>
+            </div>
+        </div>
     </div>
-</div>
 
-<!-- FLOATING ACTION BUTTON -->
-<div class="fab" id="main-fab" onclick="openChatRoom()">
-    <i data-feather="message-square"></i>
+    <!-- FLOATING ACTION BUTTON -->
+    <div class="fab" id="main-fab" onclick="openChatRoom()">
+        <i data-feather="message-square"></i>
+    </div>
 </div>
 
 <!-- CHAT ROOM (Slides in) -->
@@ -513,7 +414,7 @@
         <img class="chat-room-avatar" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png" style="background: white;">
         <div class="chat-room-title">
             <h3>Vynix Mainnet</h3>
-            <p>tap here for group info</p>
+            <p>Global encrypted channel</p>
         </div>
         <i data-feather="video"></i>
         <i data-feather="phone"></i>
@@ -550,13 +451,14 @@
     </div>
 </div>
 
-
 <script type="module">
 import {
-    getDatabase, ref, onChildAdded, push, serverTimestamp, query, limitToLast
+    getDatabase, ref, onChildAdded, push, set, get, serverTimestamp, query, limitToLast
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { 
+    getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // Firebase Config
 const firebaseConfig = {
@@ -574,7 +476,93 @@ const auth = getAuth(app);
 const db   = getDatabase(app);
 
 window.currentUser = null;
+window.currentVynixId = null;
 let chatLoaded = false;
+
+// --- VYNIX ID GENERATOR ---
+function generateMemorableID() {
+    const adjectives = ['Neon', 'Stealth', 'Cyber', 'Dark', 'Ghost', 'Nova', 'Phantom', 'Volt', 'Rogue', 'Apex'];
+    const nouns = ['Wolf', 'Hawk', 'Viper', 'Raven', 'Fox', 'Dragon', 'Tiger', 'Lynx', 'Bear', 'Titan'];
+    const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+    const noun = nouns[Math.floor(Math.random() * nouns.length)];
+    const num = Math.floor(Math.random() * 90) + 10; // Two digit number
+    return `${adj}${noun}${num}`;
+}
+
+// --- AUTHENTICATION LOGIC ---
+window.handleSignUp = async () => {
+    const email = document.getElementById('auth-email').value.trim();
+    const pass = document.getElementById('auth-password').value.trim();
+    if(!email || !pass) return showCustomDialog('Error', 'Please enter an email and password.');
+    
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+        const user = userCredential.user;
+        const newVynixID = generateMemorableID();
+        
+        // Save to Database
+        await set(ref(db, `users/${user.uid}`), {
+            email: email,
+            vynixId: newVynixID,
+            username: newVynixID,
+            createdAt: serverTimestamp()
+        });
+        
+        showCustomDialog('Welcome!', `Account created successfully! Your unique Vynix ID is ${newVynixID}.`);
+    } catch (e) {
+        showCustomDialog('Sign Up Failed', e.message);
+    }
+};
+
+window.handleLogin = async () => {
+    const email = document.getElementById('auth-email').value.trim();
+    const pass = document.getElementById('auth-password').value.trim();
+    if(!email || !pass) return showCustomDialog('Error', 'Please enter your email and password.');
+    
+    try {
+        await signInWithEmailAndPassword(auth, email, pass);
+    } catch (e) {
+        showCustomDialog('Login Failed', 'Invalid email or password.');
+    }
+};
+
+window.handleLogout = async () => {
+    try {
+        await signOut(auth);
+        document.getElementById('main-app').style.display = 'none';
+        document.getElementById('auth-screen').style.display = 'flex';
+        document.getElementById('gb-menu').classList.remove('active');
+    } catch(e) {
+        showCustomDialog('Error', 'Could not log out.');
+    }
+};
+
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        window.currentUser = user;
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'flex';
+        
+        // Load User Profile Data
+        const snapshot = await get(ref(db, `users/${user.uid}`));
+        if(snapshot.exists()) {
+            window.currentVynixId = snapshot.val().vynixId || snapshot.val().username;
+            document.getElementById('display-vynix-id').textContent = window.currentVynixId;
+            document.getElementById('profile-letter').textContent = window.currentVynixId.charAt(0).toUpperCase();
+        } else {
+            window.currentVynixId = "User_" + user.uid.substring(0,4);
+            document.getElementById('display-vynix-id').textContent = window.currentVynixId;
+        }
+        
+        document.getElementById('display-email').textContent = user.email;
+        loadStatus();
+    } else {
+        window.currentUser = null;
+        document.getElementById('main-app').style.display = 'none';
+        document.getElementById('auth-screen').style.display = 'flex';
+    }
+});
+
 
 // --- CUSTOM DIALOG LOGIC ---
 window.showCustomDialog = (title, message) => {
@@ -616,29 +604,33 @@ window.closeSearch = () => {
 window.handleGlobalSearch = () => {
     const query = document.getElementById('global-search-input').value.trim();
     if (query) {
-        showCustomDialog('Global Search', 'Searching for: ' + query);
+        showCustomDialog('Global Search', 'Searching network for: ' + query);
         closeSearch();
     }
 };
 
-// --- GLOBAL CLICK LISTENER (Menus & Search Closure) ---
+// --- GLOBAL CLICK LISTENER ---
 document.addEventListener('click', (e) => {
-    // GB Menu logic
     const menu = document.getElementById('gb-menu');
     if(!e.target.closest('.wa-icons') && !e.target.closest('.gb-menu')) {
         menu.classList.remove('active');
     }
-    
-    // Search Overlay logic: Close if clicked outside
     const searchOverlay = document.getElementById('search-overlay');
     if (searchOverlay.classList.contains('active')) {
-        // Only close if we click completely outside the overlay AND not on the trigger icon
         if (!e.target.closest('#search-overlay') && !e.target.closest('#search-trigger')) {
             closeSearch();
         }
     }
 });
 
+// --- PROFILE ACTIONS ---
+window.copyVynixID = () => {
+    if(window.currentVynixId) {
+        navigator.clipboard.writeText(window.currentVynixId).then(() => {
+            showCustomDialog('Copied', `Your Vynix ID (${window.currentVynixId}) was copied to your clipboard.`);
+        });
+    }
+};
 
 // --- UTILS ---
 function formatTime(timestamp) {
@@ -668,9 +660,11 @@ window.switchTab = (tabId) => {
     document.getElementById('tab-' + tabId).classList.add('active');
 
     const fab = document.getElementById('main-fab');
-    if(tabId === 'chats') fab.innerHTML = '<i data-feather="message-square"></i>';
-    if(tabId === 'status') fab.innerHTML = '<i data-feather="camera"></i>';
-    if(tabId === 'calls') fab.innerHTML = '<i data-feather="phone-call"></i>';
+    if(tabId === 'chats') { fab.style.display = 'flex'; fab.innerHTML = '<i data-feather="message-square"></i>'; }
+    else if(tabId === 'status') { fab.style.display = 'flex'; fab.innerHTML = '<i data-feather="camera"></i>'; }
+    else if(tabId === 'calls') { fab.style.display = 'flex'; fab.innerHTML = '<i data-feather="phone-call"></i>'; }
+    else if(tabId === 'profile') { fab.style.display = 'none'; } // Hide FAB on profile
+    
     feather.replace();
 }
 
@@ -694,18 +688,11 @@ window.toggleMicSendIcon = () => {
     feather.replace();
 }
 
-// --- AUTHENTICATION ---
-onAuthStateChanged(auth, (user) => {
-    if (!user) { window.location.href = 'signup.html'; return; }
-    window.currentUser = user;
-    loadStatus();
-});
 
 // --- LOAD CHAT ---
 function loadChat() {
     chatLoaded = true;
     const container = document.getElementById('messages-container');
-    
     const chatQuery = query(ref(db, 'posts'), limitToLast(50));
     
     onChildAdded(chatQuery, (snapshot) => {
@@ -782,7 +769,6 @@ window.sendMessage = async () => {
         showCustomDialog('Action Blocked', 'Voice messages are disabled in GB Ghost Mode.');
         return;
     }
-    
     if (!window.currentUser) return;
     
     input.value = '';
@@ -794,9 +780,8 @@ window.sendMessage = async () => {
             uid: window.currentUser.uid,
             text: text,
             timestamp: serverTimestamp(),
-            user: { username: window.currentUser.email.split('@')[0] } 
+            user: { username: window.currentVynixId || 'User' } 
         });
-        
         if(navigator.vibrate) navigator.vibrate(20);
     } catch (e) {
         showCustomDialog('Error', 'Send failed. Please check your connection.');
