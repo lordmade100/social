@@ -3,20 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mxit 2026 // Vynix Node</title>
+    <title>Vynix GB</title>
+    <script src="https://unpkg.com/feather-icons"></script>
     <style>
-        /* Modern Terminal / Neobrutalist Mxit Theme */
         :root {
-            --bg-color: #050505; /* OLED Black */
-            --surface-color: #111111;
-            --mxit-blue: #2563eb;
-            --mxit-cyan: #22d3ee;
-            --mxit-red: #ef4444;
-            --mxit-green: #4ade80;
-            --text-main: #f8fafc;
-            --text-dim: #64748b;
-            --border-color: #334155;
-            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+            /* WhatsApp GB Classic Theme Variables */
+            --wa-primary: #008069;
+            --wa-primary-dark: #005c4b;
+            --wa-light: #ffffff;
+            --wa-bg: #ece5dd;
+            --wa-chat-bg: #efeae2;
+            --wa-text-main: #111b21;
+            --wa-text-muted: #667781;
+            --wa-border: #e9edef;
+            --wa-bubble-sent: #d9fdd3;
+            --wa-bubble-recv: #ffffff;
+            --wa-blue-tick: #53bdeb;
+            --wa-status-ring: #25d366;
         }
 
         * {
@@ -27,276 +30,437 @@
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: var(--font-mono);
-            /* 100dvh handles modern mobile browser address bars perfectly */
-            height: 100dvh; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--wa-light);
+            color: var(--wa-text-main);
+            height: 100dvh;
             width: 100vw;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            text-rendering: optimizeLegibility;
-            -webkit-font-smoothing: antialiased;
         }
 
-        /* Views System */
-        .view {
-            display: none;
-            flex: 1;
-            flex-direction: column;
-            height: 100%;
-            width: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            background-color: var(--bg-color);
-        }
-        .view.active {
+        /* --- HEADER & TABS --- */
+        .wa-header-container {
+            background-color: var(--wa-primary);
+            color: var(--wa-light);
             display: flex;
-            animation: fadeIn 0.2s ease-out;
+            flex-direction: column;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 100;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Status Bar (Top) */
-        .status-bar {
-            padding: calc(env(safe-area-inset-top) + 8px) 16px 8px;
-            background-color: var(--mxit-blue);
-            color: #fff;
+        .wa-top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 13px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 2px solid var(--mxit-cyan);
-            box-shadow: 0 0 10px rgba(34, 211, 238, 0.2);
-            z-index: 10;
+            padding: calc(env(safe-area-inset-top) + 12px) 16px 12px;
         }
 
-        .status-left { display: flex; align-items: center; gap: 8px; }
-        .ping-dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--mxit-green);
+        .wa-title {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .wa-icons {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .wa-icons svg { width: 22px; height: 22px; cursor: pointer; }
+
+        /* GB Feature: Airplane Mode */
+        .gb-wifi { transform: rotate(45deg); }
+
+        .wa-tabs {
+            display: flex;
+            align-items: center;
+        }
+
+        .wa-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            text-transform: uppercase;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .wa-tab.camera-tab { flex: 0.3; }
+        .wa-tab.active {
+            color: var(--wa-light);
+            border-bottom: 3px solid var(--wa-light);
+        }
+
+        /* --- MAIN VIEWS --- */
+        .view-container {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            background-color: var(--wa-light);
+        }
+        .view-container.active { display: block; animation: fadeIn 0.2s; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- CHATS LIST --- */
+        .chat-list-item {
+            display: flex;
+            padding: 12px 16px;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .chat-list-item:active { background-color: var(--wa-bg); }
+        
+        .avatar {
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
-            box-shadow: 0 0 8px var(--mxit-green);
-            animation: pulse 2s infinite;
+            object-fit: cover;
+            margin-right: 14px;
         }
 
-        @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.8); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-
-        /* Splash Screen */
-        .splash-container {
+        .chat-info {
             flex: 1;
+            border-bottom: 1px solid var(--wa-border);
+            padding-bottom: 12px;
+        }
+
+        .chat-name-row {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .chat-name { font-size: 16px; font-weight: 600; }
+        .chat-time { font-size: 12px; color: var(--wa-text-muted); }
+
+        .chat-msg-row {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: var(--wa-text-muted);
+            gap: 4px;
+        }
+
+        .tick-icon { width: 16px; height: 16px; color: var(--wa-blue-tick); }
+
+        /* --- STATUS LIST --- */
+        .status-section-title {
+            padding: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--wa-text-muted);
+            background: var(--wa-bg);
+        }
+        .status-ring {
+            padding: 2px;
+            border: 2px solid var(--wa-status-ring);
+            border-radius: 50%;
+        }
+        .status-ring.viewed { border-color: var(--wa-text-muted); }
+
+        /* --- FLOATING ACTION BUTTON --- */
+        .fab {
+            position: fixed;
+            bottom: calc(env(safe-area-inset-bottom) + 20px);
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background-color: var(--wa-primary);
+            color: var(--wa-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
             justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle at center, #1e3a8a 0%, var(--bg-color) 70%);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 90;
+            transition: transform 0.1s;
         }
-        .splash-title {
-            font-size: 48px;
-            font-weight: 900;
-            letter-spacing: 4px;
-            color: var(--text-main);
-            text-shadow: 2px 2px 0px var(--mxit-blue), -2px -2px 0px var(--mxit-cyan);
-            margin-bottom: 16px;
-        }
-        .splash-subtitle {
-            font-size: 12px;
-            color: var(--mxit-cyan);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
+        .fab:active { transform: scale(0.95); }
 
-        /* Main Menu */
-        .menu-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-            list-style: none;
+        /* --- CHAT ROOM (SLIDE OVER) --- */
+        .chat-room {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--wa-chat-bg);
+            background-image: url('https://i.postimg.cc/QMcqkx9S/wa-bg.png'); /* WA Doodle BG */
+            background-size: cover;
+            background-blend-mode: multiply;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
-        .menu-item {
-            padding: 16px;
-            margin-bottom: 12px;
-            background-color: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            color: var(--text-main);
+        .chat-room.open { transform: translateX(0); }
+
+        .chat-room-header {
+            background-color: var(--wa-primary);
+            color: var(--wa-light);
             display: flex;
             align-items: center;
+            padding: calc(env(safe-area-inset-top) + 8px) 16px 8px;
             gap: 12px;
-            cursor: pointer;
-            transition: all 0.1s;
-        }
-        .menu-item:active {
-            background-color: var(--mxit-blue);
-            border-color: var(--mxit-cyan);
-            transform: scale(0.98);
-        }
-        .menu-num {
-            color: var(--mxit-cyan);
-            background: rgba(34, 211, 238, 0.1);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        /* Chat Interface */
-        .chat-scroll-area {
+        .back-btn { display: flex; align-items: center; cursor: pointer; margin-left: -8px; }
+        .back-btn svg { width: 24px; height: 24px; }
+        
+        .chat-room-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+        .chat-room-title { flex: 1; }
+        .chat-room-title h3 { font-size: 16px; font-weight: 600; line-height: 1.2; }
+        .chat-room-title p { font-size: 12px; color: rgba(255,255,255,0.8); }
+
+        /* --- MESSAGES --- */
+        .messages-container {
             flex: 1;
             overflow-y: auto;
             padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-        }
-        
-        .chat-message {
-            font-size: 14px;
-            line-height: 1.5;
-            word-wrap: break-word;
-            padding: 4px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .msg-meta {
-            font-size: 12px;
-            color: var(--text-dim);
-            margin-right: 6px;
-        }
-        .msg-user {
-            color: var(--mxit-cyan);
-            font-weight: bold;
-            margin-right: 4px;
-            cursor: pointer;
-        }
-        .msg-user.self { color: var(--mxit-green); }
-        .msg-text { color: var(--text-main); }
-        .msg-media-tag {
-            color: var(--mxit-blue);
-            font-size: 12px;
-            border: 1px solid var(--mxit-blue);
-            padding: 2px 6px;
-            border-radius: 4px;
-            display: inline-block;
-            margin-top: 4px;
+            gap: 4px;
         }
 
-        /* Input Area */
-        .chat-input-container {
+        .message-wrapper {
             display: flex;
-            padding: 12px 16px calc(env(safe-area-inset-bottom) + 12px);
-            background-color: var(--surface-color);
-            border-top: 1px solid var(--border-color);
+            flex-direction: column;
+            max-width: 85%;
+        }
+        .message-wrapper.sent { align-self: flex-end; }
+        .message-wrapper.recv { align-self: flex-start; }
+
+        .sender-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #d32f2f; /* Randomize colors based on user later */
+            margin-bottom: 2px;
+            padding-left: 4px;
+        }
+
+        .bubble {
+            padding: 6px 8px 8px 10px;
+            border-radius: 8px;
+            font-size: 15px;
+            position: relative;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+            line-height: 1.3;
+        }
+
+        .sent .bubble {
+            background-color: var(--wa-bubble-sent);
+            border-top-right-radius: 0;
+        }
+        
+        .recv .bubble {
+            background-color: var(--wa-bubble-recv);
+            border-top-left-radius: 0;
+        }
+
+        .msg-time-ticks {
+            float: right;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 4px;
+            margin-left: 12px;
+            font-size: 11px;
+            color: var(--wa-text-muted);
+        }
+
+        /* --- INPUT AREA --- */
+        .chat-input-area {
+            display: flex;
+            align-items: flex-end;
+            padding: 8px;
+            padding-bottom: calc(env(safe-area-inset-bottom) + 8px);
+            background-color: transparent;
             gap: 8px;
         }
-        .chat-input {
+
+        .input-bar {
             flex: 1;
-            background-color: var(--bg-color);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            font-family: var(--font-mono);
-            font-size: 16px; /* Prevents iOS auto-zoom */
-            padding: 12px;
-            border-radius: 8px;
-            outline: none;
+            background-color: var(--wa-light);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.1);
         }
-        .chat-input:focus { border-color: var(--mxit-cyan); }
+
+        .input-bar svg { color: var(--wa-text-muted); width: 24px; height: 24px; cursor: pointer; }
         
-        .chat-send-btn {
-            background-color: var(--mxit-blue);
-            color: white;
+        .input-bar input {
+            flex: 1;
             border: none;
-            padding: 0 20px;
-            font-family: var(--font-mono);
-            font-weight: bold;
-            font-size: 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            text-transform: uppercase;
+            outline: none;
+            font-size: 16px;
+            padding: 4px 12px;
+            background: transparent;
         }
-        .chat-send-btn:active { background-color: var(--mxit-cyan); color: #000; }
 
-        /* Scrollbar hides for cleanliness on desktop testing */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: var(--bg-color); }
-        ::-webkit-scrollbar-thumb { background: var(--border-color); }
+        .mic-btn {
+            width: 48px;
+            height: 48px;
+            background-color: var(--wa-primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            border: none;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+        .mic-btn:active { background-color: var(--wa-primary-dark); }
 
-        .sys-msg { color: var(--mxit-blue); font-style: italic; font-size: 13px; text-align: center; padding: 10px; }
+        /* GB Settings Menu */
+        .gb-menu {
+            position: absolute;
+            top: 50px;
+            right: 16px;
+            background: var(--wa-light);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            z-index: 200;
+            overflow: hidden;
+            width: 200px;
+            color: var(--wa-text-main);
+        }
+        .gb-menu.active { display: flex; }
+        .gb-menu-item { padding: 14px 16px; font-size: 15px; cursor: pointer; }
+        .gb-menu-item:hover { background: var(--wa-bg); }
+
+        /* Hide scrollbars */
+        ::-webkit-scrollbar { display: none; }
+
     </style>
 </head>
 <body>
 
-<!-- SPLASH SCREEN -->
-<div id="view-splash" class="view active">
-    <div class="splash-container">
-        <div class="splash-title">MXIT</div>
-        <div class="splash-subtitle">2026 // Vynix Node</div>
-        <div class="sys-msg" style="margin-top: 40px; color: var(--mxit-cyan);" id="splash-status">Establishing connection...</div>
-    </div>
-</div>
-
-<!-- MAIN MENU -->
-<div id="view-menu" class="view">
-    <div class="status-bar">
-        <div class="status-left">
-            <div class="ping-dot"></div>
-            <span>VYNIX_MAINNET</span>
+<!-- MAIN HEADER & TABS -->
+<div class="wa-header-container">
+    <div class="wa-top-bar">
+        <div class="wa-title">Vynix GB</div>
+        <div class="wa-icons">
+            <i data-feather="wifi" class="gb-wifi" onclick="alert('Ghost Mode / Airplane Mode Activated')"></i>
+            <i data-feather="moon" onclick="alert('Dark Theme Engine loading...')"></i>
+            <i data-feather="search"></i>
+            <i data-feather="more-vertical" onclick="document.getElementById('gb-menu').classList.toggle('active')"></i>
         </div>
-        <span id="clock-menu">00:00</span>
+        
+        <!-- GB Settings Dropdown -->
+        <div class="gb-menu" id="gb-menu">
+            <div class="gb-menu-item" style="font-weight: bold; color: var(--wa-primary);">GB Settings</div>
+            <div class="gb-menu-item">Restart Vynix</div>
+            <div class="gb-menu-item">Message Scheduler</div>
+            <div class="gb-menu-item">Auto Reply</div>
+            <div class="gb-menu-item">Settings</div>
+        </div>
     </div>
     
-    <ul class="menu-list">
-        <li class="menu-item" onclick="openView('view-chat')">
-            <span class="menu-num">1</span>
-            <span>MultiX Global</span>
-        </li>
-        <li class="menu-item" onclick="alert('Feature locked in current build.')">
-            <span class="menu-num">2</span>
-            <span>JoeBugg Games</span>
-        </li>
-        <li class="menu-item" onclick="alert('Feature locked in current build.')">
-            <span class="menu-num">3</span>
-            <span>Tradepost</span>
-        </li>
-        <li class="menu-item" onclick="alert('User ID: ' + (window.currentUser ? window.currentUser.uid : 'Guest'))">
-            <span class="menu-num">4</span>
-            <span>My Profile</span>
-        </li>
-    </ul>
+    <div class="wa-tabs">
+        <div class="wa-tab camera-tab"><i data-feather="camera" style="width: 20px; height: 20px;"></i></div>
+        <div class="wa-tab active" onclick="switchTab('chats')">CHATS</div>
+        <div class="wa-tab" onclick="switchTab('status')">STATUS</div>
+        <div class="wa-tab" onclick="switchTab('calls')">CALLS</div>
+    </div>
 </div>
 
-<!-- CHAT ROOM -->
-<div id="view-chat" class="view">
-    <div class="status-bar">
-        <div class="status-left" onclick="openView('view-menu')" style="cursor:pointer; color: var(--mxit-cyan);">
-            <span>&lt; BACK</span>
+<!-- CHATS TAB -->
+<div id="tab-chats" class="view-container active">
+    <!-- Pinned Global Chat -->
+    <div class="chat-list-item" onclick="openChatRoom()">
+        <img class="avatar" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png" style="background: var(--wa-primary);">
+        <div class="chat-info" style="border-bottom: none;">
+            <div class="chat-name-row">
+                <span class="chat-name">Vynix Mainnet (Global)</span>
+                <span class="chat-time" id="last-msg-time">Just now</span>
+            </div>
+            <div class="chat-msg-row">
+                <i data-feather="check-all" class="tick-icon"></i>
+                <span id="last-msg-text">Tap to enter global chat...</span>
+            </div>
         </div>
-        <span>MULTIX</span>
-        <span id="clock-chat">00:00</span>
-    </div>
-
-    <div class="chat-scroll-area" id="chat-box">
-        <div class="sys-msg" id="chat-loader">Decrypting message history...</div>
-    </div>
-
-    <div class="chat-input-container">
-        <input type="text" id="msg-input" class="chat-input" placeholder="> type here..." autocomplete="off" onkeypress="if(event.key==='Enter')sendMessage()">
-        <button class="chat-send-btn" onclick="sendMessage()">TX</button>
     </div>
 </div>
+
+<!-- STATUS TAB -->
+<div id="tab-status" class="view-container">
+    <div class="chat-list-item">
+        <img class="avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A8A8A8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='background-color:%23EFEFEF'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E">
+        <div class="chat-info" style="border-bottom: none;">
+            <div class="chat-name-row"><span class="chat-name">My status</span></div>
+            <div class="chat-msg-row"><span>Tap to add status update</span></div>
+        </div>
+    </div>
+    <div class="status-section-title">Recent updates</div>
+    <!-- Dynamically loaded statuses go here -->
+    <div id="status-list"></div>
+</div>
+
+<!-- CALLS TAB -->
+<div id="tab-calls" class="view-container">
+    <div style="padding: 40px; text-align: center; color: var(--wa-text-muted);">
+        To call contacts on Vynix, open a chat and tap the call icon.
+    </div>
+</div>
+
+<!-- FLOATING ACTION BUTTON -->
+<div class="fab" id="main-fab" onclick="openChatRoom()">
+    <i data-feather="message-square"></i>
+</div>
+
+<!-- CHAT ROOM (Slides in) -->
+<div class="chat-room" id="chat-room">
+    <div class="chat-room-header">
+        <div class="back-btn" onclick="closeChatRoom()">
+            <i data-feather="arrow-left"></i>
+        </div>
+        <img class="chat-room-avatar" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png" style="background: white;">
+        <div class="chat-room-title">
+            <h3>Vynix Mainnet</h3>
+            <p>tap here for group info</p>
+        </div>
+        <i data-feather="video"></i>
+        <i data-feather="phone"></i>
+        <i data-feather="more-vertical"></i>
+    </div>
+
+    <div class="messages-container" id="messages-container">
+        <!-- Messages loaded from Firebase -->
+        <div style="text-align:center; padding: 20px; font-size: 12px; color: var(--wa-text-muted); background: rgba(255,255,255,0.8); border-radius: 8px; margin: 10px auto; width: 80%;">
+            <i data-feather="lock" style="width:10px;height:10px;"></i> Messages are end-to-end encrypted. No one outside of this chat, not even WhatsApp, can read or listen to them. Tap to learn more.
+        </div>
+    </div>
+
+    <div class="chat-input-area">
+        <div class="input-bar">
+            <i data-feather="smile"></i>
+            <input type="text" id="msg-input" placeholder="Message" autocomplete="off" oninput="toggleMicSendIcon()" onkeypress="if(event.key==='Enter')sendMessage()">
+            <i data-feather="paperclip" style="margin-left: 12px;"></i>
+            <i data-feather="camera" style="margin-left: 16px;"></i>
+        </div>
+        <button class="mic-btn" id="send-btn" onclick="sendMessage()">
+            <i data-feather="mic" id="action-icon"></i>
+        </button>
+    </div>
+</div>
+
 
 <script type="module">
 import {
@@ -305,7 +469,7 @@ import {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// Database Configuration
+// Firebase Config
 const firebaseConfig = {
     apiKey: "AIzaSyBOyZ3As4GTuNvjemvPF_SpsC6m6vqtNhc",
     authDomain: "fire-b-a8878.firebaseapp.com",
@@ -321,137 +485,188 @@ const auth = getAuth(app);
 const db   = getDatabase(app);
 
 window.currentUser = null;
-let chatInitialized = false;
+let chatLoaded = false;
 
-// --- UTILS ---
-function updateClock() {
-    const d = new Date();
-    const time = d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
-    document.getElementById('clock-menu').textContent = time;
-    document.getElementById('clock-chat').textContent = time;
-}
-setInterval(updateClock, 1000);
-updateClock();
-
-function escapeHtml(unsafe) {
-    return (unsafe || '').toString()
-         .replace(/&/g, "&amp;")
-         .replace(/</g, "&lt;")
-         .replace(/>/g, "&gt;")
-         .replace(/"/g, "&quot;")
-         .replace(/'/g, "&#039;");
+// Format Time (HH:MM AM/PM)
+function formatTime(timestamp) {
+    const d = timestamp ? new Date(timestamp) : new Date();
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-// --- VIEW ROUTING ---
-window.openView = (viewId) => {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById(viewId).classList.add('active');
-    
-    if (viewId === 'view-chat') {
-        initChat();
-        setTimeout(() => document.getElementById('msg-input').focus(), 100);
-    }
-};
+// Generate random colors for usernames in groups
+function stringToColor(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
+    return '#' + "00000".substring(0, 6 - c.length) + c;
+}
 
-// --- AUTHENTICATION ---
-onAuthStateChanged(auth, (user) => {
-    const status = document.getElementById('splash-status');
+// Escaping
+function escapeHtml(text) {
+    return (text || '').toString().replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+    })[m]);
+}
+
+// UI Toggles
+window.switchTab = (tabId) => {
+    document.querySelectorAll('.wa-tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
     
-    if (!user) {
-        status.textContent = "Auth required. Redirecting...";
-        status.style.color = "var(--mxit-red)";
-        setTimeout(() => { window.location.href = 'signup.html'; }, 1000);
-        return;
+    document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+    document.getElementById('tab-' + tabId).classList.add('active');
+
+    const fab = document.getElementById('main-fab');
+    if(tabId === 'chats') fab.innerHTML = '<i data-feather="message-square"></i>';
+    if(tabId === 'status') fab.innerHTML = '<i data-feather="camera"></i>';
+    if(tabId === 'calls') fab.innerHTML = '<i data-feather="phone-call"></i>';
+    feather.replace();
+}
+
+window.openChatRoom = () => {
+    document.getElementById('chat-room').classList.add('open');
+    if (!chatLoaded) loadChat();
+}
+
+window.closeChatRoom = () => {
+    document.getElementById('chat-room').classList.remove('open');
+}
+
+window.toggleMicSendIcon = () => {
+    const input = document.getElementById('msg-input').value.trim();
+    const icon = document.getElementById('action-icon');
+    if(input.length > 0) {
+        icon.setAttribute('data-feather', 'send');
+    } else {
+        icon.setAttribute('data-feather', 'mic');
     }
-    
-    window.currentUser = user;
-    status.textContent = "Authentication success.";
-    status.style.color = "var(--mxit-green)";
-    
-    setTimeout(() => { openView('view-menu'); }, 800);
+    feather.replace();
+}
+
+// Outside click to close GB Menu
+document.addEventListener('click', (e) => {
+    const menu = document.getElementById('gb-menu');
+    if(!e.target.closest('.wa-icons') && !e.target.closest('.gb-menu')) {
+        menu.classList.remove('active');
+    }
 });
 
-// --- CHAT LOGIC (Using Vynix 'posts' node) ---
-function initChat() {
-    if (chatInitialized) return;
-    chatInitialized = true;
+// Authentication
+onAuthStateChanged(auth, (user) => {
+    if (!user) { window.location.href = 'signup.html'; return; }
+    window.currentUser = user;
+    loadStatus(); // Load status tab info immediately
+});
+
+// Load Chat
+function loadChat() {
+    chatLoaded = true;
+    const container = document.getElementById('messages-container');
     
-    const chatBox = document.getElementById('chat-box');
-    const loader = document.getElementById('chat-loader');
-    
-    // Limit payload to last 50 for speed
+    // Load last 50 posts from existing Vynix structure
     const chatQuery = query(ref(db, 'posts'), limitToLast(50));
     
     onChildAdded(chatQuery, (snapshot) => {
-        if(loader) loader.style.display = 'none';
-        
         const post = snapshot.val();
+        const isSelf = window.currentUser && post.uid === window.currentUser.uid;
+        const username = post.user?.username || 'User';
+        const time = formatTime(post.timestamp);
+        const nameColor = stringToColor(username);
         
-        // Extract Data
-        const uid = post.uid || 'unknown';
-        const isSelf = window.currentUser && uid === window.currentUser.uid;
-        const username = post.user?.username || uid.substring(0,6);
-        
-        // Date formatting
-        const d = post.timestamp ? new Date(post.timestamp) : new Date();
-        const timeStr = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
-        
-        // Content handling (strip heavy media, show tags)
-        let textContent = escapeHtml(post.text || '');
-        let mediaTag = '';
-        if (post.mediaUrl || (post.mediaUrls && post.mediaUrls.length > 0)) {
-            const type = post.mediaType === 'video' ? 'VIDEO' : 'IMAGE';
-            mediaTag = `<div class="msg-media-tag">[ATTACHMENT: ${type}]</div>`;
-            if(!textContent) textContent = '<span style="color:var(--text-dim);font-style:italic;">shared media</span>';
+        let contentHtml = escapeHtml(post.text);
+        if(post.mediaUrl) {
+            contentHtml = `
+                <img src="${post.mediaUrl}" style="max-width:100%; border-radius:8px; margin-bottom:4px;">
+                <div>${contentHtml}</div>
+            `;
         }
 
-        // Build element
         const msgDiv = document.createElement('div');
-        msgDiv.className = 'chat-message';
+        msgDiv.className = `message-wrapper ${isSelf ? 'sent' : 'recv'}`;
         
+        // Only show name for received messages in group chats
+        const nameHtml = !isSelf ? `<div class="sender-name" style="color: ${nameColor}">${escapeHtml(username)}</div>` : '';
+        
+        // Double ticks only for sent
+        const ticksHtml = isSelf ? `<i data-feather="check-all" style="width:14px; height:14px; color: var(--wa-blue-tick);"></i>` : '';
+
         msgDiv.innerHTML = `
-            <span class="msg-meta">[${timeStr}]</span>
-            <span class="msg-user ${isSelf ? 'self' : ''}">@${escapeHtml(username)}:</span>
-            <span class="msg-text">${textContent}</span>
-            ${mediaTag}
+            <div class="bubble">
+                ${nameHtml}
+                ${contentHtml}
+                <div class="msg-time-ticks">
+                    ${time} ${ticksHtml}
+                </div>
+            </div>
         `;
         
-        chatBox.appendChild(msgDiv);
-        
-        // Auto-scroll to bottom
-        chatBox.scrollTop = chatBox.scrollHeight;
+        container.appendChild(msgDiv);
+        container.scrollTop = container.scrollHeight;
+        feather.replace();
+
+        // Update Chat List Preview
+        document.getElementById('last-msg-text').textContent = isSelf ? "You: " + post.text.substring(0,25) : post.text.substring(0,30);
+        document.getElementById('last-msg-time').textContent = time;
     });
 }
 
-// --- SEND MESSAGE ---
+// Load Status (Stories from Vynix)
+function loadStatus() {
+    const list = document.getElementById('status-list');
+    const storiesQuery = query(ref(db, 'stories'), limitToLast(10));
+
+    onChildAdded(storiesQuery, (snapshot) => {
+        const story = snapshot.val();
+        const username = story.username || 'User';
+        const time = formatTime(story.timestamp);
+        
+        const item = document.createElement('div');
+        item.className = 'chat-list-item';
+        item.onclick = () => alert('Opening Status from: ' + username);
+
+        item.innerHTML = `
+            <img class="avatar status-ring" src="${story.userPhoto || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png'}">
+            <div class="chat-info">
+                <div class="chat-name-row"><span class="chat-name">${escapeHtml(username)}</span></div>
+                <div class="chat-msg-row"><span>${time}</span></div>
+            </div>
+        `;
+        list.appendChild(item);
+    });
+}
+
+// Send Message
 window.sendMessage = async () => {
     const input = document.getElementById('msg-input');
     const text = input.value.trim();
     
-    if (!text || !window.currentUser) return;
+    // If it's the mic icon, mock a toast
+    if(!text) {
+        alert('Voice messages are disabled in GB Ghost Mode.');
+        return;
+    }
     
-    // Clear input immediately for snappy UX
-    input.value = ''; 
+    if (!window.currentUser) return;
     
+    input.value = '';
+    window.toggleMicSendIcon();
+    input.focus();
+
     try {
-        // Push strictly text to the existing Vynix structure
         await push(ref(db, 'posts'), {
             uid: window.currentUser.uid,
             text: text,
             timestamp: serverTimestamp(),
-            // Mimic standard Vynix object structure
-            user: { 
-                username: window.currentUser.email ? window.currentUser.email.split('@')[0] : 'User' 
-            }
+            user: { username: window.currentUser.email.split('@')[0] } 
         });
         
-        // Haptic feedback if supported
-        if (navigator.vibrate) navigator.vibrate(30);
-        
+        if(navigator.vibrate) navigator.vibrate(20);
     } catch (e) {
-        alert("TX Failed: " + e.message);
+        alert("Send failed");
     }
 }
+
+feather.replace();
 </script>
 </body>
 </html>
