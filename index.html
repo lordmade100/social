@@ -3,23 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Vynix GB</title>
+    <title>Vynix GB - Stealth</title>
     <script src="https://unpkg.com/feather-icons"></script>
     <style>
         :root {
-            /* WhatsApp GB Classic Theme Variables */
-            --wa-primary: #008069;
-            --wa-primary-dark: #005c4b;
+            /* Vynix Stealth Black Theme */
+            --wa-primary: #000000;
+            --wa-primary-dark: #111111;
             --wa-light: #ffffff;
-            --wa-bg: #ece5dd;
-            --wa-chat-bg: #efeae2;
+            --wa-bg: #f3f4f6;
+            --wa-chat-bg: #e5e5e5;
             --wa-text-main: #111b21;
             --wa-text-muted: #667781;
             --wa-border: #e9edef;
-            --wa-bubble-sent: #d9fdd3;
+            --wa-bubble-sent: #e2e8f0; /* Sleek light grey instead of green */
             --wa-bubble-recv: #ffffff;
+            --wa-blue-tick: #3b82f6;
+            --wa-status-ring: #000000;
+        }
+
+        /* Dark Mode Override */
+        [data-theme="dark"] {
+            --wa-primary: #000000; /* Header stays stealth black */
+            --wa-primary-dark: #000000;
+            --wa-light: #111b21;
+            --wa-bg: #0b141a;
+            --wa-chat-bg: #0b141a;
+            --wa-text-main: #e9edef;
+            --wa-text-muted: #8696a0;
+            --wa-border: #222e35;
+            --wa-bubble-sent: #374151; /* Dark grey bubbles */
+            --wa-bubble-recv: #202c33;
             --wa-blue-tick: #53bdeb;
-            --wa-status-ring: #25d366;
+            --wa-status-ring: #e9edef;
         }
 
         * {
@@ -38,12 +54,13 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         /* --- HEADER & TABS --- */
         .wa-header-container {
             background-color: var(--wa-primary);
-            color: var(--wa-light);
+            color: #ffffff;
             display: flex;
             flex-direction: column;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -85,7 +102,7 @@
             padding: 12px 0;
             font-size: 14px;
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.5);
             cursor: pointer;
             text-transform: uppercase;
             border-bottom: 3px solid transparent;
@@ -94,8 +111,8 @@
 
         .wa-tab.camera-tab { flex: 0.3; }
         .wa-tab.active {
-            color: var(--wa-light);
-            border-bottom: 3px solid var(--wa-light);
+            color: #ffffff;
+            border-bottom: 3px solid #ffffff;
         }
 
         /* --- MAIN VIEWS --- */
@@ -166,7 +183,6 @@
             border: 2px solid var(--wa-status-ring);
             border-radius: 50%;
         }
-        .status-ring.viewed { border-color: var(--wa-text-muted); }
 
         /* --- FLOATING ACTION BUTTON --- */
         .fab {
@@ -175,7 +191,7 @@
             right: 20px;
             width: 56px;
             height: 56px;
-            background-color: var(--wa-primary);
+            background-color: var(--wa-text-main);
             color: var(--wa-light);
             border-radius: 50%;
             display: flex;
@@ -193,9 +209,8 @@
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: var(--wa-chat-bg);
-            background-image: url('https://i.postimg.cc/QMcqkx9S/wa-bg.png'); /* WA Doodle BG */
-            background-size: cover;
-            background-blend-mode: multiply;
+            /* Softened background pattern */
+            background-image: url('data:image/svg+xml,%3Csvg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M10 10h10v10H10V10z" fill="rgba(0,0,0,0.02)"/%3E%3C/svg%3E'); 
             z-index: 200;
             display: flex;
             flex-direction: column;
@@ -206,7 +221,7 @@
 
         .chat-room-header {
             background-color: var(--wa-primary);
-            color: var(--wa-light);
+            color: #ffffff;
             display: flex;
             align-items: center;
             padding: calc(env(safe-area-inset-top) + 8px) 16px 8px;
@@ -220,7 +235,7 @@
         .chat-room-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
         .chat-room-title { flex: 1; }
         .chat-room-title h3 { font-size: 16px; font-weight: 600; line-height: 1.2; }
-        .chat-room-title p { font-size: 12px; color: rgba(255,255,255,0.8); }
+        .chat-room-title p { font-size: 12px; color: rgba(255,255,255,0.7); }
 
         /* --- MESSAGES --- */
         .messages-container {
@@ -243,7 +258,6 @@
         .sender-name {
             font-size: 12px;
             font-weight: 600;
-            color: #d32f2f; /* Randomize colors based on user later */
             margin-bottom: 2px;
             padding-left: 4px;
         }
@@ -307,13 +321,14 @@
             font-size: 16px;
             padding: 4px 12px;
             background: transparent;
+            color: var(--wa-text-main);
         }
 
         .mic-btn {
             width: 48px;
             height: 48px;
-            background-color: var(--wa-primary);
-            color: white;
+            background-color: var(--wa-text-main);
+            color: var(--wa-light);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -322,9 +337,9 @@
             border: none;
             cursor: pointer;
             flex-shrink: 0;
-            transition: background 0.2s;
+            transition: opacity 0.2s;
         }
-        .mic-btn:active { background-color: var(--wa-primary-dark); }
+        .mic-btn:active { opacity: 0.8; }
 
         /* GB Settings Menu */
         .gb-menu {
@@ -345,6 +360,30 @@
         .gb-menu-item { padding: 14px 16px; font-size: 15px; cursor: pointer; }
         .gb-menu-item:hover { background: var(--wa-bg); }
 
+        /* CUSTOM DIALOG (Replaces Alert) */
+        .dialog-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000;
+            display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.2s;
+        }
+        .dialog-overlay.active { display: flex; opacity: 1; }
+        .dialog-box {
+            background: var(--wa-light); color: var(--wa-text-main);
+            width: 85%; max-width: 320px; border-radius: 12px; padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transform: scale(0.9); transition: transform 0.2s;
+        }
+        .dialog-overlay.active .dialog-box { transform: scale(1); }
+        .dialog-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+        .dialog-msg { font-size: 14px; color: var(--wa-text-muted); margin-bottom: 24px; line-height: 1.4; }
+        .dialog-actions { display: flex; justify-content: flex-end; }
+        .dialog-btn {
+            background: none; border: none; font-weight: 600; font-size: 14px;
+            cursor: pointer; padding: 8px 16px; border-radius: 6px;
+            text-transform: uppercase; color: var(--wa-text-main);
+        }
+        .dialog-btn:active { background: var(--wa-bg); }
+
         /* Hide scrollbars */
         ::-webkit-scrollbar { display: none; }
 
@@ -357,15 +396,15 @@
     <div class="wa-top-bar">
         <div class="wa-title">Vynix GB</div>
         <div class="wa-icons">
-            <i data-feather="wifi" class="gb-wifi" onclick="alert('Ghost Mode / Airplane Mode Activated')"></i>
-            <i data-feather="moon" onclick="alert('Dark Theme Engine loading...')"></i>
-            <i data-feather="search"></i>
+            <i data-feather="wifi" class="gb-wifi" onclick="showCustomDialog('Ghost Mode', 'Airplane / Ghost Mode Activated. Your status is now hidden.')"></i>
+            <i data-feather="moon" onclick="toggleTheme()"></i>
+            <i data-feather="search" onclick="showCustomDialog('Search', 'Global search is loading...')"></i>
             <i data-feather="more-vertical" onclick="document.getElementById('gb-menu').classList.toggle('active')"></i>
         </div>
         
         <!-- GB Settings Dropdown -->
         <div class="gb-menu" id="gb-menu">
-            <div class="gb-menu-item" style="font-weight: bold; color: var(--wa-primary);">GB Settings</div>
+            <div class="gb-menu-item" style="font-weight: bold;">GB Settings</div>
             <div class="gb-menu-item">Restart Vynix</div>
             <div class="gb-menu-item">Message Scheduler</div>
             <div class="gb-menu-item">Auto Reply</div>
@@ -385,7 +424,7 @@
 <div id="tab-chats" class="view-container active">
     <!-- Pinned Global Chat -->
     <div class="chat-list-item" onclick="openChatRoom()">
-        <img class="avatar" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png" style="background: var(--wa-primary);">
+        <img class="avatar" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png" style="background: var(--wa-text-main);">
         <div class="chat-info" style="border-bottom: none;">
             <div class="chat-name-row">
                 <span class="chat-name">Vynix Mainnet (Global)</span>
@@ -401,7 +440,7 @@
 
 <!-- STATUS TAB -->
 <div id="tab-status" class="view-container">
-    <div class="chat-list-item">
+    <div class="chat-list-item" onclick="showCustomDialog('Status', 'Adding statuses will be available soon.')">
         <img class="avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A8A8A8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='background-color:%23EFEFEF'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E">
         <div class="chat-info" style="border-bottom: none;">
             <div class="chat-name-row"><span class="chat-name">My status</span></div>
@@ -443,8 +482,8 @@
 
     <div class="messages-container" id="messages-container">
         <!-- Messages loaded from Firebase -->
-        <div style="text-align:center; padding: 20px; font-size: 12px; color: var(--wa-text-muted); background: rgba(255,255,255,0.8); border-radius: 8px; margin: 10px auto; width: 80%;">
-            <i data-feather="lock" style="width:10px;height:10px;"></i> Messages are end-to-end encrypted. No one outside of this chat, not even WhatsApp, can read or listen to them. Tap to learn more.
+        <div style="text-align:center; padding: 20px; font-size: 12px; color: var(--wa-text-muted); background: var(--wa-light); border-radius: 8px; margin: 10px auto; width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+            <i data-feather="lock" style="width:10px;height:10px;"></i> Messages are end-to-end encrypted. No one outside of this chat can read or listen to them.
         </div>
     </div>
 
@@ -458,6 +497,17 @@
         <button class="mic-btn" id="send-btn" onclick="sendMessage()">
             <i data-feather="mic" id="action-icon"></i>
         </button>
+    </div>
+</div>
+
+<!-- CUSTOM DIALOG OVERLAY -->
+<div class="dialog-overlay" id="custom-dialog">
+    <div class="dialog-box">
+        <h4 class="dialog-title" id="cd-title">Title</h4>
+        <p class="dialog-msg" id="cd-msg">Message goes here...</p>
+        <div class="dialog-actions">
+            <button class="dialog-btn" onclick="closeCustomDialog()">OK</button>
+        </div>
     </div>
 </div>
 
@@ -487,13 +537,39 @@ const db   = getDatabase(app);
 window.currentUser = null;
 let chatLoaded = false;
 
-// Format Time (HH:MM AM/PM)
+// --- CUSTOM DIALOG LOGIC ---
+window.showCustomDialog = (title, message) => {
+    document.getElementById('cd-title').textContent = title;
+    document.getElementById('cd-msg').textContent = message;
+    document.getElementById('custom-dialog').classList.add('active');
+};
+window.closeCustomDialog = () => {
+    document.getElementById('custom-dialog').classList.remove('active');
+};
+
+// --- DARK MODE LOGIC ---
+window.toggleTheme = () => {
+    const doc = document.documentElement;
+    if (doc.getAttribute('data-theme') === 'dark') {
+        doc.removeAttribute('data-theme');
+        localStorage.setItem('vynix_gb_theme', 'light');
+    } else {
+        doc.setAttribute('data-theme', 'dark');
+        localStorage.setItem('vynix_gb_theme', 'dark');
+    }
+};
+
+// Load saved theme on boot
+if(localStorage.getItem('vynix_gb_theme') === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+}
+
+// --- UTILS ---
 function formatTime(timestamp) {
     const d = timestamp ? new Date(timestamp) : new Date();
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-// Generate random colors for usernames in groups
 function stringToColor(str) {
     let hash = 0;
     for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
@@ -501,14 +577,13 @@ function stringToColor(str) {
     return '#' + "00000".substring(0, 6 - c.length) + c;
 }
 
-// Escaping
 function escapeHtml(text) {
     return (text || '').toString().replace(/[&<>"']/g, m => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
     })[m]);
 }
 
-// UI Toggles
+// --- UI TOGGLES ---
 window.switchTab = (tabId) => {
     document.querySelectorAll('.wa-tab').forEach(t => t.classList.remove('active'));
     event.target.classList.add('active');
@@ -551,19 +626,18 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Authentication
+// --- AUTHENTICATION ---
 onAuthStateChanged(auth, (user) => {
     if (!user) { window.location.href = 'signup.html'; return; }
     window.currentUser = user;
-    loadStatus(); // Load status tab info immediately
+    loadStatus();
 });
 
-// Load Chat
+// --- LOAD CHAT ---
 function loadChat() {
     chatLoaded = true;
     const container = document.getElementById('messages-container');
     
-    // Load last 50 posts from existing Vynix structure
     const chatQuery = query(ref(db, 'posts'), limitToLast(50));
     
     onChildAdded(chatQuery, (snapshot) => {
@@ -584,10 +658,7 @@ function loadChat() {
         const msgDiv = document.createElement('div');
         msgDiv.className = `message-wrapper ${isSelf ? 'sent' : 'recv'}`;
         
-        // Only show name for received messages in group chats
         const nameHtml = !isSelf ? `<div class="sender-name" style="color: ${nameColor}">${escapeHtml(username)}</div>` : '';
-        
-        // Double ticks only for sent
         const ticksHtml = isSelf ? `<i data-feather="check-all" style="width:14px; height:14px; color: var(--wa-blue-tick);"></i>` : '';
 
         msgDiv.innerHTML = `
@@ -610,7 +681,7 @@ function loadChat() {
     });
 }
 
-// Load Status (Stories from Vynix)
+// --- LOAD STATUS ---
 function loadStatus() {
     const list = document.getElementById('status-list');
     const storiesQuery = query(ref(db, 'stories'), limitToLast(10));
@@ -622,7 +693,7 @@ function loadStatus() {
         
         const item = document.createElement('div');
         item.className = 'chat-list-item';
-        item.onclick = () => alert('Opening Status from: ' + username);
+        item.onclick = () => showCustomDialog('Status Update', 'Opening Status from: ' + username);
 
         item.innerHTML = `
             <img class="avatar status-ring" src="${story.userPhoto || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png'}">
@@ -635,14 +706,13 @@ function loadStatus() {
     });
 }
 
-// Send Message
+// --- SEND MESSAGE ---
 window.sendMessage = async () => {
     const input = document.getElementById('msg-input');
     const text = input.value.trim();
     
-    // If it's the mic icon, mock a toast
     if(!text) {
-        alert('Voice messages are disabled in GB Ghost Mode.');
+        showCustomDialog('Action Blocked', 'Voice messages are disabled in GB Ghost Mode.');
         return;
     }
     
@@ -662,7 +732,7 @@ window.sendMessage = async () => {
         
         if(navigator.vibrate) navigator.vibrate(20);
     } catch (e) {
-        alert("Send failed");
+        showCustomDialog('Error', 'Send failed. Please check your connection.');
     }
 }
 
