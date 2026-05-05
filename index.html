@@ -7,7 +7,6 @@
     <script src="https://unpkg.com/feather-icons"></script>
     <style>
         :root {
-            /* Vynix Stealth Black Theme */
             --wa-primary: #000000;
             --wa-primary-dark: #111111;
             --wa-light: #ffffff;
@@ -22,7 +21,6 @@
             --wa-status-ring: #000000;
         }
 
-        /* Dark Mode Override */
         [data-theme="dark"] {
             --wa-primary: #000000; 
             --wa-primary-dark: #000000;
@@ -38,30 +36,17 @@
             --wa-status-ring: #e9edef;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--wa-light);
-            color: var(--wa-text-main);
-            height: 100dvh;
-            width: 100vw;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            background-color: var(--wa-light); color: var(--wa-text-main);
+            height: 100dvh; width: 100vw; overflow: hidden; display: flex; flex-direction: column;
             transition: background-color 0.3s, color 0.3s;
         }
 
         /* --- AUTH SCREEN --- */
-        #auth-screen {
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            height: 100%; padding: 24px; background-color: var(--wa-light); text-align: center;
-        }
+        #auth-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; padding: 24px; background-color: var(--wa-light); text-align: center; }
         .auth-logo { width: 80px; height: 80px; background: var(--wa-primary); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
         .auth-logo svg { color: #fff; width: 40px; height: 40px; }
         .auth-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
@@ -106,16 +91,14 @@
         .chat-name-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
         .chat-name { font-size: 16px; font-weight: 600; }
         .chat-time { font-size: 12px; color: var(--wa-text-muted); }
-        .chat-msg-row { display: flex; align-items: center; font-size: 14px; color: var(--wa-text-muted); gap: 4px; }
-        .tick-icon { width: 16px; height: 16px; color: var(--wa-blue-tick); }
-
-        /* --- STATUS LIST --- */
-        .status-section-title { padding: 16px; font-size: 14px; font-weight: 600; color: var(--wa-text-muted); background: var(--wa-bg); }
-        .status-ring { padding: 2px; border: 2px solid var(--wa-status-ring); border-radius: 50%; }
+        .chat-msg-row { display: flex; align-items: center; font-size: 14px; color: var(--wa-text-muted); gap: 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .tick-icon { width: 16px; height: 16px; color: var(--wa-blue-tick); flex-shrink: 0; }
 
         /* --- PROFILE VIEW --- */
         .profile-header { padding: 30px 20px; display: flex; align-items: center; gap: 20px; border-bottom: 1px solid var(--wa-border); background: var(--wa-bg); }
-        .profile-avatar { width: 72px; height: 72px; border-radius: 50%; background: var(--wa-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; }
+        .profile-avatar { width: 72px; height: 72px; border-radius: 50%; background: var(--wa-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; overflow: hidden; position: relative;}
+        .profile-avatar-wrapper { position: relative; cursor: pointer; }
+        .profile-cam-icon { position: absolute; bottom: 0; right: -4px; background: var(--wa-primary); border: 2px solid var(--wa-light); border-radius: 50%; padding: 6px; display: flex; align-items: center; justify-content: center; }
         .profile-id { font-size: 22px; font-weight: 700; color: var(--wa-text-main); margin-bottom: 4px; }
         .profile-email { font-size: 14px; color: var(--wa-text-muted); }
 
@@ -162,7 +145,6 @@
         .input-bar svg { color: var(--wa-text-muted); width: 24px; height: 24px; cursor: pointer; }
         .input-bar input { flex: 1; border: none; outline: none; font-size: 16px; padding: 4px 12px; background: transparent; color: var(--wa-text-main); }
         .mic-btn { width: 48px; height: 48px; background-color: var(--wa-text-main); color: var(--wa-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2); border: none; cursor: pointer; flex-shrink: 0; transition: opacity 0.2s; }
-        .mic-btn:active { opacity: 0.8; }
 
         /* GB Settings Menu */
         .gb-menu { position: absolute; top: 50px; right: 16px; background: var(--wa-light); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: none; flex-direction: column; z-index: 200; overflow: hidden; width: 200px; color: var(--wa-text-main); }
@@ -179,14 +161,12 @@
         .dialog-msg { font-size: 14px; color: var(--wa-text-muted); margin-bottom: 24px; line-height: 1.4; }
         .dialog-actions { display: flex; justify-content: flex-end; }
         .dialog-btn { background: none; border: none; font-weight: 600; font-size: 14px; cursor: pointer; padding: 8px 16px; border-radius: 6px; text-transform: uppercase; color: var(--wa-text-main); }
-        .dialog-btn:active { background: var(--wa-bg); }
 
         ::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
 
-<!-- AUTH SCREEN -->
 <div id="auth-screen">
     <div class="auth-logo"><i data-feather="cpu"></i></div>
     <div class="auth-title">Vynix GB</div>
@@ -199,12 +179,9 @@
     <button class="auth-btn outline" onclick="handleSignUp()">Create Account</button>
 </div>
 
-<!-- MAIN APP -->
 <div id="main-app">
-    <!-- MAIN HEADER & TABS -->
     <div class="wa-header-container">
         
-        <!-- Search Overlay -->
         <div class="search-overlay" id="search-overlay">
             <i data-feather="arrow-left" onclick="closeSearch()"></i>
             <div class="search-input-wrapper">
@@ -237,9 +214,7 @@
         </div>
     </div>
 
-    <!-- CHATS TAB -->
     <div id="tab-chats" class="view-container active">
-        <!-- Pinned Global Chat -->
         <div class="chat-list-item" onclick="openGlobalChat()">
             <img class="avatar" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png" style="background: var(--wa-text-main);">
             <div class="chat-info">
@@ -249,15 +224,13 @@
                 </div>
                 <div class="chat-msg-row">
                     <i data-feather="check-all" class="tick-icon"></i>
-                    <span id="last-msg-text">Tap to enter global chat...</span>
+                    <span id="last-msg-text" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Tap to enter global chat...</span>
                 </div>
             </div>
         </div>
-        <!-- Private Friends List Container -->
         <div id="private-chats-list"></div>
     </div>
 
-    <!-- STATUS TAB -->
     <div id="tab-status" class="view-container">
         <div class="chat-list-item" onclick="showCustomDialog('Status', 'Adding statuses will be available soon.')">
             <img class="avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A8A8A8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='background-color:%23EFEFEF'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E">
@@ -266,28 +239,32 @@
                 <div class="chat-msg-row"><span>Tap to add status update</span></div>
             </div>
         </div>
-        <div class="status-section-title">Recent updates</div>
+        <div class="status-section-title" style="padding: 16px; font-size: 14px; font-weight: 600; color: var(--wa-text-muted); background: var(--wa-bg);">Recent updates</div>
         <div id="status-list"></div>
     </div>
 
-    <!-- CALLS TAB -->
     <div id="tab-calls" class="view-container">
         <div style="padding: 40px; text-align: center; color: var(--wa-text-muted);">
             To call contacts on Vynix, open a chat and tap the phone icon.
         </div>
     </div>
 
-    <!-- PROFILE TAB -->
     <div id="tab-profile" class="view-container">
         <div class="profile-header">
-            <div class="profile-avatar" id="profile-letter">V</div>
+            <div class="profile-avatar-wrapper" onclick="document.getElementById('profile-pic-input').click()">
+                <img id="profile-avatar-img" class="profile-avatar" src="" style="display:none; object-fit:cover;">
+                <div class="profile-avatar" id="profile-letter">V</div>
+                <div class="profile-cam-icon"><i data-feather="camera" style="color:white; width:14px; height:14px;"></i></div>
+            </div>
+            <input type="file" id="profile-pic-input" style="display:none;" accept="image/*" onchange="handleProfilePicUpload(event)">
             <div>
                 <div class="profile-id" id="display-vynix-id">Loading...</div>
                 <div class="profile-email" id="display-email">loading@email.com</div>
             </div>
         </div>
         
-        <div class="status-section-title">Account Actions</div>
+        <div class="status-section-title" style="padding: 16px; font-size: 14px; font-weight: 600; color: var(--wa-text-muted); background: var(--wa-bg);">Account Actions</div>
+        
         <div class="chat-list-item" onclick="copyVynixID()">
             <i data-feather="copy" style="color: var(--wa-text-main);"></i>
             <div class="chat-info" style="border-bottom: none; margin-left: 16px; padding-bottom: 0;">
@@ -308,13 +285,11 @@
         </div>
     </div>
 
-    <!-- FLOATING ACTION BUTTON -->
     <div class="fab" id="main-fab" onclick="handleFabClick()">
         <i data-feather="message-square"></i>
     </div>
 </div>
 
-<!-- BOTTOM SHEET (ADD FRIEND) -->
 <div class="modal-overlay" id="friend-overlay" onclick="closeFriendSheet()"></div>
 <div class="bottom-sheet" id="friend-sheet">
     <div class="sheet-header">
@@ -326,34 +301,30 @@
     <button class="sheet-btn" onclick="addFriend()">Add Friend</button>
 </div>
 
-<!-- CHAT ROOM (Slides in) -->
 <div class="chat-room" id="chat-room">
     <div class="chat-room-header">
         <div class="back-btn" onclick="closeChatRoom()">
             <i data-feather="arrow-left"></i>
         </div>
-        <img class="chat-room-avatar" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png" style="background: white;">
+        <img class="chat-room-avatar" id="chat-room-avatar-img" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png" style="background: white;">
         <div class="chat-room-title">
             <h3 id="chat-room-title-text">Vynix Mainnet</h3>
             <p id="chat-room-subtitle">Global encrypted channel</p>
         </div>
-        <i data-feather="video"></i>
-        <i data-feather="phone"></i>
+        <i data-feather="video" onclick="showCustomDialog('Call', 'Calls are currently disabled.')"></i>
+        <i data-feather="phone" onclick="showCustomDialog('Call', 'Calls are currently disabled.')"></i>
         <i data-feather="more-vertical"></i>
     </div>
 
-    <div class="messages-container" id="messages-container">
-        <div style="text-align:center; padding: 20px; font-size: 12px; color: var(--wa-text-muted); background: var(--wa-light); border-radius: 8px; margin: 10px auto; width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
-            <i data-feather="lock" style="width:10px;height:10px;"></i> Messages are end-to-end encrypted. No one outside of this chat can read or listen to them.
-        </div>
-    </div>
+    <div class="messages-container" id="messages-container"></div>
 
     <div class="chat-input-area">
         <div class="input-bar">
             <i data-feather="smile"></i>
             <input type="text" id="msg-input" placeholder="Message" autocomplete="off" oninput="toggleMicSendIcon()" onkeypress="if(event.key==='Enter')sendMessage()">
-            <i data-feather="paperclip" style="margin-left: 12px;"></i>
+            <i data-feather="paperclip" style="margin-left: 12px;" onclick="document.getElementById('chat-img-upload').click()"></i>
             <i data-feather="camera" style="margin-left: 16px;"></i>
+            <input type="file" id="chat-img-upload" style="display:none;" accept="image/*" onchange="handleChatImageUpload(event)">
         </div>
         <button class="mic-btn" id="send-btn" onclick="sendMessage()">
             <i data-feather="mic" id="action-icon"></i>
@@ -361,7 +332,6 @@
     </div>
 </div>
 
-<!-- CUSTOM DIALOG OVERLAY -->
 <div class="dialog-overlay" id="custom-dialog">
     <div class="dialog-box">
         <h4 class="dialog-title" id="cd-title">Title</h4>
@@ -374,7 +344,7 @@
 
 <script type="module">
 import {
-    getDatabase, ref, onChildAdded, push, set, get, serverTimestamp, query, limitToLast, orderByChild, equalTo
+    getDatabase, ref, onChildAdded, push, set, get, update, off, serverTimestamp, query, limitToLast, orderByChild, equalTo
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
@@ -396,10 +366,32 @@ const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getDatabase(app);
 
+// Cloudinary Setup
+const CLOUDINARY_CLOUD_NAME = 'dqkujefxj';
+const CLOUDINARY_UPLOAD_PRESET = 'banter_box';
+
 window.currentUser = null;
 window.currentVynixId = null;
-let chatLoaded = false;
+let currentChatRef = null;
+window.currentChatPath = 'posts'; // Default to global
 let friendsLoaded = false;
+
+// --- CLOUDINARY UPLOAD HELPER ---
+async function uploadToCloudinary(file, isAvatar = false) {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    
+    const r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`, { method: 'POST', body: fd });
+    if (!r.ok) throw new Error('Upload failed');
+    const data = await r.json();
+    
+    // Auto format, compress, and perfectly crop avatars if requested
+    if (isAvatar) {
+        return data.secure_url.replace('/upload/', '/upload/f_auto,q_auto,w_200,h_200,c_fill/');
+    }
+    return data.secure_url.replace('/upload/', '/upload/f_auto,q_auto,w_1080/');
+}
 
 // --- VYNIX ID GENERATOR ---
 function generateMemorableID() {
@@ -429,6 +421,12 @@ window.handleSignUp = async () => {
             createdAt: serverTimestamp()
         });
         
+        // Auto-add themselves as a friend for "Note to Self" functionality
+        await set(ref(db, `users/${user.uid}/friends/${user.uid}`), {
+            vynixId: newVynixID + " (You)",
+            addedAt: serverTimestamp()
+        });
+        
         showCustomDialog('Welcome!', `Account created! Your unique Vynix ID is ${newVynixID}. Share it to connect.`);
     } catch (e) {
         showCustomDialog('Sign Up Failed', e.message);
@@ -440,11 +438,8 @@ window.handleLogin = async () => {
     const pass = document.getElementById('auth-password').value.trim();
     if(!email || !pass) return showCustomDialog('Error', 'Please enter your email and password.');
     
-    try {
-        await signInWithEmailAndPassword(auth, email, pass);
-    } catch (e) {
-        showCustomDialog('Login Failed', 'Invalid email or password.');
-    }
+    try { await signInWithEmailAndPassword(auth, email, pass); } 
+    catch (e) { showCustomDialog('Login Failed', 'Invalid email or password.'); }
 };
 
 window.handleLogout = async () => {
@@ -455,6 +450,7 @@ window.handleLogout = async () => {
         document.getElementById('gb-menu').classList.remove('active');
         friendsLoaded = false;
         document.getElementById('private-chats-list').innerHTML = '';
+        if(currentChatRef) off(currentChatRef);
     } catch(e) {
         showCustomDialog('Error', 'Could not log out.');
     }
@@ -468,14 +464,33 @@ onAuthStateChanged(auth, async (user) => {
         
         const snapshot = await get(ref(db, `users/${user.uid}`));
         if(snapshot.exists()) {
-            window.currentVynixId = snapshot.val().vynixId || snapshot.val().username;
+            const data = snapshot.val();
+            window.currentVynixId = data.vynixId || data.username;
             document.getElementById('display-vynix-id').textContent = window.currentVynixId;
-            document.getElementById('profile-letter').textContent = window.currentVynixId.charAt(0).toUpperCase();
+            
+            // Set Avatar if exists
+            if (data.photoURL) {
+                document.getElementById('profile-avatar-img').src = data.photoURL;
+                document.getElementById('profile-avatar-img').style.display = 'block';
+                document.getElementById('profile-letter').style.display = 'none';
+            } else {
+                document.getElementById('profile-letter').textContent = window.currentVynixId.charAt(0).toUpperCase();
+            }
+            
+            // Ensure self is in friends list for older accounts
+            if (!data.friends || !data.friends[user.uid]) {
+                await set(ref(db, `users/${user.uid}/friends/${user.uid}`), {
+                    vynixId: window.currentVynixId + " (You)",
+                    addedAt: serverTimestamp()
+                });
+            }
+            
         } else {
             window.currentVynixId = "User_" + user.uid.substring(0,4);
             document.getElementById('display-vynix-id').textContent = window.currentVynixId;
         }
         document.getElementById('display-email').textContent = user.email;
+        
         loadStatus();
         loadFriends();
     } else {
@@ -485,6 +500,47 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
+// --- PROFILE PICTURE UPLOAD ---
+window.handleProfilePicUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    showCustomDialog('Uploading', 'Updating your profile picture...');
+    try {
+        const photoURL = await uploadToCloudinary(file, true);
+        // Save to Database
+        await update(ref(db, `users/${window.currentUser.uid}`), { photoURL: photoURL });
+        
+        // Update Local UI
+        document.getElementById('profile-avatar-img').src = photoURL;
+        document.getElementById('profile-avatar-img').style.display = 'block';
+        document.getElementById('profile-letter').style.display = 'none';
+        
+        closeCustomDialog();
+    } catch (err) {
+        showCustomDialog('Error', 'Failed to upload image. Please try again.');
+    }
+};
+
+window.handleChatImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    showCustomDialog('Uploading', 'Sending image...');
+    try {
+        const photoURL = await uploadToCloudinary(file, false);
+        await push(ref(db, window.currentChatPath), {
+            uid: window.currentUser.uid,
+            text: "",
+            mediaUrl: photoURL,
+            timestamp: serverTimestamp(),
+            user: { username: window.currentVynixId || 'User' }
+        });
+        closeCustomDialog();
+    } catch (err) {
+        showCustomDialog('Error', 'Failed to send image.');
+    }
+};
+
 // --- ADD FRIEND & FAB LOGIC ---
 window.handleFabClick = () => {
     const activeTabContainer = document.querySelector('.view-container.active').id;
@@ -492,7 +548,7 @@ window.handleFabClick = () => {
         document.getElementById('friend-overlay').classList.add('active');
         setTimeout(() => document.getElementById('friend-id-input').focus(), 100);
     } else if (activeTabContainer === 'tab-status') {
-        showCustomDialog('Status', 'Opening camera to add status...');
+        showCustomDialog('Status', 'Adding statuses will be available soon.');
     } else if (activeTabContainer === 'tab-calls') {
         showCustomDialog('New Call', 'Select a contact to call.');
     }
@@ -507,10 +563,6 @@ window.addFriend = async () => {
     const inputId = document.getElementById('friend-id-input').value.trim();
     if(!inputId) return;
     
-    if(inputId === window.currentVynixId) {
-        return showCustomDialog('Oops', 'You cannot add yourself.');
-    }
-    
     const usersRef = ref(db, 'users');
     const q = query(usersRef, orderByChild('vynixId'), equalTo(inputId));
     
@@ -521,11 +573,18 @@ window.addFriend = async () => {
             let friendData = null;
             snapshot.forEach(child => { friendUid = child.key; friendData = child.val(); });
             
-            // Save to friends list
             await set(ref(db, `users/${window.currentUser.uid}/friends/${friendUid}`), {
                 vynixId: friendData.vynixId,
                 addedAt: serverTimestamp()
             });
+            
+            // Also add us to their friends list so it's a two-way connection
+            if (friendUid !== window.currentUser.uid) {
+                await set(ref(db, `users/${friendUid}/friends/${window.currentUser.uid}`), {
+                    vynixId: window.currentVynixId,
+                    addedAt: serverTimestamp()
+                });
+            }
             
             closeFriendSheet();
             showCustomDialog('Success', `${friendData.vynixId} added to your chats!`);
@@ -542,89 +601,101 @@ function loadFriends() {
     friendsLoaded = true;
     
     const friendsRef = ref(db, `users/${window.currentUser.uid}/friends`);
-    onChildAdded(friendsRef, (snap) => {
-        const friendId = snap.key;
+    onChildAdded(friendsRef, async (snap) => {
+        const friendUid = snap.key;
         const friendData = snap.val();
-        renderFriendChat(friendId, friendData.vynixId);
+        
+        // Fetch their latest avatar
+        let avatarUrl = null;
+        try {
+            const fs = await get(ref(db, `users/${friendUid}`));
+            if(fs.exists()) avatarUrl = fs.val().photoURL;
+        } catch(e) {}
+        
+        renderFriendChat(friendUid, friendData.vynixId, avatarUrl);
     });
 }
 
-function renderFriendChat(uid, vynixId) {
+// Generate unique, consistent Chat ID between two users
+function getChatId(uid1, uid2) {
+    return uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`;
+}
+
+function renderFriendChat(uid, vynixId, avatarUrl) {
     const list = document.getElementById('private-chats-list');
     if(document.getElementById(`chat-item-${uid}`)) return;
     
     const item = document.createElement('div');
     item.className = 'chat-list-item';
     item.id = `chat-item-${uid}`;
+    
+    // Define what happens when we click a private friend chat
     item.onclick = () => {
         document.getElementById('chat-room-title-text').textContent = vynixId;
-        document.getElementById('chat-room-subtitle').textContent = 'Private encrypted chat';
-        openChatRoom();
+        document.getElementById('chat-room-subtitle').textContent = uid === window.currentUser.uid ? 'Message yourself' : 'Private encrypted chat';
+        
+        if (avatarUrl) {
+            document.getElementById('chat-room-avatar-img').src = avatarUrl;
+        } else {
+            document.getElementById('chat-room-avatar-img').src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23A8A8A8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="background-color:%23EFEFEF"%3E%3Cpath d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/%3E%3Ccircle cx="12" cy="7" r="4"/%3E%3C/svg%3E';
+        }
+        
+        const chatId = getChatId(window.currentUser.uid, uid);
+        openChatRoom(chatId);
     };
     
-    const firstLetter = vynixId.charAt(0).toUpperCase();
+    let avatarHtml;
+    if (avatarUrl) {
+        avatarHtml = `<img class="avatar" src="${avatarUrl}">`;
+    } else {
+        const firstLetter = vynixId.charAt(0).toUpperCase();
+        avatarHtml = `<div class="avatar" style="background: var(--wa-text-main); color: var(--wa-light); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold;">${firstLetter}</div>`;
+    }
+
     item.innerHTML = `
-        <div class="avatar" style="background: var(--wa-text-main); color: var(--wa-light); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold;">${firstLetter}</div>
+        ${avatarHtml}
         <div class="chat-info">
             <div class="chat-name-row"><span class="chat-name">${escapeHtml(vynixId)}</span></div>
             <div class="chat-msg-row"><span>Tap to open chat...</span></div>
         </div>
     `;
-    list.prepend(item);
+    // If it's the "You" chat, prepend it to the top. Else append.
+    if (uid === window.currentUser.uid) { list.prepend(item); } 
+    else { list.appendChild(item); }
 }
 
-
 // --- SWIPE TO SWITCH TABS LOGIC ---
-let touchStartX = 0;
-let touchStartY = 0;
+let touchStartX = 0; let touchStartY = 0;
 const tabsOrder = ['chats', 'status', 'calls', 'profile'];
 
-document.addEventListener('touchstart', e => {
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-}, {passive: true});
-
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY; }, {passive: true});
 document.addEventListener('touchend', e => {
     if(!window.currentUser) return; 
     if(document.getElementById('chat-room').classList.contains('open')) return;
     if(document.getElementById('friend-overlay').classList.contains('active')) return;
     if(document.getElementById('custom-dialog').classList.contains('active')) return;
     
-    const touchEndX = e.changedTouches[0].clientX;
-    const touchEndY = e.changedTouches[0].clientY;
-    const dx = touchEndX - touchStartX;
-    const dy = touchEndY - touchStartY;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
     
-    // Ensure it's a horizontal swipe, not a vertical scroll
     if (Math.abs(dx) > 60 && Math.abs(dy) < 50) {
         const activeTabId = document.querySelector('.view-container.active').id.replace('tab-', '');
         const currentIndex = tabsOrder.indexOf(activeTabId);
         
-        if (dx < 0 && currentIndex < tabsOrder.length - 1) { // Swipe Left
-            switchTab(tabsOrder[currentIndex + 1]);
-        } else if (dx > 0 && currentIndex > 0) { // Swipe Right
-            switchTab(tabsOrder[currentIndex - 1]);
-        }
+        if (dx < 0 && currentIndex < tabsOrder.length - 1) switchTab(tabsOrder[currentIndex + 1]);
+        else if (dx > 0 && currentIndex > 0) switchTab(tabsOrder[currentIndex - 1]);
     }
 }, {passive: true});
 
-
 // --- CUSTOM DIALOG LOGIC ---
-window.showCustomDialog = (title, message) => {
-    document.getElementById('cd-title').textContent = title;
-    document.getElementById('cd-msg').textContent = message;
-    document.getElementById('custom-dialog').classList.add('active');
-};
+window.showCustomDialog = (title, message) => { document.getElementById('cd-title').textContent = title; document.getElementById('cd-msg').textContent = message; document.getElementById('custom-dialog').classList.add('active'); };
 window.closeCustomDialog = () => { document.getElementById('custom-dialog').classList.remove('active'); };
 
 // --- DARK MODE LOGIC ---
 window.toggleTheme = () => {
     const doc = document.documentElement;
-    if (doc.getAttribute('data-theme') === 'dark') {
-        doc.removeAttribute('data-theme'); localStorage.setItem('vynix_gb_theme', 'light');
-    } else {
-        doc.setAttribute('data-theme', 'dark'); localStorage.setItem('vynix_gb_theme', 'dark');
-    }
+    if (doc.getAttribute('data-theme') === 'dark') { doc.removeAttribute('data-theme'); localStorage.setItem('vynix_gb_theme', 'light'); } 
+    else { doc.setAttribute('data-theme', 'dark'); localStorage.setItem('vynix_gb_theme', 'dark'); }
 };
 if(localStorage.getItem('vynix_gb_theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
 
@@ -645,11 +716,6 @@ document.addEventListener('click', (e) => {
     if (searchOverlay.classList.contains('active')) {
         if (!e.target.closest('#search-overlay') && !e.target.closest('#search-trigger')) closeSearch();
     }
-    
-    const friendOverlay = document.getElementById('friend-overlay');
-    if (friendOverlay.classList.contains('active') && !e.target.closest('#friend-sheet') && !e.target.closest('#main-fab')) {
-        closeFriendSheet();
-    }
 });
 
 // --- PROFILE ACTIONS ---
@@ -669,7 +735,6 @@ function escapeHtml(text) { return (text || '').toString().replace(/[&<>"']/g, m
 // --- UI TOGGLES ---
 window.switchTab = (tabId) => {
     document.querySelectorAll('.wa-tab').forEach(t => t.classList.remove('active'));
-    // Handle click directly or swipe programmatically
     const targetTab = document.querySelector(`.wa-tab[onclick="switchTab('${tabId}')"]`);
     if(targetTab) targetTab.classList.add('active');
     
@@ -684,18 +749,23 @@ window.switchTab = (tabId) => {
     feather.replace();
 }
 
+// --- DYNAMIC CHAT LOADING (Global vs Private) ---
 window.openGlobalChat = () => {
     document.getElementById('chat-room-title-text').textContent = 'Vynix Mainnet';
     document.getElementById('chat-room-subtitle').textContent = 'Global encrypted channel';
-    openChatRoom();
+    document.getElementById('chat-room-avatar-img').src = 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png';
+    openChatRoom('global');
 };
 
-window.openChatRoom = () => {
+window.openChatRoom = (chatId) => {
     document.getElementById('chat-room').classList.add('open');
-    if (!chatLoaded) loadChat();
+    loadChat(chatId);
 }
 
-window.closeChatRoom = () => { document.getElementById('chat-room').classList.remove('open'); }
+window.closeChatRoom = () => { 
+    document.getElementById('chat-room').classList.remove('open'); 
+    if(currentChatRef) off(currentChatRef);
+}
 
 window.toggleMicSendIcon = () => {
     const input = document.getElementById('msg-input').value.trim();
@@ -705,13 +775,19 @@ window.toggleMicSendIcon = () => {
     feather.replace();
 }
 
-// --- LOAD CHAT (Global) ---
-function loadChat() {
-    chatLoaded = true;
+function loadChat(chatId) {
     const container = document.getElementById('messages-container');
-    const chatQuery = query(ref(db, 'posts'), limitToLast(50));
+    container.innerHTML = `<div style="text-align:center; padding: 20px; font-size: 12px; color: var(--wa-text-muted); background: var(--wa-light); border-radius: 8px; margin: 10px auto; width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1);"><i data-feather="lock" style="width:10px;height:10px;"></i> Messages are end-to-end encrypted. No one outside of this chat can read or listen to them.</div>`;
+    feather.replace();
     
-    onChildAdded(chatQuery, (snapshot) => {
+    // Clear previous chat listener so messages don't bleed over
+    if (currentChatRef) off(currentChatRef);
+
+    // Determine DB path based on if it's the global mainnet or a private chat
+    window.currentChatPath = chatId === 'global' ? 'posts' : `chats/${chatId}/messages`;
+    currentChatRef = query(ref(db, window.currentChatPath), limitToLast(50));
+    
+    onChildAdded(currentChatRef, (snapshot) => {
         const post = snapshot.val();
         const isSelf = window.currentUser && post.uid === window.currentUser.uid;
         const username = post.user?.username || 'User';
@@ -719,11 +795,11 @@ function loadChat() {
         const nameColor = stringToColor(username);
         
         let contentHtml = escapeHtml(post.text);
-        if(post.mediaUrl) contentHtml = `<img src="${post.mediaUrl}" style="max-width:100%; border-radius:8px; margin-bottom:4px;"><div>${contentHtml}</div>`;
+        if(post.mediaUrl) contentHtml = `<img src="${post.mediaUrl}" style="max-width:100%; border-radius:8px; margin-bottom:4px; cursor:pointer;" onclick="window.open('${post.mediaUrl}', '_blank')"><div style="margin-top: 4px;">${contentHtml}</div>`;
 
         const msgDiv = document.createElement('div');
         msgDiv.className = `message-wrapper ${isSelf ? 'sent' : 'recv'}`;
-        const nameHtml = !isSelf ? `<div class="sender-name" style="color: ${nameColor}">${escapeHtml(username)}</div>` : '';
+        const nameHtml = (!isSelf && chatId === 'global') ? `<div class="sender-name" style="color: ${nameColor}">${escapeHtml(username)}</div>` : '';
         const ticksHtml = isSelf ? `<i data-feather="check-all" style="width:14px; height:14px; color: var(--wa-blue-tick);"></i>` : '';
 
         msgDiv.innerHTML = `<div class="bubble">${nameHtml}${contentHtml}<div class="msg-time-ticks">${time} ${ticksHtml}</div></div>`;
@@ -731,25 +807,11 @@ function loadChat() {
         container.scrollTop = container.scrollHeight;
         feather.replace();
 
-        document.getElementById('last-msg-text').textContent = isSelf ? "You: " + post.text.substring(0,25) : post.text.substring(0,30);
-        document.getElementById('last-msg-time').textContent = time;
-    });
-}
-
-// --- LOAD STATUS ---
-function loadStatus() {
-    const list = document.getElementById('status-list');
-    const storiesQuery = query(ref(db, 'stories'), limitToLast(10));
-    onChildAdded(storiesQuery, (snapshot) => {
-        const story = snapshot.val();
-        const username = story.username || 'User';
-        const time = formatTime(story.timestamp);
-        
-        const item = document.createElement('div');
-        item.className = 'chat-list-item';
-        item.onclick = () => showCustomDialog('Status Update', 'Opening Status from: ' + username);
-        item.innerHTML = `<img class="avatar status-ring" src="${story.userPhoto || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png'}"><div class="chat-info"><div class="chat-name-row"><span class="chat-name">${escapeHtml(username)}</span></div><div class="chat-msg-row"><span>${time}</span></div></div>`;
-        list.appendChild(item);
+        // Update Global Chat preview text if we are in global
+        if (chatId === 'global') {
+            document.getElementById('last-msg-text').textContent = isSelf ? "You: " + (post.text || 'Photo').substring(0,25) : (post.text || 'Photo').substring(0,30);
+            document.getElementById('last-msg-time').textContent = time;
+        }
     });
 }
 
@@ -763,7 +825,7 @@ window.sendMessage = async () => {
     input.value = ''; window.toggleMicSendIcon(); input.focus();
 
     try {
-        await push(ref(db, 'posts'), {
+        await push(ref(db, window.currentChatPath), {
             uid: window.currentUser.uid, text: text, timestamp: serverTimestamp(),
             user: { username: window.currentVynixId || 'User' } 
         });
