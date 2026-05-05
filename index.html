@@ -16,7 +16,7 @@
             --wa-text-main: #111b21;
             --wa-text-muted: #667781;
             --wa-border: #e9edef;
-            --wa-bubble-sent: #e2e8f0; /* Sleek light grey instead of green */
+            --wa-bubble-sent: #e2e8f0; 
             --wa-bubble-recv: #ffffff;
             --wa-blue-tick: #3b82f6;
             --wa-status-ring: #000000;
@@ -24,7 +24,7 @@
 
         /* Dark Mode Override */
         [data-theme="dark"] {
-            --wa-primary: #000000; /* Header stays stealth black */
+            --wa-primary: #000000; 
             --wa-primary-dark: #000000;
             --wa-light: #111b21;
             --wa-bg: #0b141a;
@@ -32,7 +32,7 @@
             --wa-text-main: #e9edef;
             --wa-text-muted: #8696a0;
             --wa-border: #222e35;
-            --wa-bubble-sent: #374151; /* Dark grey bubbles */
+            --wa-bubble-sent: #374151; 
             --wa-bubble-recv: #202c33;
             --wa-blue-tick: #53bdeb;
             --wa-status-ring: #e9edef;
@@ -65,6 +65,7 @@
             flex-direction: column;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             z-index: 100;
+            position: relative; /* Needed for absolute search overlay */
         }
 
         .wa-top-bar {
@@ -88,7 +89,6 @@
 
         .wa-icons svg { width: 22px; height: 22px; cursor: pointer; }
 
-        /* GB Feature: Airplane Mode */
         .gb-wifi { transform: rotate(45deg); }
 
         .wa-tabs {
@@ -113,6 +113,38 @@
         .wa-tab.active {
             color: #ffffff;
             border-bottom: 3px solid #ffffff;
+        }
+
+        /* --- SEARCH OVERLAY --- */
+        .search-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--wa-primary);
+            display: none;
+            align-items: center;
+            padding: calc(env(safe-area-inset-top) + 8px) 16px 8px;
+            gap: 16px;
+            z-index: 110;
+        }
+        .search-overlay.active { display: flex; animation: fadeIn 0.2s; }
+        .search-overlay svg { color: #ffffff; cursor: pointer; width: 24px; height: 24px; }
+        
+        .search-input-wrapper {
+            flex: 1;
+            background-color: var(--wa-light);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            padding: 6px 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .search-input-wrapper input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: var(--wa-text-main);
+            font-size: 15px;
         }
 
         /* --- MAIN VIEWS --- */
@@ -209,7 +241,6 @@
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: var(--wa-chat-bg);
-            /* Softened background pattern */
             background-image: url('data:image/svg+xml,%3Csvg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M10 10h10v10H10V10z" fill="rgba(0,0,0,0.02)"/%3E%3C/svg%3E'); 
             z-index: 200;
             display: flex;
@@ -360,7 +391,7 @@
         .gb-menu-item { padding: 14px 16px; font-size: 15px; cursor: pointer; }
         .gb-menu-item:hover { background: var(--wa-bg); }
 
-        /* CUSTOM DIALOG (Replaces Alert) */
+        /* CUSTOM DIALOG */
         .dialog-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000;
             display: none; align-items: center; justify-content: center;
@@ -393,12 +424,21 @@
 
 <!-- MAIN HEADER & TABS -->
 <div class="wa-header-container">
+    
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="search-overlay">
+        <i data-feather="arrow-left" onclick="closeSearch()"></i>
+        <div class="search-input-wrapper">
+            <input type="text" id="global-search-input" placeholder="Search..." onkeypress="if(event.key==='Enter'){ handleGlobalSearch(); }">
+        </div>
+    </div>
+
     <div class="wa-top-bar">
         <div class="wa-title">Vynix GB</div>
         <div class="wa-icons">
             <i data-feather="wifi" class="gb-wifi" onclick="showCustomDialog('Ghost Mode', 'Airplane / Ghost Mode Activated. Your status is now hidden.')"></i>
             <i data-feather="moon" onclick="toggleTheme()"></i>
-            <i data-feather="search" onclick="showCustomDialog('Search', 'Global search is loading...')"></i>
+            <i data-feather="search" id="search-trigger" onclick="openSearch()"></i>
             <i data-feather="more-vertical" onclick="document.getElementById('gb-menu').classList.toggle('active')"></i>
         </div>
         
@@ -481,7 +521,6 @@
     </div>
 
     <div class="messages-container" id="messages-container">
-        <!-- Messages loaded from Firebase -->
         <div style="text-align:center; padding: 20px; font-size: 12px; color: var(--wa-text-muted); background: var(--wa-light); border-radius: 8px; margin: 10px auto; width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
             <i data-feather="lock" style="width:10px;height:10px;"></i> Messages are end-to-end encrypted. No one outside of this chat can read or listen to them.
         </div>
@@ -559,10 +598,47 @@ window.toggleTheme = () => {
     }
 };
 
-// Load saved theme on boot
 if(localStorage.getItem('vynix_gb_theme') === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
 }
+
+// --- SEARCH LOGIC ---
+window.openSearch = () => {
+    document.getElementById('search-overlay').classList.add('active');
+    setTimeout(() => document.getElementById('global-search-input').focus(), 100);
+};
+
+window.closeSearch = () => {
+    document.getElementById('search-overlay').classList.remove('active');
+    document.getElementById('global-search-input').value = '';
+};
+
+window.handleGlobalSearch = () => {
+    const query = document.getElementById('global-search-input').value.trim();
+    if (query) {
+        showCustomDialog('Global Search', 'Searching for: ' + query);
+        closeSearch();
+    }
+};
+
+// --- GLOBAL CLICK LISTENER (Menus & Search Closure) ---
+document.addEventListener('click', (e) => {
+    // GB Menu logic
+    const menu = document.getElementById('gb-menu');
+    if(!e.target.closest('.wa-icons') && !e.target.closest('.gb-menu')) {
+        menu.classList.remove('active');
+    }
+    
+    // Search Overlay logic: Close if clicked outside
+    const searchOverlay = document.getElementById('search-overlay');
+    if (searchOverlay.classList.contains('active')) {
+        // Only close if we click completely outside the overlay AND not on the trigger icon
+        if (!e.target.closest('#search-overlay') && !e.target.closest('#search-trigger')) {
+            closeSearch();
+        }
+    }
+});
+
 
 // --- UTILS ---
 function formatTime(timestamp) {
@@ -618,14 +694,6 @@ window.toggleMicSendIcon = () => {
     feather.replace();
 }
 
-// Outside click to close GB Menu
-document.addEventListener('click', (e) => {
-    const menu = document.getElementById('gb-menu');
-    if(!e.target.closest('.wa-icons') && !e.target.closest('.gb-menu')) {
-        menu.classList.remove('active');
-    }
-});
-
 // --- AUTHENTICATION ---
 onAuthStateChanged(auth, (user) => {
     if (!user) { window.location.href = 'signup.html'; return; }
@@ -675,7 +743,6 @@ function loadChat() {
         container.scrollTop = container.scrollHeight;
         feather.replace();
 
-        // Update Chat List Preview
         document.getElementById('last-msg-text').textContent = isSelf ? "You: " + post.text.substring(0,25) : post.text.substring(0,30);
         document.getElementById('last-msg-time').textContent = time;
     });
