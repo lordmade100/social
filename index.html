@@ -2,189 +2,300 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vynix</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Mxit 2026 // Vynix Node</title>
     <style>
-        /* Classic J2ME / Feature Phone Styling */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        body {
-            background-color: #333;
-            font-family: "Courier New", Courier, monospace; /* Retro fixed-width font */
-            display: flex;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
+        /* Modern Terminal / Neobrutalist Mxit Theme */
+        :root {
+            --bg-color: #050505; /* OLED Black */
+            --surface-color: #111111;
+            --mxit-blue: #2563eb;
+            --mxit-cyan: #22d3ee;
+            --mxit-red: #ef4444;
+            --mxit-green: #4ade80;
+            --text-main: #f8fafc;
+            --text-dim: #64748b;
+            --border-color: #334155;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
         }
 
-        /* The Phone Screen */
-        .screen {
-            width: 100%;
-            max-width: 320px; /* Classic feature phone width */
-            height: 100%;
-            background-color: #E8E8E8; /* Old LCD grey */
-            color: #000;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            /* 100dvh handles modern mobile browser address bars perfectly */
+            height: 100dvh; 
+            width: 100vw;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            position: relative;
-            border-left: 2px solid #111;
-            border-right: 2px solid #111;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Classic Mxit Blue Header */
-        .header {
-            background-color: #000080;
-            color: #FFF;
-            padding: 4px 8px;
-            font-weight: bold;
-            font-size: 14px;
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 2px solid #000;
-        }
-
+        /* Views System */
         .view {
             display: none;
             flex: 1;
             flex-direction: column;
-            overflow: hidden;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: var(--bg-color);
         }
-        .view.active { display: flex; }
-
-        /* Splash Screen */
-        .splash {
-            justify-content: center;
-            align-items: center;
-            background-color: #000080;
-            color: white;
-            flex: 1;
-        }
-        .splash h1 { font-size: 32px; letter-spacing: 2px; margin-bottom: 10px; }
-        .splash p { font-size: 12px; }
-
-        /* Menu Items */
-        .menu-list {
-            list-style: none;
-            flex: 1;
-            overflow-y: auto;
-            background: #E8E8E8;
-        }
-        .menu-item {
-            padding: 8px 12px;
-            border-bottom: 1px dotted #888;
-            font-size: 14px;
-            cursor: pointer;
-            color: #000080;
-            font-weight: bold;
-        }
-        .menu-item:hover, .menu-item:active {
-            background-color: #000080;
-            color: #FFF;
-        }
-
-        /* Chat Room */
-        .chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 4px;
-            background: #FFF;
-            font-size: 13px;
-        }
-        .message {
-            margin-bottom: 4px;
-            line-height: 1.2;
-            word-wrap: break-word;
-        }
-        .msg-time { color: #888; font-size: 11px; }
-        .msg-user { color: #000080; font-weight: bold; }
-        .msg-text { color: #000; }
-
-        /* Input Area */
-        .input-area {
+        .view.active {
             display: flex;
-            background: #CCC;
-            padding: 4px;
-            border-top: 1px solid #888;
-        }
-        .input-area input {
-            flex: 1;
-            font-family: inherit;
-            font-size: 14px;
-            padding: 2px 4px;
-            border: 1px solid #888;
-            border-radius: 0;
-            outline: none;
-        }
-        .input-area button {
-            font-family: inherit;
-            background: #000080;
-            color: white;
-            border: 1px solid #000;
-            padding: 2px 8px;
-            margin-left: 4px;
-            cursor: pointer;
-            font-weight: bold;
+            animation: fadeIn 0.2s ease-out;
         }
 
-        /* Soft Keys (Bottom bar) */
-        .soft-keys {
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Status Bar (Top) */
+        .status-bar {
+            padding: calc(env(safe-area-inset-top) + 8px) 16px 8px;
+            background-color: var(--mxit-blue);
+            color: #fff;
             display: flex;
             justify-content: space-between;
-            background: #000080;
-            color: white;
-            padding: 2px 8px;
-            font-size: 12px;
+            align-items: center;
+            font-size: 13px;
             font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid var(--mxit-cyan);
+            box-shadow: 0 0 10px rgba(34, 211, 238, 0.2);
+            z-index: 10;
         }
-        .soft-btn { cursor: pointer; }
 
-        .loading { text-align: center; padding: 20px; font-style: italic; font-size: 12px; }
+        .status-left { display: flex; align-items: center; gap: 8px; }
+        .ping-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--mxit-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--mxit-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Splash Screen */
+        .splash-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #1e3a8a 0%, var(--bg-color) 70%);
+        }
+        .splash-title {
+            font-size: 48px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: var(--text-main);
+            text-shadow: 2px 2px 0px var(--mxit-blue), -2px -2px 0px var(--mxit-cyan);
+            margin-bottom: 16px;
+        }
+        .splash-subtitle {
+            font-size: 12px;
+            color: var(--mxit-cyan);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Main Menu */
+        .menu-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            list-style: none;
+        }
+        .menu-item {
+            padding: 16px;
+            margin-bottom: 12px;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+        .menu-item:active {
+            background-color: var(--mxit-blue);
+            border-color: var(--mxit-cyan);
+            transform: scale(0.98);
+        }
+        .menu-num {
+            color: var(--mxit-cyan);
+            background: rgba(34, 211, 238, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* Chat Interface */
+        .chat-scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .chat-message {
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .msg-meta {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-right: 6px;
+        }
+        .msg-user {
+            color: var(--mxit-cyan);
+            font-weight: bold;
+            margin-right: 4px;
+            cursor: pointer;
+        }
+        .msg-user.self { color: var(--mxit-green); }
+        .msg-text { color: var(--text-main); }
+        .msg-media-tag {
+            color: var(--mxit-blue);
+            font-size: 12px;
+            border: 1px solid var(--mxit-blue);
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        /* Input Area */
+        .chat-input-container {
+            display: flex;
+            padding: 12px 16px calc(env(safe-area-inset-bottom) + 12px);
+            background-color: var(--surface-color);
+            border-top: 1px solid var(--border-color);
+            gap: 8px;
+        }
+        .chat-input {
+            flex: 1;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            font-size: 16px; /* Prevents iOS auto-zoom */
+            padding: 12px;
+            border-radius: 8px;
+            outline: none;
+        }
+        .chat-input:focus { border-color: var(--mxit-cyan); }
+        
+        .chat-send-btn {
+            background-color: var(--mxit-blue);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            font-family: var(--font-mono);
+            font-weight: bold;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .chat-send-btn:active { background-color: var(--mxit-cyan); color: #000; }
+
+        /* Scrollbar hides for cleanliness on desktop testing */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); }
+
+        .sys-msg { color: var(--mxit-blue); font-style: italic; font-size: 13px; text-align: center; padding: 10px; }
     </style>
 </head>
 <body>
 
-<div class="screen">
+<!-- SPLASH SCREEN -->
+<div id="view-splash" class="view active">
+    <div class="splash-container">
+        <div class="splash-title">MXIT</div>
+        <div class="splash-subtitle">2026 // Vynix Node</div>
+        <div class="sys-msg" style="margin-top: 40px; color: var(--mxit-cyan);" id="splash-status">Establishing connection...</div>
+    </div>
+</div>
 
-    <!-- SPLASH SCREEN -->
-    <div id="view-splash" class="view splash active">
-        <h1>VYNIX</h1>
-        <p>Connecting...</p>
+<!-- MAIN MENU -->
+<div id="view-menu" class="view">
+    <div class="status-bar">
+        <div class="status-left">
+            <div class="ping-dot"></div>
+            <span>VYNIX_MAINNET</span>
+        </div>
+        <span id="clock-menu">00:00</span>
+    </div>
+    
+    <ul class="menu-list">
+        <li class="menu-item" onclick="openView('view-chat')">
+            <span class="menu-num">1</span>
+            <span>MultiX Global</span>
+        </li>
+        <li class="menu-item" onclick="alert('Feature locked in current build.')">
+            <span class="menu-num">2</span>
+            <span>JoeBugg Games</span>
+        </li>
+        <li class="menu-item" onclick="alert('Feature locked in current build.')">
+            <span class="menu-num">3</span>
+            <span>Tradepost</span>
+        </li>
+        <li class="menu-item" onclick="alert('User ID: ' + (window.currentUser ? window.currentUser.uid : 'Guest'))">
+            <span class="menu-num">4</span>
+            <span>My Profile</span>
+        </li>
+    </ul>
+</div>
+
+<!-- CHAT ROOM -->
+<div id="view-chat" class="view">
+    <div class="status-bar">
+        <div class="status-left" onclick="openView('view-menu')" style="cursor:pointer; color: var(--mxit-cyan);">
+            <span>&lt; BACK</span>
+        </div>
+        <span>MULTIX</span>
+        <span id="clock-chat">00:00</span>
     </div>
 
-    <!-- MAIN MENU -->
-    <div id="view-menu" class="view">
-        <div class="header">
-            <span>Vynix</span>
-            <span id="menu-time">12:00</span>
-        </div>
-        <ul class="menu-list">
-            <li class="menu-item" onclick="openChat()">[1] Global Chat</li>
-            <li class="menu-item" onclick="alert('Feature coming soon!')">[2] Contacts</li>
-            <li class="menu-item" onclick="alert('Feature coming soon!')">[3] Tradepost</li>
-            <li class="menu-item" onclick="alert('Profile ID: ' + (currentUser ? currentUser.uid.substring(0,6) : 'Guest'))">[4] My Profile</li>
-            <li class="menu-item" onclick="alert('Vynix v1.0. Ultra-light.')">[5] Info</li>
-        </ul>
-        <div class="soft-keys">
-            <span class="soft-btn">Options</span>
-            <span class="soft-btn">Exit</span>
-        </div>
+    <div class="chat-scroll-area" id="chat-box">
+        <div class="sys-msg" id="chat-loader">Decrypting message history...</div>
     </div>
 
-    <!-- CHAT ROOM -->
-    <div id="view-chat" class="view">
-        <div class="header">
-            <span>MultiX: Global</span>
-            <span class="soft-btn" onclick="openMenu()">Back</span>
-        </div>
-        <div class="chat-container" id="chat-box">
-            <div class="loading" id="chat-loading">Loading messages...</div>
-        </div>
-        <div class="input-area">
-            <input type="text" id="msg-input" placeholder="Type msg..." onkeypress="if(event.key==='Enter')sendMessage()">
-            <button onclick="sendMessage()">Send</button>
-        </div>
+    <div class="chat-input-container">
+        <input type="text" id="msg-input" class="chat-input" placeholder="> type here..." autocomplete="off" onkeypress="if(event.key==='Enter')sendMessage()">
+        <button class="chat-send-btn" onclick="sendMessage()">TX</button>
     </div>
-
 </div>
 
 <script type="module">
@@ -194,7 +305,7 @@ import {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// Your exact Firebase config
+// Database Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyBOyZ3As4GTuNvjemvPF_SpsC6m6vqtNhc",
     authDomain: "fire-b-a8878.firebaseapp.com",
@@ -210,112 +321,18 @@ const auth = getAuth(app);
 const db   = getDatabase(app);
 
 window.currentUser = null;
-let chatListenerActive = false;
+let chatInitialized = false;
 
-// Format time like Mxit: HH:MM
-function getFormattedTime(timestamp) {
-    const d = timestamp ? new Date(timestamp) : new Date();
-    return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+// --- UTILS ---
+function updateClock() {
+    const d = new Date();
+    const time = d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+    document.getElementById('clock-menu').textContent = time;
+    document.getElementById('clock-chat').textContent = time;
 }
+setInterval(updateClock, 1000);
+updateClock();
 
-// Update clock
-setInterval(() => {
-    const el = document.getElementById('menu-time');
-    if(el) el.textContent = getFormattedTime();
-}, 10000);
-
-// View Navigation
-function switchView(viewId) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById(viewId).classList.add('active');
-}
-
-window.openMenu = () => {
-    switchView('view-menu');
-}
-
-window.openChat = () => {
-    switchView('view-chat');
-    if (!chatListenerActive) {
-        loadChat();
-    }
-}
-
-// Authentication
-onAuthStateChanged(auth, (user) => {
-    if (!user) {
-        // If not logged in, mock a basic sign in or redirect
-        window.location.href = 'signup.html';
-        return;
-    }
-    window.currentUser = user;
-    
-    // Simulate connection delay for nostalgia
-    setTimeout(() => {
-        switchView('view-menu');
-    }, 1500);
-});
-
-// Load Chat (Vynix Posts rendered as text messages)
-function loadChat() {
-    chatListenerActive = true;
-    const chatBox = document.getElementById('chat-box');
-    const loading = document.getElementById('chat-loading');
-    
-    // Listen to the last 30 posts
-    const chatQuery = query(ref(db, 'posts'), limitToLast(30));
-    
-    onChildAdded(chatQuery, (snapshot) => {
-        if(loading) loading.style.display = 'none';
-        
-        const post = snapshot.val();
-        // Since we are reading from the 'posts' node you already have, 
-        // we'll format it like a Mxit chat message.
-        
-        // Handle missing data gracefully
-        const username = post.user?.username || (post.uid ? post.uid.substring(0,5) : 'Guest');
-        const time = getFormattedTime(post.timestamp);
-        const text = post.text || (post.mediaUrl ? '[Image Attachment]' : '[Empty]');
-        
-        const msgDiv = document.createElement('div');
-        msgDiv.className = 'message';
-        
-        // Only show text, strip out HTML or complex media
-        msgDiv.innerHTML = `
-            <span class="msg-time">[${time}]</span> 
-            <span class="msg-user">*${escapeHtml(username)}*:</span> 
-            <span class="msg-text">${escapeHtml(text)}</span>
-        `;
-        
-        chatBox.appendChild(msgDiv);
-        chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
-    });
-}
-
-// Send Message
-window.sendMessage = async () => {
-    const input = document.getElementById('msg-input');
-    const text = input.value.trim();
-    if (!text || !window.currentUser) return;
-    
-    input.value = ''; // clear input immediately
-    input.focus();
-
-    try {
-        // Pushing to your existing 'posts' node to keep data consistent
-        await push(ref(db, 'posts'), {
-            uid: window.currentUser.uid,
-            text: text,
-            timestamp: serverTimestamp(),
-            // Mocking a basic user object so it shows up correctly
-            user: { username: window.currentUser.email.split('@')[0] } 
-        });
-    } catch (e) {
-        alert("Failed to send: " + e.message);
-    }
-}
-
-// Simple HTML escape to prevent XSS
 function escapeHtml(unsafe) {
     return (unsafe || '').toString()
          .replace(/&/g, "&amp;")
@@ -323,6 +340,117 @@ function escapeHtml(unsafe) {
          .replace(/>/g, "&gt;")
          .replace(/"/g, "&quot;")
          .replace(/'/g, "&#039;");
+}
+
+// --- VIEW ROUTING ---
+window.openView = (viewId) => {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(viewId).classList.add('active');
+    
+    if (viewId === 'view-chat') {
+        initChat();
+        setTimeout(() => document.getElementById('msg-input').focus(), 100);
+    }
+};
+
+// --- AUTHENTICATION ---
+onAuthStateChanged(auth, (user) => {
+    const status = document.getElementById('splash-status');
+    
+    if (!user) {
+        status.textContent = "Auth required. Redirecting...";
+        status.style.color = "var(--mxit-red)";
+        setTimeout(() => { window.location.href = 'signup.html'; }, 1000);
+        return;
+    }
+    
+    window.currentUser = user;
+    status.textContent = "Authentication success.";
+    status.style.color = "var(--mxit-green)";
+    
+    setTimeout(() => { openView('view-menu'); }, 800);
+});
+
+// --- CHAT LOGIC (Using Vynix 'posts' node) ---
+function initChat() {
+    if (chatInitialized) return;
+    chatInitialized = true;
+    
+    const chatBox = document.getElementById('chat-box');
+    const loader = document.getElementById('chat-loader');
+    
+    // Limit payload to last 50 for speed
+    const chatQuery = query(ref(db, 'posts'), limitToLast(50));
+    
+    onChildAdded(chatQuery, (snapshot) => {
+        if(loader) loader.style.display = 'none';
+        
+        const post = snapshot.val();
+        
+        // Extract Data
+        const uid = post.uid || 'unknown';
+        const isSelf = window.currentUser && uid === window.currentUser.uid;
+        const username = post.user?.username || uid.substring(0,6);
+        
+        // Date formatting
+        const d = post.timestamp ? new Date(post.timestamp) : new Date();
+        const timeStr = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+        
+        // Content handling (strip heavy media, show tags)
+        let textContent = escapeHtml(post.text || '');
+        let mediaTag = '';
+        if (post.mediaUrl || (post.mediaUrls && post.mediaUrls.length > 0)) {
+            const type = post.mediaType === 'video' ? 'VIDEO' : 'IMAGE';
+            mediaTag = `<div class="msg-media-tag">[ATTACHMENT: ${type}]</div>`;
+            if(!textContent) textContent = '<span style="color:var(--text-dim);font-style:italic;">shared media</span>';
+        }
+
+        // Build element
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'chat-message';
+        
+        msgDiv.innerHTML = `
+            <span class="msg-meta">[${timeStr}]</span>
+            <span class="msg-user ${isSelf ? 'self' : ''}">@${escapeHtml(username)}:</span>
+            <span class="msg-text">${textContent}</span>
+            ${mediaTag}
+        `;
+        
+        chatBox.appendChild(msgDiv);
+        
+        // Auto-scroll to bottom
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+}
+
+// --- SEND MESSAGE ---
+window.sendMessage = async () => {
+    const input = document.getElementById('msg-input');
+    const text = input.value.trim();
+    
+    if (!text || !window.currentUser) return;
+    
+    // Clear input immediately for snappy UX
+    input.value = ''; 
+    
+    try {
+        // Push strictly text to the existing Vynix structure
+        await push(ref(db, 'posts'), {
+            uid: window.currentUser.uid,
+            text: text,
+            timestamp: serverTimestamp(),
+            // Mimic standard Vynix object structure
+            user: { 
+                username: window.currentUser.email ? window.currentUser.email.split('@')[0] : 'User' 
+            }
+        });
+        
+        // Haptic feedback if supported
+        if (navigator.vibrate) navigator.vibrate(30);
+        
+    } catch (e) {
+        alert("TX Failed: " + e.message);
+    }
 }
 </script>
 </body>
