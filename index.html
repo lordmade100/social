@@ -155,12 +155,13 @@
         /* CUSTOM DIALOG */
         .dialog-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
         .dialog-overlay.active { display: flex; opacity: 1; }
-        .dialog-box { background: var(--wa-light); color: var(--wa-text-main); width: 85%; max-width: 320px; border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: scale(0.9); transition: transform 0.2s; }
+        .dialog-box { background: var(--wa-light); color: var(--wa-text-main); width: 85%; max-width: 320px; border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: scale(0.9); transition: transform 0.2s; max-height: 90vh; overflow-y: auto;}
         .dialog-overlay.active .dialog-box { transform: scale(1); }
         .dialog-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
         .dialog-msg { font-size: 14px; color: var(--wa-text-muted); margin-bottom: 24px; line-height: 1.4; }
         .dialog-actions { display: flex; justify-content: flex-end; }
         .dialog-btn { background: none; border: none; font-weight: 600; font-size: 14px; cursor: pointer; padding: 8px 16px; border-radius: 6px; text-transform: uppercase; color: var(--wa-text-main); }
+        .dialog-btn:active { background: var(--wa-bg); }
 
         ::-webkit-scrollbar { display: none; }
     </style>
@@ -232,7 +233,9 @@
     </div>
 
     <div id="tab-status" class="view-container">
-        <div class="chat-list-item" onclick="showCustomDialog('Status', 'Adding statuses will be available soon.')">
+        <input type="file" id="status-pic-input" accept="image/*" style="display:none;" onchange="handleStatusUpload(event)">
+        
+        <div class="chat-list-item" onclick="document.getElementById('status-pic-input').click()">
             <img class="avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A8A8A8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='background-color:%23EFEFEF'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E">
             <div class="chat-info" style="border-bottom: none;">
                 <div class="chat-name-row"><span class="chat-name">My status</span></div>
@@ -296,7 +299,7 @@
         <h3>New Chat</h3>
         <i data-feather="x" onclick="closeFriendSheet()" style="cursor: pointer;"></i>
     </div>
-    <p style="font-size: 14px; color: var(--wa-text-muted); margin-bottom: 12px;">Enter your friend's Vynix ID to add them to your chat list.</p>
+    <p style="font-size: 14px; color: var(--wa-text-muted); margin-bottom: 12px;">Enter a Vynix ID (You can also add your own ID).</p>
     <input type="text" id="friend-id-input" class="sheet-input" placeholder="e.g. NeonWolf88" autocomplete="off">
     <button class="sheet-btn" onclick="addFriend()">Add Friend</button>
 </div>
@@ -335,7 +338,7 @@
 <div class="dialog-overlay" id="custom-dialog">
     <div class="dialog-box">
         <h4 class="dialog-title" id="cd-title">Title</h4>
-        <p class="dialog-msg" id="cd-msg">Message goes here...</p>
+        <div class="dialog-msg" id="cd-msg">Message goes here...</div>
         <div class="dialog-actions">
             <button class="dialog-btn" onclick="closeCustomDialog()">OK</button>
         </div>
@@ -373,8 +376,9 @@ const CLOUDINARY_UPLOAD_PRESET = 'banter_box';
 window.currentUser = null;
 window.currentVynixId = null;
 let currentChatRef = null;
-window.currentChatPath = 'posts'; // Default to global
+window.currentChatPath = 'posts'; 
 let friendsLoaded = false;
+let statusesLoaded = false;
 
 // --- CLOUDINARY UPLOAD HELPER ---
 async function uploadToCloudinary(file, isAvatar = false) {
@@ -386,7 +390,6 @@ async function uploadToCloudinary(file, isAvatar = false) {
     if (!r.ok) throw new Error('Upload failed');
     const data = await r.json();
     
-    // Auto format, compress, and perfectly crop avatars if requested
     if (isAvatar) {
         return data.secure_url.replace('/upload/', '/upload/f_auto,q_auto,w_200,h_200,c_fill/');
     }
@@ -421,7 +424,7 @@ window.handleSignUp = async () => {
             createdAt: serverTimestamp()
         });
         
-        // Auto-add themselves as a friend for "Note to Self" functionality
+        // Auto-add themselves as a friend for "Note to Self"
         await set(ref(db, `users/${user.uid}/friends/${user.uid}`), {
             vynixId: newVynixID + " (You)",
             addedAt: serverTimestamp()
@@ -449,6 +452,7 @@ window.handleLogout = async () => {
         document.getElementById('auth-screen').style.display = 'flex';
         document.getElementById('gb-menu').classList.remove('active');
         friendsLoaded = false;
+        statusesLoaded = false;
         document.getElementById('private-chats-list').innerHTML = '';
         if(currentChatRef) off(currentChatRef);
     } catch(e) {
@@ -468,7 +472,6 @@ onAuthStateChanged(auth, async (user) => {
             window.currentVynixId = data.vynixId || data.username;
             document.getElementById('display-vynix-id').textContent = window.currentVynixId;
             
-            // Set Avatar if exists
             if (data.photoURL) {
                 document.getElementById('profile-avatar-img').src = data.photoURL;
                 document.getElementById('profile-avatar-img').style.display = 'block';
@@ -477,7 +480,6 @@ onAuthStateChanged(auth, async (user) => {
                 document.getElementById('profile-letter').textContent = window.currentVynixId.charAt(0).toUpperCase();
             }
             
-            // Ensure self is in friends list for older accounts
             if (!data.friends || !data.friends[user.uid]) {
                 await set(ref(db, `users/${user.uid}/friends/${user.uid}`), {
                     vynixId: window.currentVynixId + " (You)",
@@ -500,6 +502,36 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
+// --- STATUS UPLOAD ---
+window.handleStatusUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    showCustomDialog('Uploading', 'Adding to your status...');
+    try {
+        const photoURL = await uploadToCloudinary(file, false);
+        
+        let userPhoto = 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png';
+        try {
+            const snap = await get(ref(db, `users/${window.currentUser.uid}`));
+            if (snap.exists() && snap.val().photoURL) userPhoto = snap.val().photoURL;
+        } catch(err) {}
+
+        await push(ref(db, 'stories'), {
+            uid: window.currentUser.uid,
+            username: window.currentVynixId,
+            userPhoto: userPhoto,
+            mediaUrl: photoURL,
+            timestamp: serverTimestamp()
+        });
+        
+        closeCustomDialog();
+        showCustomDialog('Success', 'Status updated successfully!');
+    } catch (err) {
+        showCustomDialog('Error', 'Failed to upload status. Please try again.');
+    }
+};
+
 // --- PROFILE PICTURE UPLOAD ---
 window.handleProfilePicUpload = async (e) => {
     const file = e.target.files[0];
@@ -508,10 +540,8 @@ window.handleProfilePicUpload = async (e) => {
     showCustomDialog('Uploading', 'Updating your profile picture...');
     try {
         const photoURL = await uploadToCloudinary(file, true);
-        // Save to Database
         await update(ref(db, `users/${window.currentUser.uid}`), { photoURL: photoURL });
         
-        // Update Local UI
         document.getElementById('profile-avatar-img').src = photoURL;
         document.getElementById('profile-avatar-img').style.display = 'block';
         document.getElementById('profile-letter').style.display = 'none';
@@ -548,7 +578,7 @@ window.handleFabClick = () => {
         document.getElementById('friend-overlay').classList.add('active');
         setTimeout(() => document.getElementById('friend-id-input').focus(), 100);
     } else if (activeTabContainer === 'tab-status') {
-        showCustomDialog('Status', 'Adding statuses will be available soon.');
+        document.getElementById('status-pic-input').click();
     } else if (activeTabContainer === 'tab-calls') {
         showCustomDialog('New Call', 'Select a contact to call.');
     }
@@ -563,6 +593,8 @@ window.addFriend = async () => {
     const inputId = document.getElementById('friend-id-input').value.trim();
     if(!inputId) return;
     
+    // Explicitly removed the self-add block so users can add themselves if deleted
+    
     const usersRef = ref(db, 'users');
     const q = query(usersRef, orderByChild('vynixId'), equalTo(inputId));
     
@@ -573,12 +605,13 @@ window.addFriend = async () => {
             let friendData = null;
             snapshot.forEach(child => { friendUid = child.key; friendData = child.val(); });
             
+            const displayId = friendUid === window.currentUser.uid ? friendData.vynixId + " (You)" : friendData.vynixId;
+            
             await set(ref(db, `users/${window.currentUser.uid}/friends/${friendUid}`), {
-                vynixId: friendData.vynixId,
+                vynixId: displayId,
                 addedAt: serverTimestamp()
             });
             
-            // Also add us to their friends list so it's a two-way connection
             if (friendUid !== window.currentUser.uid) {
                 await set(ref(db, `users/${friendUid}/friends/${window.currentUser.uid}`), {
                     vynixId: window.currentVynixId,
@@ -587,7 +620,7 @@ window.addFriend = async () => {
             }
             
             closeFriendSheet();
-            showCustomDialog('Success', `${friendData.vynixId} added to your chats!`);
+            showCustomDialog('Success', `${displayId} added to your chats!`);
         } else {
             showCustomDialog('Not Found', 'No user found with that Vynix ID.');
         }
@@ -605,7 +638,6 @@ function loadFriends() {
         const friendUid = snap.key;
         const friendData = snap.val();
         
-        // Fetch their latest avatar
         let avatarUrl = null;
         try {
             const fs = await get(ref(db, `users/${friendUid}`));
@@ -616,10 +648,7 @@ function loadFriends() {
     });
 }
 
-// Generate unique, consistent Chat ID between two users
-function getChatId(uid1, uid2) {
-    return uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`;
-}
+function getChatId(uid1, uid2) { return uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`; }
 
 function renderFriendChat(uid, vynixId, avatarUrl) {
     const list = document.getElementById('private-chats-list');
@@ -629,7 +658,6 @@ function renderFriendChat(uid, vynixId, avatarUrl) {
     item.className = 'chat-list-item';
     item.id = `chat-item-${uid}`;
     
-    // Define what happens when we click a private friend chat
     item.onclick = () => {
         document.getElementById('chat-room-title-text').textContent = vynixId;
         document.getElementById('chat-room-subtitle').textContent = uid === window.currentUser.uid ? 'Message yourself' : 'Private encrypted chat';
@@ -659,7 +687,6 @@ function renderFriendChat(uid, vynixId, avatarUrl) {
             <div class="chat-msg-row"><span>Tap to open chat...</span></div>
         </div>
     `;
-    // If it's the "You" chat, prepend it to the top. Else append.
     if (uid === window.currentUser.uid) { list.prepend(item); } 
     else { list.appendChild(item); }
 }
@@ -687,8 +714,12 @@ document.addEventListener('touchend', e => {
     }
 }, {passive: true});
 
-// --- CUSTOM DIALOG LOGIC ---
-window.showCustomDialog = (title, message) => { document.getElementById('cd-title').textContent = title; document.getElementById('cd-msg').textContent = message; document.getElementById('custom-dialog').classList.add('active'); };
+// --- CUSTOM DIALOG LOGIC (Allows innerHTML for Images) ---
+window.showCustomDialog = (title, message) => { 
+    document.getElementById('cd-title').textContent = title; 
+    document.getElementById('cd-msg').innerHTML = message; 
+    document.getElementById('custom-dialog').classList.add('active'); 
+};
 window.closeCustomDialog = () => { document.getElementById('custom-dialog').classList.remove('active'); };
 
 // --- DARK MODE LOGIC ---
@@ -715,6 +746,11 @@ document.addEventListener('click', (e) => {
     const searchOverlay = document.getElementById('search-overlay');
     if (searchOverlay.classList.contains('active')) {
         if (!e.target.closest('#search-overlay') && !e.target.closest('#search-trigger')) closeSearch();
+    }
+    
+    const friendOverlay = document.getElementById('friend-overlay');
+    if (friendOverlay.classList.contains('active') && !e.target.closest('#friend-sheet') && !e.target.closest('#main-fab')) {
+        closeFriendSheet();
     }
 });
 
@@ -749,7 +785,6 @@ window.switchTab = (tabId) => {
     feather.replace();
 }
 
-// --- DYNAMIC CHAT LOADING (Global vs Private) ---
 window.openGlobalChat = () => {
     document.getElementById('chat-room-title-text').textContent = 'Vynix Mainnet';
     document.getElementById('chat-room-subtitle').textContent = 'Global encrypted channel';
@@ -780,10 +815,7 @@ function loadChat(chatId) {
     container.innerHTML = `<div style="text-align:center; padding: 20px; font-size: 12px; color: var(--wa-text-muted); background: var(--wa-light); border-radius: 8px; margin: 10px auto; width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1);"><i data-feather="lock" style="width:10px;height:10px;"></i> Messages are end-to-end encrypted. No one outside of this chat can read or listen to them.</div>`;
     feather.replace();
     
-    // Clear previous chat listener so messages don't bleed over
     if (currentChatRef) off(currentChatRef);
-
-    // Determine DB path based on if it's the global mainnet or a private chat
     window.currentChatPath = chatId === 'global' ? 'posts' : `chats/${chatId}/messages`;
     currentChatRef = query(ref(db, window.currentChatPath), limitToLast(50));
     
@@ -807,11 +839,49 @@ function loadChat(chatId) {
         container.scrollTop = container.scrollHeight;
         feather.replace();
 
-        // Update Global Chat preview text if we are in global
         if (chatId === 'global') {
             document.getElementById('last-msg-text').textContent = isSelf ? "You: " + (post.text || 'Photo').substring(0,25) : (post.text || 'Photo').substring(0,30);
             document.getElementById('last-msg-time').textContent = time;
         }
+    });
+}
+
+// --- LOAD STATUS (Filtered 24 Hours) ---
+function loadStatus() {
+    if (statusesLoaded) return;
+    statusesLoaded = true;
+    
+    const list = document.getElementById('status-list');
+    list.innerHTML = '';
+    
+    const storiesQuery = query(ref(db, 'stories'), limitToLast(50));
+    onChildAdded(storiesQuery, (snapshot) => {
+        const story = snapshot.val();
+        const now = Date.now();
+        const storyTime = story.timestamp || now;
+        
+        // Filter out stories older than 24 hours (86,400,000 ms)
+        if (now - storyTime > 86400000) return;
+
+        const username = story.username || 'User';
+        const time = formatTime(story.timestamp);
+        
+        const item = document.createElement('div');
+        item.className = 'chat-list-item';
+        
+        item.onclick = () => {
+            showCustomDialog(`Status from ${escapeHtml(username)}`, `<img src="${story.mediaUrl}" style="max-width:100%; border-radius:8px;">`);
+        };
+
+        item.innerHTML = `
+            <img class="avatar status-ring" src="${story.userPhoto || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png'}">
+            <div class="chat-info">
+                <div class="chat-name-row"><span class="chat-name">${escapeHtml(username)}</span></div>
+                <div class="chat-msg-row"><span>${time}</span></div>
+            </div>
+        `;
+        // Prepend so the latest is on top
+        list.prepend(item);
     });
 }
 
