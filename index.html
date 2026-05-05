@@ -59,14 +59,8 @@
 
         /* --- AUTH SCREEN --- */
         #auth-screen {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            padding: 24px;
-            background-color: var(--wa-light);
-            text-align: center;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            height: 100%; padding: 24px; background-color: var(--wa-light); text-align: center;
         }
         .auth-logo { width: 80px; height: 80px; background: var(--wa-primary); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
         .auth-logo svg { color: #fff; width: 40px; height: 40px; }
@@ -81,53 +75,23 @@
         #main-app { display: none; flex: 1; flex-direction: column; height: 100%; }
 
         /* --- HEADER & TABS --- */
-        .wa-header-container {
-            background-color: var(--wa-primary);
-            color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            z-index: 100;
-            position: relative; 
-        }
-
-        .wa-top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: calc(env(safe-area-inset-top) + 12px) 16px 12px;
-        }
-
+        .wa-header-container { background-color: var(--wa-primary); color: #ffffff; display: flex; flex-direction: column; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 100; position: relative; }
+        .wa-top-bar { display: flex; justify-content: space-between; align-items: center; padding: calc(env(safe-area-inset-top) + 12px) 16px 12px; }
         .wa-title { font-size: 20px; font-weight: 600; letter-spacing: 0.5px; }
         .wa-icons { display: flex; gap: 20px; align-items: center; }
         .wa-icons svg { width: 22px; height: 22px; cursor: pointer; }
         .gb-wifi { transform: rotate(45deg); }
 
         .wa-tabs { display: flex; align-items: center; }
-        .wa-tab {
-            flex: 1; text-align: center; padding: 12px 0; font-size: 13px; font-weight: 600;
-            color: rgba(255, 255, 255, 0.5); cursor: pointer; text-transform: uppercase;
-            border-bottom: 3px solid transparent; transition: all 0.2s;
-        }
+        .wa-tab { flex: 1; text-align: center; padding: 12px 0; font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.5); cursor: pointer; text-transform: uppercase; border-bottom: 3px solid transparent; transition: all 0.2s; }
         .wa-tab.active { color: #ffffff; border-bottom: 3px solid #ffffff; }
 
         /* --- SEARCH OVERLAY --- */
-        .search-overlay {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: var(--wa-primary); display: none; align-items: center;
-            padding: calc(env(safe-area-inset-top) + 8px) 16px 8px; gap: 16px; z-index: 110;
-        }
+        .search-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--wa-primary); display: none; align-items: center; padding: calc(env(safe-area-inset-top) + 8px) 16px 8px; gap: 16px; z-index: 110; }
         .search-overlay.active { display: flex; animation: fadeIn 0.2s; }
         .search-overlay svg { color: #ffffff; cursor: pointer; width: 24px; height: 24px; }
-        
-        .search-input-wrapper {
-            flex: 1; background-color: var(--wa-light); border-radius: 24px; display: flex;
-            align-items: center; padding: 6px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .search-input-wrapper input {
-            flex: 1; border: none; outline: none; background: transparent;
-            color: var(--wa-text-main); font-size: 15px;
-        }
+        .search-input-wrapper { flex: 1; background-color: var(--wa-light); border-radius: 24px; display: flex; align-items: center; padding: 6px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .search-input-wrapper input { flex: 1; border: none; outline: none; background: transparent; color: var(--wa-text-main); font-size: 15px; }
 
         /* --- MAIN VIEWS --- */
         .view-container { display: none; flex: 1; overflow-y: auto; background-color: var(--wa-light); }
@@ -137,9 +101,7 @@
         /* --- CHATS LIST --- */
         .chat-list-item { display: flex; padding: 12px 16px; align-items: center; cursor: pointer; transition: background 0.15s; }
         .chat-list-item:active { background-color: var(--wa-bg); }
-        
         .avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; margin-right: 14px; }
-
         .chat-info { flex: 1; border-bottom: 1px solid var(--wa-border); padding-bottom: 12px; }
         .chat-name-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
         .chat-name { font-size: 16px; font-weight: 600; }
@@ -158,120 +120,68 @@
         .profile-email { font-size: 14px; color: var(--wa-text-muted); }
 
         /* --- FLOATING ACTION BUTTON --- */
-        .fab {
-            position: fixed; bottom: calc(env(safe-area-inset-bottom) + 20px); right: 20px;
-            width: 56px; height: 56px; background-color: var(--wa-text-main); color: var(--wa-light);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 90; transition: transform 0.1s;
-        }
+        .fab { position: fixed; bottom: calc(env(safe-area-inset-bottom) + 20px); right: 20px; width: 56px; height: 56px; background-color: var(--wa-text-main); color: var(--wa-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 90; transition: transform 0.1s; }
         .fab:active { transform: scale(0.95); }
 
+        /* --- BOTTOM SHEET (ADD FRIEND) --- */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 500; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: var(--wa-light); color: var(--wa-text-main); border-radius: 16px 16px 0 0; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); z-index: 501; box-shadow: 0 -4px 12px rgba(0,0,0,0.1); }
+        .modal-overlay.active + .bottom-sheet { transform: translateY(0); }
+        .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .sheet-header h3 { font-size: 18px; font-weight: 600; }
+        .sheet-input { width: 100%; background: var(--wa-bg); border: 1px solid var(--wa-border); color: var(--wa-text-main); padding: 14px; border-radius: 8px; font-size: 15px; margin-bottom: 16px; outline: none; }
+        .sheet-input:focus { border-color: var(--wa-text-muted); }
+        .sheet-btn { width: 100%; background: var(--wa-text-main); color: var(--wa-light); border: none; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
+
         /* --- CHAT ROOM (SLIDE OVER) --- */
-        .chat-room {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--wa-chat-bg);
-            background-image: url('data:image/svg+xml,%3Csvg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M10 10h10v10H10V10z" fill="rgba(0,0,0,0.02)"/%3E%3C/svg%3E'); 
-            z-index: 200; display: flex; flex-direction: column; transform: translateX(100%);
-            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
+        .chat-room { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--wa-chat-bg); background-image: url('data:image/svg+xml,%3Csvg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M10 10h10v10H10V10z" fill="rgba(0,0,0,0.02)"/%3E%3C/svg%3E'); z-index: 200; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
         .chat-room.open { transform: translateX(0); }
-
-        .chat-room-header {
-            background-color: var(--wa-primary); color: #ffffff; display: flex; align-items: center;
-            padding: calc(env(safe-area-inset-top) + 8px) 16px 8px; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
+        .chat-room-header { background-color: var(--wa-primary); color: #ffffff; display: flex; align-items: center; padding: calc(env(safe-area-inset-top) + 8px) 16px 8px; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .back-btn { display: flex; align-items: center; cursor: pointer; margin-left: -8px; }
         .back-btn svg { width: 24px; height: 24px; }
-        
         .chat-room-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
         .chat-room-title { flex: 1; }
         .chat-room-title h3 { font-size: 16px; font-weight: 600; line-height: 1.2; }
         .chat-room-title p { font-size: 12px; color: rgba(255,255,255,0.7); }
 
         /* --- MESSAGES --- */
-        .messages-container {
-            flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 4px;
-        }
-
+        .messages-container { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 4px; }
         .message-wrapper { display: flex; flex-direction: column; max-width: 85%; }
         .message-wrapper.sent { align-self: flex-end; }
         .message-wrapper.recv { align-self: flex-start; }
-
         .sender-name { font-size: 12px; font-weight: 600; margin-bottom: 2px; padding-left: 4px; }
-        .bubble {
-            padding: 6px 8px 8px 10px; border-radius: 8px; font-size: 15px;
-            position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1); line-height: 1.3;
-        }
-
+        .bubble { padding: 6px 8px 8px 10px; border-radius: 8px; font-size: 15px; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1); line-height: 1.3; }
         .sent .bubble { background-color: var(--wa-bubble-sent); border-top-right-radius: 0; }
         .recv .bubble { background-color: var(--wa-bubble-recv); border-top-left-radius: 0; }
-
-        .msg-time-ticks {
-            float: right; display: flex; align-items: center; gap: 4px;
-            margin-top: 4px; margin-left: 12px; font-size: 11px; color: var(--wa-text-muted);
-        }
+        .msg-time-ticks { float: right; display: flex; align-items: center; gap: 4px; margin-top: 4px; margin-left: 12px; font-size: 11px; color: var(--wa-text-muted); }
 
         /* --- INPUT AREA --- */
-        .chat-input-area {
-            display: flex; align-items: flex-end; padding: 8px;
-            padding-bottom: calc(env(safe-area-inset-bottom) + 8px);
-            background-color: transparent; gap: 8px;
-        }
-
-        .input-bar {
-            flex: 1; background-color: var(--wa-light); border-radius: 24px;
-            display: flex; align-items: center; padding: 8px 12px; box-shadow: 0 1px 1px rgba(0,0,0,0.1);
-        }
-
+        .chat-input-area { display: flex; align-items: flex-end; padding: 8px; padding-bottom: calc(env(safe-area-inset-bottom) + 8px); background-color: transparent; gap: 8px; }
+        .input-bar { flex: 1; background-color: var(--wa-light); border-radius: 24px; display: flex; align-items: center; padding: 8px 12px; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
         .input-bar svg { color: var(--wa-text-muted); width: 24px; height: 24px; cursor: pointer; }
-        .input-bar input {
-            flex: 1; border: none; outline: none; font-size: 16px; padding: 4px 12px;
-            background: transparent; color: var(--wa-text-main);
-        }
-
-        .mic-btn {
-            width: 48px; height: 48px; background-color: var(--wa-text-main); color: var(--wa-light);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2); border: none; cursor: pointer; flex-shrink: 0;
-            transition: opacity 0.2s;
-        }
+        .input-bar input { flex: 1; border: none; outline: none; font-size: 16px; padding: 4px 12px; background: transparent; color: var(--wa-text-main); }
+        .mic-btn { width: 48px; height: 48px; background-color: var(--wa-text-main); color: var(--wa-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2); border: none; cursor: pointer; flex-shrink: 0; transition: opacity 0.2s; }
         .mic-btn:active { opacity: 0.8; }
 
         /* GB Settings Menu */
-        .gb-menu {
-            position: absolute; top: 50px; right: 16px; background: var(--wa-light); border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: none; flex-direction: column;
-            z-index: 200; overflow: hidden; width: 200px; color: var(--wa-text-main);
-        }
+        .gb-menu { position: absolute; top: 50px; right: 16px; background: var(--wa-light); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: none; flex-direction: column; z-index: 200; overflow: hidden; width: 200px; color: var(--wa-text-main); }
         .gb-menu.active { display: flex; }
         .gb-menu-item { padding: 14px 16px; font-size: 15px; cursor: pointer; }
         .gb-menu-item:hover { background: var(--wa-bg); }
 
         /* CUSTOM DIALOG */
-        .dialog-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000;
-            display: none; align-items: center; justify-content: center;
-            opacity: 0; transition: opacity 0.2s;
-        }
+        .dialog-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
         .dialog-overlay.active { display: flex; opacity: 1; }
-        .dialog-box {
-            background: var(--wa-light); color: var(--wa-text-main);
-            width: 85%; max-width: 320px; border-radius: 12px; padding: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: scale(0.9); transition: transform 0.2s;
-        }
+        .dialog-box { background: var(--wa-light); color: var(--wa-text-main); width: 85%; max-width: 320px; border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: scale(0.9); transition: transform 0.2s; }
         .dialog-overlay.active .dialog-box { transform: scale(1); }
         .dialog-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
         .dialog-msg { font-size: 14px; color: var(--wa-text-muted); margin-bottom: 24px; line-height: 1.4; }
         .dialog-actions { display: flex; justify-content: flex-end; }
-        .dialog-btn {
-            background: none; border: none; font-weight: 600; font-size: 14px;
-            cursor: pointer; padding: 8px 16px; border-radius: 6px;
-            text-transform: uppercase; color: var(--wa-text-main);
-        }
+        .dialog-btn { background: none; border: none; font-weight: 600; font-size: 14px; cursor: pointer; padding: 8px 16px; border-radius: 6px; text-transform: uppercase; color: var(--wa-text-main); }
         .dialog-btn:active { background: var(--wa-bg); }
 
         ::-webkit-scrollbar { display: none; }
-
     </style>
 </head>
 <body>
@@ -330,9 +240,9 @@
     <!-- CHATS TAB -->
     <div id="tab-chats" class="view-container active">
         <!-- Pinned Global Chat -->
-        <div class="chat-list-item" onclick="openChatRoom()">
+        <div class="chat-list-item" onclick="openGlobalChat()">
             <img class="avatar" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png" style="background: var(--wa-text-main);">
-            <div class="chat-info" style="border-bottom: none;">
+            <div class="chat-info">
                 <div class="chat-name-row">
                     <span class="chat-name">Vynix Mainnet (Global)</span>
                     <span class="chat-time" id="last-msg-time">Just now</span>
@@ -343,6 +253,8 @@
                 </div>
             </div>
         </div>
+        <!-- Private Friends List Container -->
+        <div id="private-chats-list"></div>
     </div>
 
     <!-- STATUS TAB -->
@@ -376,21 +288,18 @@
         </div>
         
         <div class="status-section-title">Account Actions</div>
-        
         <div class="chat-list-item" onclick="copyVynixID()">
             <i data-feather="copy" style="color: var(--wa-text-main);"></i>
             <div class="chat-info" style="border-bottom: none; margin-left: 16px; padding-bottom: 0;">
                 <div class="chat-name" style="font-weight: 400;">Copy Vynix ID to Invite Friends</div>
             </div>
         </div>
-        
         <div class="chat-list-item" onclick="showCustomDialog('Privacy', 'Your Vynix ID keeps your real phone number hidden from other users.')">
             <i data-feather="shield" style="color: var(--wa-text-main);"></i>
             <div class="chat-info" style="border-bottom: none; margin-left: 16px; padding-bottom: 0;">
                 <div class="chat-name" style="font-weight: 400;">Privacy & Security</div>
             </div>
         </div>
-        
         <div class="chat-list-item" onclick="handleLogout()">
             <i data-feather="log-out" style="color: #ef4444;"></i>
             <div class="chat-info" style="border-bottom: none; margin-left: 16px; padding-bottom: 0;">
@@ -400,9 +309,21 @@
     </div>
 
     <!-- FLOATING ACTION BUTTON -->
-    <div class="fab" id="main-fab" onclick="openChatRoom()">
+    <div class="fab" id="main-fab" onclick="handleFabClick()">
         <i data-feather="message-square"></i>
     </div>
+</div>
+
+<!-- BOTTOM SHEET (ADD FRIEND) -->
+<div class="modal-overlay" id="friend-overlay" onclick="closeFriendSheet()"></div>
+<div class="bottom-sheet" id="friend-sheet">
+    <div class="sheet-header">
+        <h3>New Chat</h3>
+        <i data-feather="x" onclick="closeFriendSheet()" style="cursor: pointer;"></i>
+    </div>
+    <p style="font-size: 14px; color: var(--wa-text-muted); margin-bottom: 12px;">Enter your friend's Vynix ID to add them to your chat list.</p>
+    <input type="text" id="friend-id-input" class="sheet-input" placeholder="e.g. NeonWolf88" autocomplete="off">
+    <button class="sheet-btn" onclick="addFriend()">Add Friend</button>
 </div>
 
 <!-- CHAT ROOM (Slides in) -->
@@ -413,8 +334,8 @@
         </div>
         <img class="chat-room-avatar" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png" style="background: white;">
         <div class="chat-room-title">
-            <h3>Vynix Mainnet</h3>
-            <p>Global encrypted channel</p>
+            <h3 id="chat-room-title-text">Vynix Mainnet</h3>
+            <p id="chat-room-subtitle">Global encrypted channel</p>
         </div>
         <i data-feather="video"></i>
         <i data-feather="phone"></i>
@@ -453,7 +374,7 @@
 
 <script type="module">
 import {
-    getDatabase, ref, onChildAdded, push, set, get, serverTimestamp, query, limitToLast
+    getDatabase, ref, onChildAdded, push, set, get, serverTimestamp, query, limitToLast, orderByChild, equalTo
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
@@ -478,6 +399,7 @@ const db   = getDatabase(app);
 window.currentUser = null;
 window.currentVynixId = null;
 let chatLoaded = false;
+let friendsLoaded = false;
 
 // --- VYNIX ID GENERATOR ---
 function generateMemorableID() {
@@ -485,7 +407,7 @@ function generateMemorableID() {
     const nouns = ['Wolf', 'Hawk', 'Viper', 'Raven', 'Fox', 'Dragon', 'Tiger', 'Lynx', 'Bear', 'Titan'];
     const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
     const noun = nouns[Math.floor(Math.random() * nouns.length)];
-    const num = Math.floor(Math.random() * 90) + 10; // Two digit number
+    const num = Math.floor(Math.random() * 90) + 10;
     return `${adj}${noun}${num}`;
 }
 
@@ -500,7 +422,6 @@ window.handleSignUp = async () => {
         const user = userCredential.user;
         const newVynixID = generateMemorableID();
         
-        // Save to Database
         await set(ref(db, `users/${user.uid}`), {
             email: email,
             vynixId: newVynixID,
@@ -508,7 +429,7 @@ window.handleSignUp = async () => {
             createdAt: serverTimestamp()
         });
         
-        showCustomDialog('Welcome!', `Account created successfully! Your unique Vynix ID is ${newVynixID}.`);
+        showCustomDialog('Welcome!', `Account created! Your unique Vynix ID is ${newVynixID}. Share it to connect.`);
     } catch (e) {
         showCustomDialog('Sign Up Failed', e.message);
     }
@@ -532,6 +453,8 @@ window.handleLogout = async () => {
         document.getElementById('main-app').style.display = 'none';
         document.getElementById('auth-screen').style.display = 'flex';
         document.getElementById('gb-menu').classList.remove('active');
+        friendsLoaded = false;
+        document.getElementById('private-chats-list').innerHTML = '';
     } catch(e) {
         showCustomDialog('Error', 'Could not log out.');
     }
@@ -543,7 +466,6 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('main-app').style.display = 'flex';
         
-        // Load User Profile Data
         const snapshot = await get(ref(db, `users/${user.uid}`));
         if(snapshot.exists()) {
             window.currentVynixId = snapshot.val().vynixId || snapshot.val().username;
@@ -553,15 +475,138 @@ onAuthStateChanged(auth, async (user) => {
             window.currentVynixId = "User_" + user.uid.substring(0,4);
             document.getElementById('display-vynix-id').textContent = window.currentVynixId;
         }
-        
         document.getElementById('display-email').textContent = user.email;
         loadStatus();
+        loadFriends();
     } else {
         window.currentUser = null;
         document.getElementById('main-app').style.display = 'none';
         document.getElementById('auth-screen').style.display = 'flex';
     }
 });
+
+// --- ADD FRIEND & FAB LOGIC ---
+window.handleFabClick = () => {
+    const activeTabContainer = document.querySelector('.view-container.active').id;
+    if(activeTabContainer === 'tab-chats') {
+        document.getElementById('friend-overlay').classList.add('active');
+        setTimeout(() => document.getElementById('friend-id-input').focus(), 100);
+    } else if (activeTabContainer === 'tab-status') {
+        showCustomDialog('Status', 'Opening camera to add status...');
+    } else if (activeTabContainer === 'tab-calls') {
+        showCustomDialog('New Call', 'Select a contact to call.');
+    }
+};
+
+window.closeFriendSheet = () => {
+    document.getElementById('friend-overlay').classList.remove('active');
+    document.getElementById('friend-id-input').value = '';
+};
+
+window.addFriend = async () => {
+    const inputId = document.getElementById('friend-id-input').value.trim();
+    if(!inputId) return;
+    
+    if(inputId === window.currentVynixId) {
+        return showCustomDialog('Oops', 'You cannot add yourself.');
+    }
+    
+    const usersRef = ref(db, 'users');
+    const q = query(usersRef, orderByChild('vynixId'), equalTo(inputId));
+    
+    try {
+        const snapshot = await get(q);
+        if(snapshot.exists()) {
+            let friendUid = null;
+            let friendData = null;
+            snapshot.forEach(child => { friendUid = child.key; friendData = child.val(); });
+            
+            // Save to friends list
+            await set(ref(db, `users/${window.currentUser.uid}/friends/${friendUid}`), {
+                vynixId: friendData.vynixId,
+                addedAt: serverTimestamp()
+            });
+            
+            closeFriendSheet();
+            showCustomDialog('Success', `${friendData.vynixId} added to your chats!`);
+        } else {
+            showCustomDialog('Not Found', 'No user found with that Vynix ID.');
+        }
+    } catch(e) {
+        showCustomDialog('Error', 'Failed to search for user.');
+    }
+};
+
+function loadFriends() {
+    if(friendsLoaded || !window.currentUser) return;
+    friendsLoaded = true;
+    
+    const friendsRef = ref(db, `users/${window.currentUser.uid}/friends`);
+    onChildAdded(friendsRef, (snap) => {
+        const friendId = snap.key;
+        const friendData = snap.val();
+        renderFriendChat(friendId, friendData.vynixId);
+    });
+}
+
+function renderFriendChat(uid, vynixId) {
+    const list = document.getElementById('private-chats-list');
+    if(document.getElementById(`chat-item-${uid}`)) return;
+    
+    const item = document.createElement('div');
+    item.className = 'chat-list-item';
+    item.id = `chat-item-${uid}`;
+    item.onclick = () => {
+        document.getElementById('chat-room-title-text').textContent = vynixId;
+        document.getElementById('chat-room-subtitle').textContent = 'Private encrypted chat';
+        openChatRoom();
+    };
+    
+    const firstLetter = vynixId.charAt(0).toUpperCase();
+    item.innerHTML = `
+        <div class="avatar" style="background: var(--wa-text-main); color: var(--wa-light); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold;">${firstLetter}</div>
+        <div class="chat-info">
+            <div class="chat-name-row"><span class="chat-name">${escapeHtml(vynixId)}</span></div>
+            <div class="chat-msg-row"><span>Tap to open chat...</span></div>
+        </div>
+    `;
+    list.prepend(item);
+}
+
+
+// --- SWIPE TO SWITCH TABS LOGIC ---
+let touchStartX = 0;
+let touchStartY = 0;
+const tabsOrder = ['chats', 'status', 'calls', 'profile'];
+
+document.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+}, {passive: true});
+
+document.addEventListener('touchend', e => {
+    if(!window.currentUser) return; 
+    if(document.getElementById('chat-room').classList.contains('open')) return;
+    if(document.getElementById('friend-overlay').classList.contains('active')) return;
+    if(document.getElementById('custom-dialog').classList.contains('active')) return;
+    
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const dx = touchEndX - touchStartX;
+    const dy = touchEndY - touchStartY;
+    
+    // Ensure it's a horizontal swipe, not a vertical scroll
+    if (Math.abs(dx) > 60 && Math.abs(dy) < 50) {
+        const activeTabId = document.querySelector('.view-container.active').id.replace('tab-', '');
+        const currentIndex = tabsOrder.indexOf(activeTabId);
+        
+        if (dx < 0 && currentIndex < tabsOrder.length - 1) { // Swipe Left
+            switchTab(tabsOrder[currentIndex + 1]);
+        } else if (dx > 0 && currentIndex > 0) { // Swipe Right
+            switchTab(tabsOrder[currentIndex - 1]);
+        }
+    }
+}, {passive: true});
 
 
 // --- CUSTOM DIALOG LOGIC ---
@@ -570,56 +615,40 @@ window.showCustomDialog = (title, message) => {
     document.getElementById('cd-msg').textContent = message;
     document.getElementById('custom-dialog').classList.add('active');
 };
-window.closeCustomDialog = () => {
-    document.getElementById('custom-dialog').classList.remove('active');
-};
+window.closeCustomDialog = () => { document.getElementById('custom-dialog').classList.remove('active'); };
 
 // --- DARK MODE LOGIC ---
 window.toggleTheme = () => {
     const doc = document.documentElement;
     if (doc.getAttribute('data-theme') === 'dark') {
-        doc.removeAttribute('data-theme');
-        localStorage.setItem('vynix_gb_theme', 'light');
+        doc.removeAttribute('data-theme'); localStorage.setItem('vynix_gb_theme', 'light');
     } else {
-        doc.setAttribute('data-theme', 'dark');
-        localStorage.setItem('vynix_gb_theme', 'dark');
+        doc.setAttribute('data-theme', 'dark'); localStorage.setItem('vynix_gb_theme', 'dark');
     }
 };
-
-if(localStorage.getItem('vynix_gb_theme') === 'dark') {
-    document.documentElement.setAttribute('data-theme', 'dark');
-}
+if(localStorage.getItem('vynix_gb_theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
 
 // --- SEARCH LOGIC ---
-window.openSearch = () => {
-    document.getElementById('search-overlay').classList.add('active');
-    setTimeout(() => document.getElementById('global-search-input').focus(), 100);
-};
-
-window.closeSearch = () => {
-    document.getElementById('search-overlay').classList.remove('active');
-    document.getElementById('global-search-input').value = '';
-};
-
+window.openSearch = () => { document.getElementById('search-overlay').classList.add('active'); setTimeout(() => document.getElementById('global-search-input').focus(), 100); };
+window.closeSearch = () => { document.getElementById('search-overlay').classList.remove('active'); document.getElementById('global-search-input').value = ''; };
 window.handleGlobalSearch = () => {
     const query = document.getElementById('global-search-input').value.trim();
-    if (query) {
-        showCustomDialog('Global Search', 'Searching network for: ' + query);
-        closeSearch();
-    }
+    if (query) { showCustomDialog('Global Search', 'Searching network for: ' + query); closeSearch(); }
 };
 
 // --- GLOBAL CLICK LISTENER ---
 document.addEventListener('click', (e) => {
     const menu = document.getElementById('gb-menu');
-    if(!e.target.closest('.wa-icons') && !e.target.closest('.gb-menu')) {
-        menu.classList.remove('active');
-    }
+    if(!e.target.closest('.wa-icons') && !e.target.closest('.gb-menu')) menu.classList.remove('active');
+    
     const searchOverlay = document.getElementById('search-overlay');
     if (searchOverlay.classList.contains('active')) {
-        if (!e.target.closest('#search-overlay') && !e.target.closest('#search-trigger')) {
-            closeSearch();
-        }
+        if (!e.target.closest('#search-overlay') && !e.target.closest('#search-trigger')) closeSearch();
+    }
+    
+    const friendOverlay = document.getElementById('friend-overlay');
+    if (friendOverlay.classList.contains('active') && !e.target.closest('#friend-sheet') && !e.target.closest('#main-fab')) {
+        closeFriendSheet();
     }
 });
 
@@ -633,28 +662,16 @@ window.copyVynixID = () => {
 };
 
 // --- UTILS ---
-function formatTime(timestamp) {
-    const d = timestamp ? new Date(timestamp) : new Date();
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-
-function stringToColor(str) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
-    return '#' + "00000".substring(0, 6 - c.length) + c;
-}
-
-function escapeHtml(text) {
-    return (text || '').toString().replace(/[&<>"']/g, m => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
-    })[m]);
-}
+function formatTime(timestamp) { const d = timestamp ? new Date(timestamp) : new Date(); return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
+function stringToColor(str) { let hash = 0; for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash); const c = (hash & 0x00FFFFFF).toString(16).toUpperCase(); return '#' + "00000".substring(0, 6 - c.length) + c; }
+function escapeHtml(text) { return (text || '').toString().replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]); }
 
 // --- UI TOGGLES ---
 window.switchTab = (tabId) => {
     document.querySelectorAll('.wa-tab').forEach(t => t.classList.remove('active'));
-    event.target.classList.add('active');
+    // Handle click directly or swipe programmatically
+    const targetTab = document.querySelector(`.wa-tab[onclick="switchTab('${tabId}')"]`);
+    if(targetTab) targetTab.classList.add('active');
     
     document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
     document.getElementById('tab-' + tabId).classList.add('active');
@@ -663,33 +680,32 @@ window.switchTab = (tabId) => {
     if(tabId === 'chats') { fab.style.display = 'flex'; fab.innerHTML = '<i data-feather="message-square"></i>'; }
     else if(tabId === 'status') { fab.style.display = 'flex'; fab.innerHTML = '<i data-feather="camera"></i>'; }
     else if(tabId === 'calls') { fab.style.display = 'flex'; fab.innerHTML = '<i data-feather="phone-call"></i>'; }
-    else if(tabId === 'profile') { fab.style.display = 'none'; } // Hide FAB on profile
-    
+    else if(tabId === 'profile') { fab.style.display = 'none'; } 
     feather.replace();
 }
+
+window.openGlobalChat = () => {
+    document.getElementById('chat-room-title-text').textContent = 'Vynix Mainnet';
+    document.getElementById('chat-room-subtitle').textContent = 'Global encrypted channel';
+    openChatRoom();
+};
 
 window.openChatRoom = () => {
     document.getElementById('chat-room').classList.add('open');
     if (!chatLoaded) loadChat();
 }
 
-window.closeChatRoom = () => {
-    document.getElementById('chat-room').classList.remove('open');
-}
+window.closeChatRoom = () => { document.getElementById('chat-room').classList.remove('open'); }
 
 window.toggleMicSendIcon = () => {
     const input = document.getElementById('msg-input').value.trim();
     const icon = document.getElementById('action-icon');
-    if(input.length > 0) {
-        icon.setAttribute('data-feather', 'send');
-    } else {
-        icon.setAttribute('data-feather', 'mic');
-    }
+    if(input.length > 0) icon.setAttribute('data-feather', 'send');
+    else icon.setAttribute('data-feather', 'mic');
     feather.replace();
 }
 
-
-// --- LOAD CHAT ---
+// --- LOAD CHAT (Global) ---
 function loadChat() {
     chatLoaded = true;
     const container = document.getElementById('messages-container');
@@ -703,29 +719,14 @@ function loadChat() {
         const nameColor = stringToColor(username);
         
         let contentHtml = escapeHtml(post.text);
-        if(post.mediaUrl) {
-            contentHtml = `
-                <img src="${post.mediaUrl}" style="max-width:100%; border-radius:8px; margin-bottom:4px;">
-                <div>${contentHtml}</div>
-            `;
-        }
+        if(post.mediaUrl) contentHtml = `<img src="${post.mediaUrl}" style="max-width:100%; border-radius:8px; margin-bottom:4px;"><div>${contentHtml}</div>`;
 
         const msgDiv = document.createElement('div');
         msgDiv.className = `message-wrapper ${isSelf ? 'sent' : 'recv'}`;
-        
         const nameHtml = !isSelf ? `<div class="sender-name" style="color: ${nameColor}">${escapeHtml(username)}</div>` : '';
         const ticksHtml = isSelf ? `<i data-feather="check-all" style="width:14px; height:14px; color: var(--wa-blue-tick);"></i>` : '';
 
-        msgDiv.innerHTML = `
-            <div class="bubble">
-                ${nameHtml}
-                ${contentHtml}
-                <div class="msg-time-ticks">
-                    ${time} ${ticksHtml}
-                </div>
-            </div>
-        `;
-        
+        msgDiv.innerHTML = `<div class="bubble">${nameHtml}${contentHtml}<div class="msg-time-ticks">${time} ${ticksHtml}</div></div>`;
         container.appendChild(msgDiv);
         container.scrollTop = container.scrollHeight;
         feather.replace();
@@ -739,7 +740,6 @@ function loadChat() {
 function loadStatus() {
     const list = document.getElementById('status-list');
     const storiesQuery = query(ref(db, 'stories'), limitToLast(10));
-
     onChildAdded(storiesQuery, (snapshot) => {
         const story = snapshot.val();
         const username = story.username || 'User';
@@ -748,14 +748,7 @@ function loadStatus() {
         const item = document.createElement('div');
         item.className = 'chat-list-item';
         item.onclick = () => showCustomDialog('Status Update', 'Opening Status from: ' + username);
-
-        item.innerHTML = `
-            <img class="avatar status-ring" src="${story.userPhoto || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png'}">
-            <div class="chat-info">
-                <div class="chat-name-row"><span class="chat-name">${escapeHtml(username)}</span></div>
-                <div class="chat-msg-row"><span>${time}</span></div>
-            </div>
-        `;
+        item.innerHTML = `<img class="avatar status-ring" src="${story.userPhoto || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png'}"><div class="chat-info"><div class="chat-name-row"><span class="chat-name">${escapeHtml(username)}</span></div><div class="chat-msg-row"><span>${time}</span></div></div>`;
         list.appendChild(item);
     });
 }
@@ -764,28 +757,18 @@ function loadStatus() {
 window.sendMessage = async () => {
     const input = document.getElementById('msg-input');
     const text = input.value.trim();
-    
-    if(!text) {
-        showCustomDialog('Action Blocked', 'Voice messages are disabled in GB Ghost Mode.');
-        return;
-    }
+    if(!text) return showCustomDialog('Action Blocked', 'Voice messages are disabled in GB Ghost Mode.');
     if (!window.currentUser) return;
     
-    input.value = '';
-    window.toggleMicSendIcon();
-    input.focus();
+    input.value = ''; window.toggleMicSendIcon(); input.focus();
 
     try {
         await push(ref(db, 'posts'), {
-            uid: window.currentUser.uid,
-            text: text,
-            timestamp: serverTimestamp(),
+            uid: window.currentUser.uid, text: text, timestamp: serverTimestamp(),
             user: { username: window.currentVynixId || 'User' } 
         });
         if(navigator.vibrate) navigator.vibrate(20);
-    } catch (e) {
-        showCustomDialog('Error', 'Send failed. Please check your connection.');
-    }
+    } catch (e) { showCustomDialog('Error', 'Send failed. Please check your connection.'); }
 }
 
 feather.replace();
