@@ -19,7 +19,7 @@
             --wa-bubble-sent: #e2e8f0; 
             --wa-bubble-recv: #ffffff;
             --wa-blue-tick: #3b82f6;
-            --wa-status-ring: #000000;
+            --wa-like-red: #f91880;
             
             /* Pill Variables */
             --pill-active-bg: #ffffff;
@@ -40,7 +40,7 @@
             --wa-bubble-sent: #374151; 
             --wa-bubble-recv: #202c33;
             --wa-blue-tick: #53bdeb;
-            --wa-status-ring: #e9edef;
+            --wa-like-red: #f91880;
 
             --pill-active-bg: #374151;
             --pill-active-text: #ffffff;
@@ -48,22 +48,16 @@
             --pill-inactive-text: rgba(255, 255, 255, 0.5);
         }
 
-        /* --- NATIVE APP FEEL (Prevents highlighting and long-press menus) --- */
+        /* --- NATIVE APP FEEL --- */
         * { 
             box-sizing: border-box; margin: 0; padding: 0; 
             -webkit-tap-highlight-color: transparent; 
-            -webkit-touch-callout: none; /* Prevents long-press context menu on iOS */
-            -webkit-user-select: none;   /* Prevents text highlighting */
+            -webkit-touch-callout: none; 
+            -webkit-user-select: none;   
             user-select: none;
         }
 
-        /* Re-enable text selection ONLY for input fields */
-        input, textarea {
-            -webkit-user-select: auto;
-            user-select: auto;
-        }
-
-        /* Prevent image drag and drop */
+        input, textarea { -webkit-user-select: auto; user-select: auto; }
         img { -webkit-user-drag: none; pointer-events: auto; }
 
         body {
@@ -139,30 +133,32 @@
 
         #private-chats-list { display: flex; flex-direction: column; }
 
-        /* --- STATUS LIST --- */
-        .status-section-title { padding: 16px; font-size: 14px; font-weight: 600; color: var(--wa-text-muted); background: var(--wa-bg); }
-        .status-ring { padding: 2px; border: 2px solid var(--wa-status-ring); border-radius: 50%; }
+        /* --- X-STYLE FEED --- */
+        .feed-composer { padding: 16px; border-bottom: 1px solid var(--wa-border); display: flex; gap: 12px; background: var(--wa-light); }
+        .feed-composer-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+        .feed-input-area { flex: 1; display: flex; flex-direction: column; }
+        .feed-input-area textarea { border: none; outline: none; background: transparent; color: var(--wa-text-main); font-size: 16px; resize: none; min-height: 50px; font-family: inherit; margin-bottom: 8px; }
+        .feed-composer-actions { display: flex; justify-content: space-between; align-items: center; }
+        .feed-composer-actions svg { color: var(--wa-blue-tick); width: 20px; height: 20px; cursor: pointer; }
+        .feed-post-btn { background: var(--wa-primary); color: #fff; border: none; padding: 6px 16px; border-radius: 9999px; font-weight: bold; font-size: 14px; opacity: 0.6; cursor: pointer; transition: opacity 0.2s; }
+        .feed-post-btn.active { opacity: 1; }
+        .feed-media-preview { width: 100%; max-height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; display: none; }
 
-        /* --- WHATSAPP STATUS VIEWER --- */
-        .wa-status-viewer { position: fixed; inset: 0; background: #000; z-index: 300; display: none; flex-direction: column; }
-        .wa-status-viewer.active { display: flex; animation: fadeIn 0.2s; }
+        .feed-card { padding: 16px; border-bottom: 1px solid var(--wa-border); display: flex; gap: 12px; background: var(--wa-light); transition: background 0.15s; cursor: pointer; }
+        .feed-card:active { background: var(--wa-bg); }
+        .feed-card-main { flex: 1; min-width: 0; }
+        .feed-card-header { display: flex; justify-content: space-between; margin-bottom: 4px; align-items: baseline; }
+        .feed-card-name { font-weight: bold; color: var(--wa-text-main); font-size: 15px; }
+        .feed-card-time { font-size: 13px; color: var(--wa-text-muted); }
+        .feed-card-text { font-size: 15px; line-height: 1.4; margin-bottom: 12px; word-wrap: break-word; white-space: pre-wrap; color: var(--wa-text-main); }
+        .feed-card-img { width: 100%; border-radius: 16px; border: 1px solid var(--wa-border); margin-bottom: 12px; object-fit: cover; max-height: 400px; }
         
-        .status-progress-container { display: flex; gap: 4px; padding: calc(env(safe-area-inset-top) + 12px) 12px 12px; position: absolute; top: 0; left: 0; right: 0; z-index: 10; }
-        .status-progress-bar { flex: 1; height: 2px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden; }
-        .status-progress-fill { height: 100%; background: #fff; width: 0%; }
-        
-        .status-header { position: absolute; top: calc(env(safe-area-inset-top) + 24px); left: 12px; right: 12px; display: flex; align-items: center; gap: 12px; color: white; z-index: 10; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
-        .status-header svg { width: 24px; height: 24px; cursor: pointer; }
-        .status-header img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-        .status-header-info { flex: 1; }
-        .status-header-info h4 { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
-        .status-header-info p { font-size: 12px; opacity: 0.8; }
-        
-        .status-media-container { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
-        .status-media-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        
-        .status-tap-left { position: absolute; top: 0; bottom: 0; left: 0; width: 30%; z-index: 5; }
-        .status-tap-right { position: absolute; top: 0; bottom: 0; right: 0; width: 70%; z-index: 5; }
+        .feed-actions { display: flex; justify-content: space-between; max-width: 300px; color: var(--wa-text-muted); }
+        .feed-action { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: color 0.2s; }
+        .feed-action svg { width: 18px; height: 18px; transition: transform 0.2s; }
+        .feed-action:active svg { transform: scale(0.8); }
+        .feed-action.liked { color: var(--wa-like-red); }
+        .feed-action.liked svg { fill: currentColor; }
 
         /* --- PROFILE VIEW --- */
         .profile-header { padding: 30px 20px; display: flex; align-items: center; gap: 20px; border-bottom: 1px solid var(--wa-border); background: var(--wa-bg); }
@@ -176,16 +172,24 @@
         .fab { position: fixed; bottom: calc(env(safe-area-inset-bottom) + 20px); right: 20px; width: 56px; height: 56px; background-color: var(--wa-text-main); color: var(--wa-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 90; transition: transform 0.1s; }
         .fab:active { transform: scale(0.95); }
 
-        /* --- BOTTOM SHEET (ADD FRIEND) --- */
+        /* --- BOTTOM SHEETS --- */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 500; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        .bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: var(--wa-light); color: var(--wa-text-main); border-radius: 16px 16px 0 0; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); z-index: 501; box-shadow: 0 -4px 12px rgba(0,0,0,0.1); }
+        .bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: var(--wa-light); color: var(--wa-text-main); border-radius: 16px 16px 0 0; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); z-index: 501; box-shadow: 0 -4px 12px rgba(0,0,0,0.1); max-height: 85vh; display: flex; flex-direction: column; }
         .modal-overlay.active + .bottom-sheet { transform: translateY(0); }
-        .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-shrink: 0; }
         .sheet-header h3 { font-size: 18px; font-weight: 600; }
         .sheet-input { width: 100%; background: var(--wa-bg); border: 1px solid var(--wa-border); color: var(--wa-text-main); padding: 14px; border-radius: 8px; font-size: 15px; margin-bottom: 16px; outline: none; }
         .sheet-input:focus { border-color: var(--wa-text-muted); }
         .sheet-btn { width: 100%; background: var(--wa-text-main); color: var(--wa-light); border: none; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
+
+        /* Feed Comments Specific */
+        .feed-comments-list { flex: 1; overflow-y: auto; margin-bottom: 16px; }
+        .feed-comment-item { display: flex; gap: 12px; margin-bottom: 16px; }
+        .feed-comment-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+        .feed-comment-body { background: var(--wa-bg); padding: 10px 14px; border-radius: 16px; border-top-left-radius: 4px; flex: 1; }
+        .feed-comment-name { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
+        .feed-comment-text { font-size: 14px; line-height: 1.4; word-wrap: break-word; }
 
         /* --- CHAT ROOM (SLIDE OVER) --- */
         .chat-room { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--wa-chat-bg); background-image: url('data:image/svg+xml,%3Csvg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M10 10h10v10H10V10z" fill="rgba(0,0,0,0.02)"/%3E%3C/svg%3E'); z-index: 200; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
@@ -279,7 +283,7 @@
         
         <div class="wa-tabs">
             <div class="wa-tab active" onclick="switchTab('chats')">CHATS <span class="pill-badge" id="tab-badge-chats"></span></div>
-            <div class="wa-tab" onclick="switchTab('status')">STATUS</div>
+            <div class="wa-tab" onclick="switchTab('feed')">FEED</div>
             <div class="wa-tab" onclick="switchTab('calls')">CALLS</div>
             <div class="wa-tab" onclick="switchTab('profile')">PROFILE</div>
         </div>
@@ -303,18 +307,24 @@
         <div id="private-chats-list"></div>
     </div>
 
-    <div id="tab-status" class="view-container">
-        <input type="file" id="status-pic-input" accept="image/*" style="display:none;" onchange="handleStatusUpload(event)">
-        
-        <div class="chat-list-item" onclick="document.getElementById('status-pic-input').click()">
-            <img class="avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A8A8A8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='background-color:%23EFEFEF'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E">
-            <div class="chat-info" style="border-bottom: none;">
-                <div class="chat-name-row"><span class="chat-name">My status</span></div>
-                <div class="chat-msg-row"><span class="chat-msg-text">Tap to add status update</span></div>
+    <div id="tab-feed" class="view-container">
+        <div class="feed-composer">
+            <img class="feed-composer-avatar" id="feed-composer-avatar" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png">
+            <div class="feed-input-area">
+                <textarea id="feed-caption-input" placeholder="What's happening?" oninput="updateFeedPostBtn()"></textarea>
+                <img id="feed-media-preview" class="feed-media-preview" src="">
+                <input type="file" id="feed-img-upload" style="display:none;" accept="image/*" onchange="previewFeedImage(event)">
+                
+                <div class="feed-composer-actions">
+                    <i data-feather="image" onclick="document.getElementById('feed-img-upload').click()"></i>
+                    <button class="feed-post-btn" id="feed-post-btn" disabled onclick="submitFeedPost()">Post</button>
+                </div>
             </div>
         </div>
-        <div class="status-section-title">Recent updates</div>
-        <div id="status-list"></div>
+        
+        <div id="feed-posts-list">
+            <div style="padding: 40px; text-align: center; color: var(--wa-text-muted); font-size: 14px;">Loading feed...</div>
+        </div>
     </div>
 
     <div id="tab-calls" class="view-container">
@@ -337,7 +347,7 @@
             </div>
         </div>
         
-        <div class="status-section-title">Account Actions</div>
+        <div style="padding: 16px; font-size: 14px; font-weight: 600; color: var(--wa-text-muted); background: var(--wa-bg);">Account Actions</div>
         
         <div class="chat-list-item" onclick="copyVynixID()">
             <i data-feather="copy" style="color: var(--wa-text-main);"></i>
@@ -375,21 +385,17 @@
     <button class="sheet-btn" onclick="addFriend()">Add Friend</button>
 </div>
 
-<div class="wa-status-viewer" id="wa-status-viewer">
-    <div class="status-progress-container" id="status-progress-container"></div>
-    <div class="status-header">
-        <i data-feather="arrow-left" onclick="closeStatusViewer()"></i>
-        <img id="status-viewer-avatar" src="">
-        <div class="status-header-info">
-            <h4 id="status-viewer-name">Name</h4>
-            <p id="status-viewer-time">Time</p>
-        </div>
-        <i data-feather="more-vertical"></i>
+<div class="modal-overlay" id="feed-comments-overlay" onclick="closeFeedComments()"></div>
+<div class="bottom-sheet" id="feed-comments-sheet" style="height: 80vh;">
+    <div class="sheet-header">
+        <h3>Comments</h3>
+        <i data-feather="x" onclick="closeFeedComments()" style="cursor: pointer;"></i>
     </div>
-    <div class="status-media-container">
-        <img id="status-viewer-img" src="">
-        <div class="status-tap-left" onclick="prevStatus()"></div>
-        <div class="status-tap-right" onclick="nextStatus()"></div>
+    <div class="feed-comments-list" id="feed-comments-list">
+        </div>
+    <div style="display: flex; gap: 8px; margin-top: auto;">
+        <input type="text" id="feed-comment-input" class="sheet-input" style="margin-bottom: 0;" placeholder="Add a comment..." autocomplete="off">
+        <button class="sheet-btn" style="width: auto; padding: 0 20px;" onclick="submitFeedComment()">Post</button>
     </div>
 </div>
 
@@ -436,7 +442,7 @@
 
 <script type="module">
 import {
-    getDatabase, ref, onChildAdded, push, set, get, update, off, serverTimestamp, query, limitToLast, orderByChild, equalTo
+    getDatabase, ref, onChildAdded, onValue, push, set, get, update, off, serverTimestamp, query, limitToLast, orderByChild, equalTo
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
@@ -464,17 +470,16 @@ const CLOUDINARY_UPLOAD_PRESET = 'banter_box';
 
 window.currentUser = null;
 window.currentVynixId = null;
+window.currentUserAvatar = 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png';
+
 let currentChatRef = null;
 window.currentChatPath = 'posts'; 
 let friendsLoaded = false;
-let statusesLoaded = false;
+let feedLoaded = false;
 
-// Status Viewer State
-window.statusGroups = {}; 
-let currentStatusUserUid = null;
-let currentStoryIndex = 0;
-let statusTimer = null;
-const STATUS_DURATION = 5000; // 5 seconds per image
+// Variables for Feed
+let pendingFeedImage = null;
+let currentFeedCommentPostId = null;
 
 // Session Unread Count Trackers
 window.unreadCounts = {};
@@ -515,9 +520,7 @@ function updateTotalUnread() {
 }
 
 window.updateLastSeen = () => {
-    if(window.currentUser) {
-        update(ref(db, `users/${window.currentUser.uid}`), { lastSeen: serverTimestamp() });
-    }
+    if(window.currentUser) update(ref(db, `users/${window.currentUser.uid}`), { lastSeen: serverTimestamp() });
 };
 
 // Lightweight listener for previews & sorting
@@ -534,17 +537,12 @@ function listenToChatPreview(chatId, isGlobal, friendUid = null) {
         const timeStr = formatTime(msg.timestamp);
         let textSnippet = msg.text ? msg.text : '📷 Photo';
         
-        if (msg.uid === window.currentUser.uid) {
-            textSnippet = 'You: ' + textSnippet;
-        }
+        if (msg.uid === window.currentUser.uid) textSnippet = 'You: ' + textSnippet;
         
         if (isGlobal) {
             document.getElementById('global-last-time').textContent = timeStr;
             document.getElementById('global-last-text').textContent = textSnippet;
-            
-            if (isNewMessage && window.currentChatPath !== 'posts') {
-                incrementUnread('global');
-            }
+            if (isNewMessage && window.currentChatPath !== 'posts') incrementUnread('global');
         } else if (friendUid) {
             const timeEl = document.getElementById(`time-${friendUid}`);
             const textEl = document.getElementById(`text-${friendUid}`);
@@ -552,14 +550,8 @@ function listenToChatPreview(chatId, isGlobal, friendUid = null) {
             
             if (timeEl) timeEl.textContent = timeStr;
             if (textEl) textEl.textContent = textSnippet;
-            
-            if (itemEl && msg.timestamp) {
-                itemEl.style.order = -msg.timestamp;
-            }
-            
-            if (isNewMessage && window.currentChatPath !== path) {
-                incrementUnread(friendUid);
-            }
+            if (itemEl && msg.timestamp) itemEl.style.order = -msg.timestamp;
+            if (isNewMessage && window.currentChatPath !== path) incrementUnread(friendUid);
         }
     });
 }
@@ -574,9 +566,7 @@ async function uploadToCloudinary(file, isAvatar = false) {
     if (!r.ok) throw new Error('Upload failed');
     const data = await r.json();
     
-    if (isAvatar) {
-        return data.secure_url.replace('/upload/', '/upload/f_auto,q_auto,w_200,h_200,c_fill/');
-    }
+    if (isAvatar) return data.secure_url.replace('/upload/', '/upload/f_auto,q_auto,w_200,h_200,c_fill/');
     return data.secure_url.replace('/upload/', '/upload/f_auto,q_auto,w_1080/');
 }
 
@@ -602,22 +592,16 @@ window.handleSignUp = async () => {
         const newVynixID = generateMemorableID();
         
         await set(ref(db, `users/${user.uid}`), {
-            email: email,
-            vynixId: newVynixID,
-            username: newVynixID,
-            createdAt: serverTimestamp(),
-            lastSeen: serverTimestamp()
+            email: email, vynixId: newVynixID, username: newVynixID,
+            createdAt: serverTimestamp(), lastSeen: serverTimestamp()
         });
         
         await set(ref(db, `users/${user.uid}/friends/${user.uid}`), {
-            vynixId: newVynixID + " (You)",
-            addedAt: serverTimestamp()
+            vynixId: newVynixID + " (You)", addedAt: serverTimestamp()
         });
         
         showCustomDialog('Welcome!', `Account created! Your unique Vynix ID is ${newVynixID}. Share it to connect.`);
-    } catch (e) {
-        showCustomDialog('Sign Up Failed', e.message);
-    }
+    } catch (e) { showCustomDialog('Sign Up Failed', e.message); }
 };
 
 window.handleLogin = async () => {
@@ -636,15 +620,13 @@ window.handleLogout = async () => {
         document.getElementById('auth-screen').style.display = 'flex';
         document.getElementById('gb-menu').classList.remove('active');
         friendsLoaded = false;
-        statusesLoaded = false;
+        feedLoaded = false;
         window.unreadCounts = {};
-        window.statusGroups = {};
         updateTotalUnread();
         document.getElementById('private-chats-list').innerHTML = '';
         if(currentChatRef) off(currentChatRef);
-    } catch(e) {
-        showCustomDialog('Error', 'Could not log out.');
-    }
+        off(ref(db, 'feed_posts')); // Stop listening to feed
+    } catch(e) { showCustomDialog('Error', 'Could not log out.'); }
 };
 
 onAuthStateChanged(auth, async (user) => {
@@ -662,6 +644,7 @@ onAuthStateChanged(auth, async (user) => {
             document.getElementById('display-vynix-id').textContent = window.currentVynixId;
             
             if (data.photoURL) {
+                window.currentUserAvatar = data.photoURL;
                 document.getElementById('profile-avatar-img').src = data.photoURL;
                 document.getElementById('profile-avatar-img').style.display = 'block';
                 document.getElementById('profile-letter').style.display = 'none';
@@ -669,13 +652,13 @@ onAuthStateChanged(auth, async (user) => {
                 document.getElementById('profile-letter').textContent = window.currentVynixId.charAt(0).toUpperCase();
             }
             
+            document.getElementById('feed-composer-avatar').src = window.currentUserAvatar;
+            
             if (!data.friends || !data.friends[user.uid]) {
                 await set(ref(db, `users/${user.uid}/friends/${user.uid}`), {
-                    vynixId: window.currentVynixId + " (You)",
-                    addedAt: serverTimestamp()
+                    vynixId: window.currentVynixId + " (You)", addedAt: serverTimestamp()
                 });
             }
-            
         } else {
             window.currentVynixId = "User_" + user.uid.substring(0,4);
             document.getElementById('display-vynix-id').textContent = window.currentVynixId;
@@ -683,8 +666,8 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById('display-email').textContent = user.email;
         
         listenToChatPreview('global', true);
-        loadStatus();
         loadFriends();
+        loadFeed(); // Load new X-style feed
     } else {
         window.currentUser = null;
         document.getElementById('main-app').style.display = 'none';
@@ -692,193 +675,242 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-// --- STATUS UPLOAD ---
-window.handleStatusUpload = async (e) => {
+// --- FEED (X-STYLE) LOGIC ---
+window.updateFeedPostBtn = () => {
+    const text = document.getElementById('feed-caption-input').value.trim();
+    const btn = document.getElementById('feed-post-btn');
+    if (text || pendingFeedImage) {
+        btn.classList.add('active');
+        btn.disabled = false;
+    } else {
+        btn.classList.remove('active');
+        btn.disabled = true;
+    }
+};
+
+window.previewFeedImage = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
-    showCustomDialog('Uploading', 'Adding to your status...');
-    try {
-        const photoURL = await uploadToCloudinary(file, false);
-        
-        let userPhoto = 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png';
-        try {
-            const snap = await get(ref(db, `users/${window.currentUser.uid}`));
-            if (snap.exists() && snap.val().photoURL) userPhoto = snap.val().photoURL;
-        } catch(err) {}
+    pendingFeedImage = file;
+    const preview = document.getElementById('feed-media-preview');
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = 'block';
+    window.updateFeedPostBtn();
+};
 
-        await push(ref(db, 'stories'), {
+window.submitFeedPost = async () => {
+    const input = document.getElementById('feed-caption-input');
+    const text = input.value.trim();
+    const btn = document.getElementById('feed-post-btn');
+    
+    if (!text && !pendingFeedImage) return;
+    
+    btn.disabled = true;
+    btn.textContent = '...';
+    
+    try {
+        let mediaUrl = null;
+        if (pendingFeedImage) {
+            mediaUrl = await uploadToCloudinary(pendingFeedImage, false);
+        }
+        
+        await push(ref(db, 'feed_posts'), {
             uid: window.currentUser.uid,
             username: window.currentVynixId,
-            userPhoto: userPhoto,
-            mediaUrl: photoURL,
-            timestamp: serverTimestamp()
+            userPhoto: window.currentUserAvatar,
+            text: text,
+            mediaUrl: mediaUrl,
+            timestamp: serverTimestamp(),
+            likes: {},
+            comments: {}
         });
         
-        closeCustomDialog();
-        showCustomDialog('Success', 'Status updated successfully!');
+        // Reset composer
+        input.value = '';
+        pendingFeedImage = null;
+        document.getElementById('feed-media-preview').style.display = 'none';
+        document.getElementById('feed-img-upload').value = '';
+        window.updateFeedPostBtn();
+        
     } catch (err) {
-        showCustomDialog('Error', 'Failed to upload status. Please try again.');
+        showCustomDialog('Error', 'Failed to post. Check your connection.');
+    } finally {
+        btn.textContent = 'Post';
     }
 };
 
-// --- WHATSAPP STATUS VIEWER LOGIC ---
-function renderStatusList() {
-    const list = document.getElementById('status-list');
-    list.innerHTML = '';
-    
-    // Sort groups so the ones with the most recent updates are at the top
-    const sortedGroups = Object.values(window.statusGroups).sort((a, b) => {
-        const latestA = Math.max(...a.stories.map(s => s.timestamp || 0));
-        const latestB = Math.max(...b.stories.map(s => s.timestamp || 0));
-        return latestB - latestA;
-    });
-
-    sortedGroups.forEach(group => {
-        const latestStory = group.stories.reduce((prev, current) => (prev.timestamp > current.timestamp) ? prev : current);
-        const time = formatTime(latestStory.timestamp);
+function sortFeed(postsArray) {
+    const now = Date.now();
+    return postsArray.sort((a, b) => {
+        const ageA = (now - (a.timestamp || now)) / 3600000; 
+        const ageB = (now - (b.timestamp || now)) / 3600000;
         
-        const item = document.createElement('div');
-        item.className = 'chat-list-item';
+        const likesA = a.likes ? Object.keys(a.likes).length : 0;
+        const commentsA = a.comments ? Object.keys(a.comments).length : 0;
         
-        item.onclick = () => openStatusViewer(group.uid);
-
-        item.innerHTML = `
-            <img class="avatar status-ring" src="${group.userPhoto || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png'}" style="border-color: var(--wa-primary);">
-            <div class="chat-info">
-                <div class="chat-name-row"><span class="chat-name">${escapeHtml(group.username)}</span></div>
-                <div class="chat-msg-row"><span class="chat-msg-text">${time}</span></div>
-            </div>
-        `;
-        list.appendChild(item);
+        const likesB = b.likes ? Object.keys(b.likes).length : 0;
+        const commentsB = b.comments ? Object.keys(b.comments).length : 0;
+        
+        // Score = Engagement / (Age in hours + 1) + slight randomizer
+        const scoreA = ((likesA * 2) + (commentsA * 3)) / (ageA + 1) + (Math.random() * 2);
+        const scoreB = ((likesB * 2) + (commentsB * 3)) / (ageB + 1) + (Math.random() * 2);
+        
+        return scoreB - scoreA; // Descending
     });
 }
 
-window.openStatusViewer = (uid) => {
-    const group = window.statusGroups[uid];
-    if (!group || !group.stories.length) return;
+function loadFeed() {
+    if (feedLoaded) return;
+    feedLoaded = true;
     
-    currentStatusUserUid = uid;
-    currentStoryIndex = 0;
-    document.getElementById('wa-status-viewer').classList.add('active');
+    const list = document.getElementById('feed-posts-list');
     
-    showStory();
-};
-
-window.closeStatusViewer = () => {
-    document.getElementById('wa-status-viewer').classList.remove('active');
-    clearTimeout(statusTimer);
-    currentStatusUserUid = null;
-};
-
-window.showStory = () => {
-    const group = window.statusGroups[currentStatusUserUid];
-    if (!group) { closeStatusViewer(); return; }
-    const story = group.stories[currentStoryIndex];
-    if (!story) { closeStatusViewer(); return; }
-
-    document.getElementById('status-viewer-avatar').src = group.userPhoto || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png';
-    document.getElementById('status-viewer-name').textContent = group.username;
-    document.getElementById('status-viewer-time').textContent = formatTime(story.timestamp);
-    document.getElementById('status-viewer-img').src = story.mediaUrl;
-
-    // Render Progress Bars
-    const pc = document.getElementById('status-progress-container');
-    pc.innerHTML = '';
-    group.stories.forEach((_, idx) => {
-        const bar = document.createElement('div'); bar.className = 'status-progress-bar';
-        const fill = document.createElement('div'); fill.className = 'status-progress-fill';
-        
-        if (idx < currentStoryIndex) fill.style.width = '100%';
-        if (idx === currentStoryIndex) fill.id = 'current-status-fill';
-        
-        bar.appendChild(fill); pc.appendChild(bar);
-    });
-
-    clearTimeout(statusTimer);
-    
-    // Animate progress bar
-    requestAnimationFrame(() => {
-        const activeFill = document.getElementById('current-status-fill');
-        if (activeFill) {
-            activeFill.style.transition = `width ${STATUS_DURATION}ms linear`;
-            activeFill.style.width = '100%';
-        }
-    });
-
-    statusTimer = setTimeout(() => { nextStatus(); }, STATUS_DURATION);
-};
-
-window.nextStatus = () => {
-    const group = window.statusGroups[currentStatusUserUid];
-    if (group && currentStoryIndex < group.stories.length - 1) {
-        currentStoryIndex++;
-        showStory();
-    } else {
-        closeStatusViewer();
-    }
-};
-
-window.prevStatus = () => {
-    if (currentStoryIndex > 0) {
-        currentStoryIndex--;
-        showStory();
-    } else {
-        // Already at the first story, just replay it
-        showStory();
-    }
-};
-
-// --- LOAD STATUS (Filtered 24 Hours & Grouped) ---
-function loadStatus() {
-    if (statusesLoaded) return;
-    statusesLoaded = true;
-    window.statusGroups = {};
-    
-    const storiesQuery = query(ref(db, 'stories'), limitToLast(50));
-    onChildAdded(storiesQuery, (snapshot) => {
-        const story = snapshot.val();
-        const now = Date.now();
-        const storyTime = story.timestamp || now;
-        
-        if (now - storyTime > 86400000) return; // Ignore older than 24h
-
-        const uid = story.uid;
-        if (!window.statusGroups[uid]) {
-            window.statusGroups[uid] = {
-                uid: uid,
-                username: story.username || 'User',
-                userPhoto: story.userPhoto,
-                stories: []
-            };
+    // We use onValue to fetch the batch, sort it, and render it dynamically
+    onValue(query(ref(db, 'feed_posts'), limitToLast(100)), (snapshot) => {
+        if (!snapshot.exists()) {
+            list.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--wa-text-muted); font-size: 14px;">No posts yet. Be the first!</div>';
+            return;
         }
         
-        window.statusGroups[uid].stories.push(story);
-        // Ensure stories inside a group are sorted chronologically
-        window.statusGroups[uid].stories.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+        const posts = [];
+        snapshot.forEach(child => { posts.push({ id: child.key, ...child.val() }); });
         
-        renderStatusList();
+        const sortedPosts = sortFeed(posts);
+        
+        list.innerHTML = '';
+        sortedPosts.forEach(post => {
+            const isLiked = post.likes && post.likes[window.currentUser.uid];
+            const likeCount = post.likes ? Object.keys(post.likes).length : 0;
+            const commentCount = post.comments ? Object.keys(post.comments).length : 0;
+            
+            const card = document.createElement('div');
+            card.className = 'feed-card';
+            
+            // X-Style layout
+            card.innerHTML = `
+                <img src="${post.userPhoto || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png'}" class="feed-composer-avatar" onclick="showCustomDialog('Profile', '@${escapeHtml(post.username)}')">
+                <div class="feed-card-main">
+                    <div class="feed-card-header">
+                        <span class="feed-card-name">${escapeHtml(post.username)}</span>
+                        <span class="feed-card-time">${formatTime(post.timestamp)}</span>
+                    </div>
+                    ${post.text ? `<div class="feed-card-text">${escapeHtml(post.text)}</div>` : ''}
+                    ${post.mediaUrl ? `<img src="${post.mediaUrl}" class="feed-card-img" onclick="showCustomDialog('Image', '<img src=\\'${post.mediaUrl}\\' style=\\'width:100%; border-radius:8px;\\'>')">` : ''}
+                    
+                    <div class="feed-actions">
+                        <div class="feed-action" onclick="openFeedComments('${post.id}')">
+                            <i data-feather="message-circle"></i>
+                            <span>${commentCount > 0 ? commentCount : ''}</span>
+                        </div>
+                        <div class="feed-action" onclick="showCustomDialog('Repost', 'Retweets/Reposts coming soon!')">
+                            <i data-feather="repeat"></i>
+                        </div>
+                        <div class="feed-action ${isLiked ? 'liked' : ''}" onclick="toggleFeedLike('${post.id}', ${isLiked})">
+                            <svg viewBox="0 0 24 24" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                            <span>${likeCount > 0 ? likeCount : ''}</span>
+                        </div>
+                        <div class="feed-action" onclick="showCustomDialog('Share', 'Share functionality coming soon!')">
+                            <i data-feather="share"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+            list.appendChild(card);
+        });
+        feather.replace();
     });
 }
+
+window.toggleFeedLike = async (postId, currentlyLiked) => {
+    if (!window.currentUser) return;
+    const likeRef = ref(db, `feed_posts/${postId}/likes/${window.currentUser.uid}`);
+    
+    // Optimistic vibration
+    if (!currentlyLiked && navigator.vibrate) navigator.vibrate(30);
+    
+    if (currentlyLiked) await set(likeRef, null);
+    else await set(likeRef, true);
+};
+
+// --- FEED COMMENTS BOTTOM SHEET ---
+window.openFeedComments = (postId) => {
+    currentFeedCommentPostId = postId;
+    document.getElementById('feed-comments-overlay').classList.add('active');
+    loadFeedComments(postId);
+};
+
+window.closeFeedComments = () => {
+    document.getElementById('feed-comments-overlay').classList.remove('active');
+    currentFeedCommentPostId = null;
+    off(ref(db, `feed_posts/${currentFeedCommentPostId}/comments`)); // clean listener
+};
+
+function loadFeedComments(postId) {
+    const list = document.getElementById('feed-comments-list');
+    list.innerHTML = '<div style="text-align:center; padding: 20px; font-size:13px; color:var(--wa-text-muted);">Loading comments...</div>';
+    
+    onValue(ref(db, `feed_posts/${postId}/comments`), (snapshot) => {
+        list.innerHTML = '';
+        if (!snapshot.exists()) {
+            list.innerHTML = '<div style="text-align:center; padding: 20px; font-size:13px; color:var(--wa-text-muted);">No comments yet.</div>';
+            return;
+        }
+        
+        snapshot.forEach(child => {
+            const c = child.val();
+            const item = document.createElement('div');
+            item.className = 'feed-comment-item';
+            item.innerHTML = `
+                <img src="${c.userPhoto || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png'}" class="feed-comment-avatar">
+                <div class="feed-comment-body">
+                    <div class="feed-comment-name">${escapeHtml(c.username)} <span style="font-size:11px; color:var(--wa-text-muted); font-weight:normal; margin-left:6px;">${formatTime(c.timestamp)}</span></div>
+                    <div class="feed-comment-text">${escapeHtml(c.text)}</div>
+                </div>
+            `;
+            list.appendChild(item);
+        });
+        
+        // scroll to bottom
+        list.scrollTop = list.scrollHeight;
+    });
+}
+
+window.submitFeedComment = async () => {
+    if (!currentFeedCommentPostId || !window.currentUser) return;
+    const input = document.getElementById('feed-comment-input');
+    const text = input.value.trim();
+    if (!text) return;
+    
+    input.value = '';
+    
+    try {
+        await push(ref(db, `feed_posts/${currentFeedCommentPostId}/comments`), {
+            uid: window.currentUser.uid,
+            username: window.currentVynixId,
+            userPhoto: window.currentUserAvatar,
+            text: text,
+            timestamp: serverTimestamp()
+        });
+    } catch (e) {
+        showCustomDialog('Error', 'Failed to post comment.');
+    }
+};
 
 // --- PROFILE PICTURE UPLOAD ---
 window.handleProfilePicUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
     showCustomDialog('Uploading', 'Updating your profile picture...');
     try {
         const photoURL = await uploadToCloudinary(file, true);
         await update(ref(db, `users/${window.currentUser.uid}`), { photoURL: photoURL });
-        
         document.getElementById('profile-avatar-img').src = photoURL;
         document.getElementById('profile-avatar-img').style.display = 'block';
         document.getElementById('profile-letter').style.display = 'none';
-        
+        window.currentUserAvatar = photoURL;
+        document.getElementById('feed-composer-avatar').src = photoURL;
         closeCustomDialog();
-    } catch (err) {
-        showCustomDialog('Error', 'Failed to upload image. Please try again.');
-    }
+    } catch (err) { showCustomDialog('Error', 'Failed to upload image.'); }
 };
 
 window.handleChatImageUpload = async (e) => {
@@ -888,17 +920,12 @@ window.handleChatImageUpload = async (e) => {
     try {
         const photoURL = await uploadToCloudinary(file, false);
         await push(ref(db, window.currentChatPath), {
-            uid: window.currentUser.uid,
-            text: "",
-            mediaUrl: photoURL,
-            timestamp: serverTimestamp(),
-            user: { username: window.currentVynixId || 'User' }
+            uid: window.currentUser.uid, text: "", mediaUrl: photoURL,
+            timestamp: serverTimestamp(), user: { username: window.currentVynixId || 'User' }
         });
         window.updateLastSeen();
         closeCustomDialog();
-    } catch (err) {
-        showCustomDialog('Error', 'Failed to send image.');
-    }
+    } catch (err) { showCustomDialog('Error', 'Failed to send image.'); }
 };
 
 // --- ADD FRIEND & FAB LOGIC ---
@@ -907,17 +934,14 @@ window.handleFabClick = () => {
     if(activeTabContainer === 'tab-chats') {
         document.getElementById('friend-overlay').classList.add('active');
         setTimeout(() => document.getElementById('friend-id-input').focus(), 100);
-    } else if (activeTabContainer === 'tab-status') {
-        document.getElementById('status-pic-input').click();
+    } else if (activeTabContainer === 'tab-feed') {
+        document.getElementById('feed-caption-input').focus();
     } else if (activeTabContainer === 'tab-calls') {
         showCustomDialog('New Call', 'Select a contact to call.');
     }
 };
 
-window.closeFriendSheet = () => {
-    document.getElementById('friend-overlay').classList.remove('active');
-    document.getElementById('friend-id-input').value = '';
-};
+window.closeFriendSheet = () => { document.getElementById('friend-overlay').classList.remove('active'); document.getElementById('friend-id-input').value = ''; };
 
 window.addFriend = async () => {
     const inputId = document.getElementById('friend-id-input').value.trim();
@@ -929,32 +953,18 @@ window.addFriend = async () => {
     try {
         const snapshot = await get(q);
         if(snapshot.exists()) {
-            let friendUid = null;
-            let friendData = null;
+            let friendUid = null; let friendData = null;
             snapshot.forEach(child => { friendUid = child.key; friendData = child.val(); });
-            
             const displayId = friendUid === window.currentUser.uid ? friendData.vynixId + " (You)" : friendData.vynixId;
             
-            await set(ref(db, `users/${window.currentUser.uid}/friends/${friendUid}`), {
-                vynixId: displayId,
-                addedAt: serverTimestamp()
-            });
-            
+            await set(ref(db, `users/${window.currentUser.uid}/friends/${friendUid}`), { vynixId: displayId, addedAt: serverTimestamp() });
             if (friendUid !== window.currentUser.uid) {
-                await set(ref(db, `users/${friendUid}/friends/${window.currentUser.uid}`), {
-                    vynixId: window.currentVynixId,
-                    addedAt: serverTimestamp()
-                });
+                await set(ref(db, `users/${friendUid}/friends/${window.currentUser.uid}`), { vynixId: window.currentVynixId, addedAt: serverTimestamp() });
             }
-            
             closeFriendSheet();
             showCustomDialog('Success', `${displayId} added to your chats!`);
-        } else {
-            showCustomDialog('Not Found', 'No user found with that Vynix ID.');
-        }
-    } catch(e) {
-        showCustomDialog('Error', 'Failed to search for user.');
-    }
+        } else { showCustomDialog('Not Found', 'No user found with that Vynix ID.'); }
+    } catch(e) { showCustomDialog('Error', 'Failed to search for user.'); }
 };
 
 function loadFriends() {
@@ -963,15 +973,9 @@ function loadFriends() {
     
     const friendsRef = ref(db, `users/${window.currentUser.uid}/friends`);
     onChildAdded(friendsRef, async (snap) => {
-        const friendUid = snap.key;
-        const friendData = snap.val();
-        
+        const friendUid = snap.key; const friendData = snap.val();
         let avatarUrl = null;
-        try {
-            const fs = await get(ref(db, `users/${friendUid}`));
-            if(fs.exists()) avatarUrl = fs.val().photoURL;
-        } catch(e) {}
-        
+        try { const fs = await get(ref(db, `users/${friendUid}`)); if(fs.exists()) avatarUrl = fs.val().photoURL; } catch(e) {}
         renderFriendChat(friendUid, friendData.vynixId, avatarUrl);
     });
 }
@@ -983,44 +987,22 @@ function renderFriendChat(uid, vynixId, avatarUrl) {
     if(document.getElementById(`chat-item-${uid}`)) return;
     
     const item = document.createElement('div');
-    item.className = 'chat-list-item';
-    item.id = `chat-item-${uid}`;
+    item.className = 'chat-list-item'; item.id = `chat-item-${uid}`;
     
     item.onclick = () => {
         document.getElementById('chat-room-title-text').textContent = vynixId;
         
-        if (avatarUrl) {
-            document.getElementById('chat-room-avatar-img').src = avatarUrl;
-        } else {
-            document.getElementById('chat-room-avatar-img').src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23A8A8A8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="background-color:%23EFEFEF"%3E%3Cpath d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/%3E%3Ccircle cx="12" cy="7" r="4"/%3E%3C/svg%3E';
-        }
+        if (avatarUrl) document.getElementById('chat-room-avatar-img').src = avatarUrl;
+        else document.getElementById('chat-room-avatar-img').src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23A8A8A8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="background-color:%23EFEFEF"%3E%3Cpath d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/%3E%3Ccircle cx="12" cy="7" r="4"/%3E%3C/svg%3E';
         
         const chatId = getChatId(window.currentUser.uid, uid);
         resetUnread(uid);
         openChatRoom(chatId, uid);
     };
     
-    let avatarHtml;
-    if (avatarUrl) {
-        avatarHtml = `<img class="avatar" src="${avatarUrl}">`;
-    } else {
-        const firstLetter = vynixId.charAt(0).toUpperCase();
-        avatarHtml = `<div class="avatar" style="background: var(--wa-text-main); color: var(--wa-light); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold;">${firstLetter}</div>`;
-    }
+    let avatarHtml = avatarUrl ? `<img class="avatar" src="${avatarUrl}">` : `<div class="avatar" style="background: var(--wa-text-main); color: var(--wa-light); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold;">${vynixId.charAt(0).toUpperCase()}</div>`;
 
-    item.innerHTML = `
-        ${avatarHtml}
-        <div class="chat-info">
-            <div class="chat-name-row">
-                <span class="chat-name">${escapeHtml(vynixId)}</span>
-                <span class="chat-time" id="time-${uid}"></span>
-            </div>
-            <div class="chat-msg-row">
-                <span class="chat-msg-text" id="text-${uid}">Tap to open chat...</span>
-                <div class="unread-badge" id="unread-${uid}"></div>
-            </div>
-        </div>
-    `;
+    item.innerHTML = `${avatarHtml}<div class="chat-info"><div class="chat-name-row"><span class="chat-name">${escapeHtml(vynixId)}</span><span class="chat-time" id="time-${uid}"></span></div><div class="chat-msg-row"><span class="chat-msg-text" id="text-${uid}">Tap to open chat...</span><div class="unread-badge" id="unread-${uid}"></div></div></div>`;
     list.appendChild(item);
     
     listenToChatPreview(getChatId(window.currentUser.uid, uid), false, uid);
@@ -1028,14 +1010,14 @@ function renderFriendChat(uid, vynixId, avatarUrl) {
 
 // --- SWIPE TO SWITCH TABS LOGIC ---
 let touchStartX = 0; let touchStartY = 0;
-const tabsOrder = ['chats', 'status', 'calls', 'profile'];
+const tabsOrder = ['chats', 'feed', 'calls', 'profile'];
 
 document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY; }, {passive: true});
 document.addEventListener('touchend', e => {
     if(!window.currentUser) return; 
     if(document.getElementById('chat-room').classList.contains('open')) return;
-    if(document.getElementById('wa-status-viewer').classList.contains('active')) return;
     if(document.getElementById('friend-overlay').classList.contains('active')) return;
+    if(document.getElementById('feed-comments-overlay').classList.contains('active')) return;
     if(document.getElementById('custom-dialog').classList.contains('active')) return;
     if(document.getElementById('search-overlay').classList.contains('active')) return;
     
@@ -1052,11 +1034,7 @@ document.addEventListener('touchend', e => {
 }, {passive: true});
 
 // --- CUSTOM DIALOG LOGIC ---
-window.showCustomDialog = (title, message) => { 
-    document.getElementById('cd-title').textContent = title; 
-    document.getElementById('cd-msg').innerHTML = message; 
-    document.getElementById('custom-dialog').classList.add('active'); 
-};
+window.showCustomDialog = (title, message) => { document.getElementById('cd-title').textContent = title; document.getElementById('cd-msg').innerHTML = message; document.getElementById('custom-dialog').classList.add('active'); };
 window.closeCustomDialog = () => { document.getElementById('custom-dialog').classList.remove('active'); };
 
 // --- DARK MODE LOGIC ---
@@ -1070,10 +1048,7 @@ if(localStorage.getItem('vynix_gb_theme') === 'dark') document.documentElement.s
 // --- SEARCH LOGIC ---
 window.openSearch = () => { document.getElementById('search-overlay').classList.add('active'); setTimeout(() => document.getElementById('global-search-input').focus(), 100); };
 window.closeSearch = () => { document.getElementById('search-overlay').classList.remove('active'); document.getElementById('global-search-input').value = ''; };
-window.handleGlobalSearch = () => {
-    const query = document.getElementById('global-search-input').value.trim();
-    if (query) { showCustomDialog('Global Search', 'Searching network for: ' + query); closeSearch(); }
-};
+window.handleGlobalSearch = () => { const query = document.getElementById('global-search-input').value.trim(); if (query) { showCustomDialog('Global Search', 'Searching network for: ' + query); closeSearch(); } };
 
 // --- GLOBAL CLICK LISTENER ---
 document.addEventListener('click', (e) => {
@@ -1081,38 +1056,26 @@ document.addEventListener('click', (e) => {
     if(!e.target.closest('.wa-icons') && !e.target.closest('.gb-menu')) menu.classList.remove('active');
     
     const searchOverlay = document.getElementById('search-overlay');
-    if (searchOverlay.classList.contains('active')) {
-        if (!e.target.closest('#search-overlay') && !e.target.closest('#search-trigger')) closeSearch();
-    }
+    if (searchOverlay.classList.contains('active')) { if (!e.target.closest('#search-overlay') && !e.target.closest('#search-trigger')) closeSearch(); }
     
     const friendOverlay = document.getElementById('friend-overlay');
-    if (friendOverlay.classList.contains('active') && !e.target.closest('#friend-sheet') && !e.target.closest('#main-fab')) {
-        closeFriendSheet();
-    }
+    if (friendOverlay.classList.contains('active') && !e.target.closest('#friend-sheet') && !e.target.closest('#main-fab')) closeFriendSheet();
+    
+    const feedCommentsOverlay = document.getElementById('feed-comments-overlay');
+    if (feedCommentsOverlay.classList.contains('active') && !e.target.closest('#feed-comments-sheet') && !e.target.closest('.feed-action')) closeFeedComments();
 });
 
 // --- PROFILE ACTIONS ---
-window.copyVynixID = () => {
-    if(window.currentVynixId) {
-        navigator.clipboard.writeText(window.currentVynixId).then(() => {
-            showCustomDialog('Copied', `Your Vynix ID (${window.currentVynixId}) was copied to your clipboard.`);
-        });
-    }
-};
+window.copyVynixID = () => { if(window.currentVynixId) { navigator.clipboard.writeText(window.currentVynixId).then(() => { showCustomDialog('Copied', `Your Vynix ID (${window.currentVynixId}) was copied to your clipboard.`); }); } };
 
 // --- UTILS ---
 function formatTime(timestamp) { 
-    if (!timestamp) return '';
-    const d = new Date(timestamp);
-    const now = new Date();
-    if (d.toDateString() === now.toDateString()) {
-        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); 
-    }
+    if (!timestamp) return ''; const d = new Date(timestamp); const now = new Date();
+    if (d.toDateString() === now.toDateString()) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); 
     const yest = new Date(); yest.setDate(yest.getDate() - 1);
     if (d.toDateString() === yest.toDateString()) return 'Yesterday';
     return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
 }
-
 function stringToColor(str) { let hash = 0; for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash); const c = (hash & 0x00FFFFFF).toString(16).toUpperCase(); return '#' + "00000".substring(0, 6 - c.length) + c; }
 function escapeHtml(text) { return (text || '').toString().replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]); }
 
@@ -1127,13 +1090,13 @@ window.switchTab = (tabId) => {
 
     const fab = document.getElementById('main-fab');
     if(tabId === 'chats') { fab.style.display = 'flex'; fab.innerHTML = '<i data-feather="message-square"></i>'; }
-    else if(tabId === 'status') { fab.style.display = 'flex'; fab.innerHTML = '<i data-feather="camera"></i>'; }
+    else if(tabId === 'feed') { fab.style.display = 'flex'; fab.innerHTML = '<i data-feather="edit-2"></i>'; }
     else if(tabId === 'calls') { fab.style.display = 'flex'; fab.innerHTML = '<i data-feather="phone-call"></i>'; }
     else if(tabId === 'profile') { fab.style.display = 'none'; } 
     feather.replace();
 }
 
-// --- DYNAMIC CHAT LOADING & HISTORY API (Device Back Button) ---
+// --- DYNAMIC CHAT LOADING & HISTORY API ---
 window.openGlobalChat = () => {
     document.getElementById('chat-room-title-text').textContent = 'Vynix Mainnet';
     document.getElementById('chat-room-avatar-img').src = 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png';
@@ -1145,53 +1108,32 @@ window.openChatRoom = (chatId, friendUid = null) => {
     document.getElementById('chat-room').classList.add('open');
     history.pushState({ chatOpen: true }, '', '#chat');
     
-    if (chatId === 'global') {
-        document.getElementById('chat-room-subtitle').textContent = 'Global encrypted channel';
-    } else if (friendUid === window.currentUser.uid) {
-        document.getElementById('chat-room-subtitle').textContent = 'Message yourself';
-    } else if (friendUid) {
+    if (chatId === 'global') document.getElementById('chat-room-subtitle').textContent = 'Global encrypted channel';
+    else if (friendUid === window.currentUser.uid) document.getElementById('chat-room-subtitle').textContent = 'Message yourself';
+    else if (friendUid) {
         document.getElementById('chat-room-subtitle').textContent = 'loading...';
         get(ref(db, `users/${friendUid}/lastSeen`)).then(snap => {
             if(snap.exists()) {
                 const ls = snap.val();
                 if(Date.now() - ls < 60000) document.getElementById('chat-room-subtitle').textContent = 'online';
                 else document.getElementById('chat-room-subtitle').textContent = `last seen ${formatTime(ls)}`;
-            } else {
-                document.getElementById('chat-room-subtitle').textContent = 'Private encrypted chat';
-            }
+            } else document.getElementById('chat-room-subtitle').textContent = 'Private encrypted chat';
         });
     }
-
     loadChat(chatId);
 }
 
-window.uiCloseChatRoom = () => { 
-    if(history.state && history.state.chatOpen) history.back();
-    else window.doCloseChatRoom();
-}
+window.uiCloseChatRoom = () => { if(history.state && history.state.chatOpen) history.back(); else window.doCloseChatRoom(); }
+window.doCloseChatRoom = () => { document.getElementById('chat-room').classList.remove('open'); window.currentChatPath = null; if(currentChatRef) off(currentChatRef); }
 
-window.doCloseChatRoom = () => {
-    document.getElementById('chat-room').classList.remove('open'); 
-    window.currentChatPath = null;
-    if(currentChatRef) off(currentChatRef);
-}
-
-// Listen for device hardware back button
 window.addEventListener('popstate', (e) => {
-    window.doCloseChatRoom();
-    closeSearch();
-    closeFriendSheet();
-    closeCustomDialog();
-    if(document.getElementById('wa-status-viewer').classList.contains('active')) {
-        closeStatusViewer();
-    }
+    window.doCloseChatRoom(); closeSearch(); closeFriendSheet(); closeCustomDialog(); closeFeedComments();
 });
 
 window.toggleMicSendIcon = () => {
     const input = document.getElementById('msg-input').value.trim();
     const icon = document.getElementById('action-icon');
-    if(input.length > 0) icon.setAttribute('data-feather', 'send');
-    else icon.setAttribute('data-feather', 'mic');
+    if(input.length > 0) icon.setAttribute('data-feather', 'send'); else icon.setAttribute('data-feather', 'mic');
     feather.replace();
 }
 
@@ -1212,7 +1154,7 @@ function loadChat(chatId) {
         const nameColor = stringToColor(username);
         
         let contentHtml = escapeHtml(post.text);
-        if(post.mediaUrl) contentHtml = `<img src="${post.mediaUrl}" style="max-width:100%; border-radius:8px; margin-bottom:4px; cursor:pointer;" onclick="window.open('${post.mediaUrl}', '_blank')"><div style="margin-top: 4px;">${contentHtml}</div>`;
+        if(post.mediaUrl) contentHtml = `<img src="${post.mediaUrl}" style="max-width:100%; border-radius:8px; margin-bottom:4px; cursor:pointer;" onclick="showCustomDialog('Image', '<img src=\\'${post.mediaUrl}\\' style=\\'width:100%; border-radius:8px;\\'>')"><div style="margin-top: 4px;">${contentHtml}</div>`;
 
         const msgDiv = document.createElement('div');
         msgDiv.className = `message-wrapper ${isSelf ? 'sent' : 'recv'}`;
