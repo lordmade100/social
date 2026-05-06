@@ -52,13 +52,19 @@
         * { 
             box-sizing: border-box; margin: 0; padding: 0; 
             -webkit-tap-highlight-color: transparent; 
-            -webkit-touch-callout: none; 
+            -webkit-touch-callout: none; /* Prevents callout menu globally */
             -webkit-user-select: none;   
             user-select: none;
         }
 
         input, textarea { -webkit-user-select: auto; user-select: auto; }
-        img { -webkit-user-drag: none; pointer-events: auto; }
+        
+        /* Enforce strict image restrictions */
+        img { 
+            -webkit-user-drag: none; 
+            pointer-events: auto; 
+            -webkit-touch-callout: none; /* Extra enforcement for images */
+        }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -161,7 +167,7 @@
         .feed-card-name { font-weight: bold; color: var(--wa-text-main); font-size: 15px; }
         .feed-card-time { font-size: 13px; color: var(--wa-text-muted); }
         .feed-card-text { font-size: 15px; line-height: 1.4; margin-bottom: 12px; word-wrap: break-word; white-space: pre-wrap; color: var(--wa-text-main); }
-        .feed-card-img { width: 100%; border-radius: 16px; border: 1px solid var(--wa-border); margin-bottom: 12px; object-fit: cover; max-height: 400px; }
+        .feed-card-img { width: 100%; border-radius: 16px; border: 1px solid var(--wa-border); margin-bottom: 12px; object-fit: cover; max-height: 400px; cursor: pointer; }
         
         .feed-actions { display: flex; justify-content: space-between; max-width: 300px; color: var(--wa-text-muted); }
         .feed-action { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: color 0.2s; }
@@ -207,7 +213,7 @@
         .chat-room-header { background-color: var(--wa-primary); color: #ffffff; display: flex; align-items: center; padding: calc(env(safe-area-inset-top) + 8px) 16px 8px; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .back-btn { display: flex; align-items: center; cursor: pointer; margin-left: -8px; }
         .back-btn svg { width: 24px; height: 24px; }
-        .chat-room-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+        .chat-room-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; cursor: pointer; }
         .chat-room-title { flex: 1; min-width: 0; }
         .chat-room-title h3 { font-size: 16px; font-weight: 600; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         .chat-room-title p { font-size: 12px; color: rgba(255,255,255,0.7); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
@@ -246,11 +252,32 @@
         .dialog-actions { display: flex; justify-content: flex-end; }
         .dialog-btn { background: none; border: none; font-weight: 600; font-size: 14px; cursor: pointer; padding: 8px 16px; border-radius: 6px; text-transform: uppercase; color: var(--wa-text-main); }
         .dialog-btn:active { background: var(--wa-bg); }
+        
+        /* --- FULL SCREEN IMAGE VIEWER --- */
+        #image-viewer-overlay {
+            position: fixed; inset: 0; background: #000000; z-index: 2000;
+            display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.2s; flex-direction: column;
+        }
+        #image-viewer-overlay.active { display: flex; opacity: 1; }
+        .image-viewer-close {
+            position: absolute; top: calc(env(safe-area-inset-top) + 20px); left: 20px;
+            color: #ffffff; cursor: pointer; z-index: 2010; padding: 8px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center;
+        }
+        .image-viewer-img {
+            max-width: 100vw; max-height: 100dvh; object-fit: contain; pointer-events: auto;
+            user-select: none; -webkit-user-drag: none; -webkit-touch-callout: none;
+        }
 
         ::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
+
+<div id="image-viewer-overlay">
+    <div class="image-viewer-close" onclick="closeImageViewer()"><i data-feather="x"></i></div>
+    <img id="image-viewer-img" class="image-viewer-img" src="">
+</div>
 
 <div id="splash-screen">
     <div class="splash-logo"><i data-feather="cpu"></i></div>
@@ -421,7 +448,7 @@
         <div class="back-btn" onclick="uiCloseChatRoom()">
             <i data-feather="arrow-left"></i>
         </div>
-        <img class="chat-room-avatar" id="chat-room-avatar-img" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png" style="background: white;">
+        <img class="chat-room-avatar" id="chat-room-avatar-img" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png" style="background: white;" onclick="openImageViewer(this.src)">
         <div class="chat-room-title">
             <h3 id="chat-room-title-text">Vynix Mainnet</h3>
             <p id="chat-room-subtitle">Global encrypted channel</p>
@@ -466,6 +493,18 @@ import {
     getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+// Prevent long press (context menu) and dragging globally on all images
+document.addEventListener('contextmenu', (e) => {
+    if (e.target.tagName === 'IMG' || e.target.classList.contains('avatar') || e.target.classList.contains('feed-composer-avatar')) {
+        e.preventDefault();
+    }
+});
+document.addEventListener('dragstart', (e) => {
+    if (e.target.tagName === 'IMG') {
+        e.preventDefault();
+    }
+});
+
 // Firebase Config
 const firebaseConfig = {
     apiKey: "AIzaSyBOyZ3As4GTuNvjemvPF_SpsC6m6vqtNhc",
@@ -500,6 +539,19 @@ let currentFeedCommentPostId = null;
 
 // Session Unread Count Trackers
 window.unreadCounts = {};
+
+// --- IMAGE VIEWER LOGIC ---
+window.openImageViewer = (src) => {
+    document.getElementById('image-viewer-img').src = src;
+    document.getElementById('image-viewer-overlay').classList.add('active');
+    history.pushState({ imageViewerOpen: true }, '', '#image');
+};
+
+window.closeImageViewer = () => {
+    document.getElementById('image-viewer-overlay').classList.remove('active');
+    setTimeout(() => { document.getElementById('image-viewer-img').src = ''; }, 200); // clear src after fade
+    if(history.state && history.state.imageViewerOpen) history.back();
+};
 
 function incrementUnread(chatId) {
     window.unreadCounts[chatId] = (window.unreadCounts[chatId] || 0) + 1;
@@ -852,7 +904,7 @@ function loadFeed() {
             const card = document.createElement('div');
             card.className = 'feed-card';
             
-            // X-Style layout
+            // X-Style layout with global image viewer triggered on feed image tap
             card.innerHTML = `
                 <img src="${post.userPhoto || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png'}" class="feed-composer-avatar" onclick="showCustomDialog('Profile', '@${escapeHtml(post.username)}')">
                 <div class="feed-card-main">
@@ -861,7 +913,7 @@ function loadFeed() {
                         <span class="feed-card-time">${formatTime(post.timestamp)}</span>
                     </div>
                     ${post.text ? `<div class="feed-card-text">${escapeHtml(post.text)}</div>` : ''}
-                    ${post.mediaUrl ? `<img src="${post.mediaUrl}" class="feed-card-img" onclick="showCustomDialog('Image', '<img src=\\'${post.mediaUrl}\\' style=\\'width:100%; border-radius:8px;\\'>')">` : ''}
+                    ${post.mediaUrl ? `<img src="${post.mediaUrl}" class="feed-card-img" onclick="openImageViewer('${post.mediaUrl}')">` : ''}
                     
                     <div class="feed-actions">
                         <div class="feed-action" onclick="openFeedComments('${post.id}')">
@@ -1086,6 +1138,7 @@ document.addEventListener('touchend', e => {
     if(document.getElementById('feed-comments-overlay').classList.contains('active')) return;
     if(document.getElementById('custom-dialog').classList.contains('active')) return;
     if(document.getElementById('search-overlay').classList.contains('active')) return;
+    if(document.getElementById('image-viewer-overlay').classList.contains('active')) return;
     
     const dx = e.changedTouches[0].clientX - touchStartX;
     const dy = e.changedTouches[0].clientY - touchStartY;
@@ -1192,8 +1245,10 @@ window.openChatRoom = (chatId, friendUid = null) => {
 window.uiCloseChatRoom = () => { if(history.state && history.state.chatOpen) history.back(); else window.doCloseChatRoom(); }
 window.doCloseChatRoom = () => { document.getElementById('chat-room').classList.remove('open'); window.currentChatPath = null; if(currentChatRef) off(currentChatRef); }
 
+// Updated popstate listener to close the image viewer properly
 window.addEventListener('popstate', (e) => {
     window.doCloseChatRoom(); closeSearch(); closeFriendSheet(); closeCustomDialog(); closeFeedComments();
+    document.getElementById('image-viewer-overlay').classList.remove('active');
 });
 
 window.toggleMicSendIcon = () => {
@@ -1220,7 +1275,9 @@ function loadChat(chatId) {
         const nameColor = stringToColor(username);
         
         let contentHtml = escapeHtml(post.text);
-        if(post.mediaUrl) contentHtml = `<img src="${post.mediaUrl}" style="max-width:100%; border-radius:8px; margin-bottom:4px; cursor:pointer;" onclick="showCustomDialog('Image', '<img src=\\'${post.mediaUrl}\\' style=\\'width:100%; border-radius:8px;\\'>')"><div style="margin-top: 4px;">${contentHtml}</div>`;
+        
+        // Replaced custom dialog with new full-screen image viewer inside chat
+        if(post.mediaUrl) contentHtml = `<img src="${post.mediaUrl}" style="max-width:100%; border-radius:8px; margin-bottom:4px; cursor:pointer;" onclick="openImageViewer('${post.mediaUrl}')"><div style="margin-top: 4px;">${contentHtml}</div>`;
 
         const msgDiv = document.createElement('div');
         msgDiv.className = `message-wrapper ${isSelf ? 'sent' : 'recv'}`;
