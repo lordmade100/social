@@ -67,8 +67,18 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
+        /* --- SPLASH SCREEN --- */
+        #splash-screen { position: fixed; inset: 0; background-color: var(--wa-primary); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
+        .splash-logo { width: 100px; height: 100px; background: var(--wa-light); border-radius: 24px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; animation: pulse 2s infinite ease-in-out; }
+        .splash-logo svg { color: var(--wa-primary); width: 50px; height: 50px; }
+        .splash-title { font-size: 28px; font-weight: 800; letter-spacing: 2px; margin-bottom: 8px;}
+        .splash-subtitle { font-size: 14px; color: rgba(255,255,255,0.6); letter-spacing: 4px; text-transform: uppercase; }
+        .splash-spinner { width: 30px; height: 30px; border: 3px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; margin-top: 40px; animation: spin 1s linear infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
         /* --- AUTH SCREEN --- */
-        #auth-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; padding: 24px; background-color: var(--wa-light); text-align: center; }
+        #auth-screen { display: none; flex-direction: column; justify-content: center; align-items: center; height: 100%; padding: 24px; background-color: var(--wa-light); text-align: center; }
         .auth-logo { width: 80px; height: 80px; background: var(--wa-primary); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
         .auth-logo svg { color: #fff; width: 40px; height: 40px; }
         .auth-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
@@ -241,6 +251,13 @@
     </style>
 </head>
 <body>
+
+<div id="splash-screen">
+    <div class="splash-logo"><i data-feather="cpu"></i></div>
+    <div class="splash-title">VYNIX GB</div>
+    <div class="splash-subtitle">Stealth Network</div>
+    <div class="splash-spinner"></div>
+</div>
 
 <div id="auth-screen">
     <div class="auth-logo"><i data-feather="cpu"></i></div>
@@ -523,6 +540,33 @@ window.updateLastSeen = () => {
     if(window.currentUser) update(ref(db, `users/${window.currentUser.uid}`), { lastSeen: serverTimestamp() });
 };
 
+// --- NOTIFICATION API LOGIC ---
+function requestNotificationPermission() {
+    if ("Notification" in window) {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                console.log("Vynix Stealth: Notifications enabled.");
+            }
+        });
+    }
+}
+
+function triggerSystemNotification(title, body, iconUrl) {
+    if ("Notification" in window && Notification.permission === "granted" && document.visibilityState === 'hidden') {
+        const notification = new Notification(title, {
+            body: body,
+            icon: iconUrl || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png',
+            badge: 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png',
+            vibrate: [200, 100, 200]
+        });
+        
+        notification.onclick = function() {
+            window.focus();
+            this.close();
+        };
+    }
+}
+
 // Lightweight listener for previews & sorting
 function listenToChatPreview(chatId, isGlobal, friendUid = null) {
     const path = isGlobal ? 'posts' : `chats/${chatId}/messages`;
@@ -537,12 +581,16 @@ function listenToChatPreview(chatId, isGlobal, friendUid = null) {
         const timeStr = formatTime(msg.timestamp);
         let textSnippet = msg.text ? msg.text : '📷 Photo';
         
-        if (msg.uid === window.currentUser.uid) textSnippet = 'You: ' + textSnippet;
+        const isSelf = window.currentUser && msg.uid === window.currentUser.uid;
+        if (isSelf) textSnippet = 'You: ' + textSnippet;
         
         if (isGlobal) {
             document.getElementById('global-last-time').textContent = timeStr;
             document.getElementById('global-last-text').textContent = textSnippet;
-            if (isNewMessage && window.currentChatPath !== 'posts') incrementUnread('global');
+            if (isNewMessage && window.currentChatPath !== 'posts' && !isSelf) {
+                incrementUnread('global');
+                triggerSystemNotification("Vynix Mainnet", `${msg.user?.username || 'User'}: ${msg.text ? msg.text : '📷 Photo'}`);
+            }
         } else if (friendUid) {
             const timeEl = document.getElementById(`time-${friendUid}`);
             const textEl = document.getElementById(`text-${friendUid}`);
@@ -551,7 +599,10 @@ function listenToChatPreview(chatId, isGlobal, friendUid = null) {
             if (timeEl) timeEl.textContent = timeStr;
             if (textEl) textEl.textContent = textSnippet;
             if (itemEl && msg.timestamp) itemEl.style.order = -msg.timestamp;
-            if (isNewMessage && window.currentChatPath !== path) incrementUnread(friendUid);
+            if (isNewMessage && window.currentChatPath !== path && !isSelf) {
+                incrementUnread(friendUid);
+                triggerSystemNotification("New Stealth Message", msg.text ? msg.text : '📷 Photo');
+            }
         }
     });
 }
@@ -617,6 +668,7 @@ window.handleLogout = async () => {
     try {
         await signOut(auth);
         document.getElementById('main-app').style.display = 'none';
+        document.getElementById('splash-screen').style.display = 'none';
         document.getElementById('auth-screen').style.display = 'flex';
         document.getElementById('gb-menu').classList.remove('active');
         friendsLoaded = false;
@@ -629,12 +681,15 @@ window.handleLogout = async () => {
     } catch(e) { showCustomDialog('Error', 'Could not log out.'); }
 };
 
+// UPDATED AUTH STATE LISTENER WITH SPLASH DELAY
 onAuthStateChanged(auth, async (user) => {
+    // Add a minimum visual delay of 1.2 seconds so the splash screen feels deliberate
+    const minimumSplashTime = new Promise(resolve => setTimeout(resolve, 1200));
+    
     if (user) {
         window.currentUser = user;
-        document.getElementById('auth-screen').style.display = 'none';
-        document.getElementById('main-app').style.display = 'flex';
         
+        requestNotificationPermission();
         window.updateLastSeen();
         
         const snapshot = await get(ref(db, `users/${user.uid}`));
@@ -667,9 +722,20 @@ onAuthStateChanged(auth, async (user) => {
         
         listenToChatPreview('global', true);
         loadFriends();
-        loadFeed(); // Load new X-style feed
+        loadFeed(); 
+        
+        // Wait for the minimum splash time, then show the main app
+        await minimumSplashTime;
+        document.getElementById('splash-screen').style.display = 'none';
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'flex';
+        
     } else {
         window.currentUser = null;
+        
+        // Wait for the minimum splash time, then show the auth screen
+        await minimumSplashTime;
+        document.getElementById('splash-screen').style.display = 'none';
         document.getElementById('main-app').style.display = 'none';
         document.getElementById('auth-screen').style.display = 'flex';
     }
