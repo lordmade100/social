@@ -102,8 +102,10 @@
         .wa-top-bar { display: flex; justify-content: space-between; align-items: center; padding: calc(env(safe-area-inset-top) + 12px) 16px 12px; }
         .wa-title { font-size: 20px; font-weight: 600; letter-spacing: 0.5px; }
         .wa-icons { display: flex; gap: 20px; align-items: center; }
-        .wa-icons svg { width: 22px; height: 22px; cursor: pointer; }
-        .gb-wifi { transform: rotate(45deg); }
+        .wa-icons svg { width: 22px; height: 22px; cursor: pointer; transition: color 0.3s; }
+        
+        /* Ghost Mode Active Style */
+        .gb-wifi.ghost-active { color: var(--wa-like-red); }
 
         .wa-tabs { 
             display: flex; align-items: center; padding: 12px 16px; gap: 10px; 
@@ -311,7 +313,7 @@
         <div class="wa-top-bar">
             <div class="wa-title">Vynsta</div>
             <div class="wa-icons">
-                <i data-feather="wifi" class="gb-wifi" onclick="showCustomDialog('Ghost Mode', 'Airplane / Ghost Mode Activated. Your status is now hidden.')"></i>
+                <i data-feather="wifi" id="ghost-toggle-icon" class="gb-wifi" onclick="toggleGhostMode()"></i>
                 <i data-feather="moon" onclick="toggleTheme()"></i>
                 <i data-feather="search" id="search-trigger" onclick="openSearch()"></i>
                 <i data-feather="more-vertical" onclick="document.getElementById('gb-menu').classList.toggle('active')"></i>
@@ -540,17 +542,48 @@ let currentFeedCommentPostId = null;
 // Session Unread Count Trackers
 window.unreadCounts = {};
 
-// --- IMAGE VIEWER LOGIC ---
+// --- GHOST MODE LOGIC ---
+window.ghostMode = localStorage.getItem('vynsta_ghost') === 'true';
+
+document.addEventListener("DOMContentLoaded", () => {
+    if (window.ghostMode) {
+        document.getElementById('ghost-toggle-icon').classList.add('ghost-active');
+    }
+});
+
+window.toggleGhostMode = () => {
+    window.ghostMode = !window.ghostMode;
+    localStorage.setItem('vynsta_ghost', window.ghostMode);
+    const icon = document.getElementById('ghost-toggle-icon');
+    
+    if (window.ghostMode) {
+        icon.classList.add('ghost-active');
+        showCustomDialog('Ghost Mode Activated', 'Your presence is now hidden. Last Seen updates and read receipts are disabled.');
+    } else {
+        icon.classList.remove('ghost-active');
+        window.updateLastSeen();
+        showCustomDialog('Ghost Mode Disabled', 'You are now visible on the network.');
+    }
+};
+
+window.updateLastSeen = () => {
+    // Only update Firebase if Ghost Mode is disabled
+    if(window.currentUser && !window.ghostMode) {
+        update(ref(db, `users/${window.currentUser.uid}`), { lastSeen: serverTimestamp() });
+    }
+};
+
+// --- IMAGE VIEWER LOGIC (WITH PROPER ROUTING) ---
 window.openImageViewer = (src) => {
     document.getElementById('image-viewer-img').src = src;
     document.getElementById('image-viewer-overlay').classList.add('active');
-    history.pushState({ imageViewerOpen: true }, '', '#image');
+    if (location.hash !== '#image') history.pushState(null, '', '#image');
 };
 
 window.closeImageViewer = () => {
     document.getElementById('image-viewer-overlay').classList.remove('active');
-    setTimeout(() => { document.getElementById('image-viewer-img').src = ''; }, 200); // clear src after fade
-    if(history.state && history.state.imageViewerOpen) history.back();
+    setTimeout(() => { document.getElementById('image-viewer-img').src = ''; }, 200); 
+    if(location.hash === '#image') history.back();
 };
 
 function incrementUnread(chatId) {
@@ -587,10 +620,6 @@ function updateTotalUnread() {
         tabBadge.classList.remove('show');
     }
 }
-
-window.updateLastSeen = () => {
-    if(window.currentUser) update(ref(db, `users/${window.currentUser.uid}`), { lastSeen: serverTimestamp() });
-};
 
 // --- NOTIFICATION API LOGIC ---
 function requestNotificationPermission() {
@@ -1227,7 +1256,7 @@ window.openGlobalChat = () => {
 
 window.openChatRoom = (chatId, friendUid = null) => {
     document.getElementById('chat-room').classList.add('open');
-    history.pushState({ chatOpen: true }, '', '#chat');
+    if (location.hash !== '#chat') history.pushState(null, '', '#chat');
     
     if (chatId === 'global') document.getElementById('chat-room-subtitle').textContent = 'Global encrypted channel';
     else if (friendUid === window.currentUser.uid) document.getElementById('chat-room-subtitle').textContent = 'Message yourself';
@@ -1244,13 +1273,34 @@ window.openChatRoom = (chatId, friendUid = null) => {
     loadChat(chatId);
 }
 
-window.uiCloseChatRoom = () => { if(history.state && history.state.chatOpen) history.back(); else window.doCloseChatRoom(); }
-window.doCloseChatRoom = () => { document.getElementById('chat-room').classList.remove('open'); window.currentChatPath = null; if(currentChatRef) off(currentChatRef); }
+window.uiCloseChatRoom = () => { 
+    if(location.hash === '#chat') history.back(); 
+    else window.doCloseChatRoom(); 
+}
+window.doCloseChatRoom = () => { 
+    document.getElementById('chat-room').classList.remove('open'); 
+    window.currentChatPath = null; 
+    if(currentChatRef) off(currentChatRef); 
+}
 
-// Updated popstate listener to close the image viewer properly
+// UPDATED POPSTATE ROUTING: Closes top layers sequentially
 window.addEventListener('popstate', (e) => {
-    window.doCloseChatRoom(); closeSearch(); closeFriendSheet(); closeCustomDialog(); closeFeedComments();
+    const hash = location.hash;
+    
+    // Always close top-level overlays when going back
     document.getElementById('image-viewer-overlay').classList.remove('active');
+    closeSearch(); 
+    closeFriendSheet(); 
+    closeCustomDialog(); 
+    closeFeedComments();
+
+    if (hash === '#chat') {
+        // If we backed out of an image, ensure chat stays open visually
+        document.getElementById('chat-room').classList.add('open');
+    } else if (hash === '') {
+        // If we backed out of the chat back to the main UI
+        window.doCloseChatRoom();
+    }
 });
 
 window.toggleMicSendIcon = () => {
