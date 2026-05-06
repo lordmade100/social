@@ -100,7 +100,7 @@
         /* --- HEADER & PILL TABS --- */
         .wa-header-container { background-color: var(--wa-primary); color: #ffffff; display: flex; flex-direction: column; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 100; position: relative; }
         .wa-top-bar { display: flex; justify-content: space-between; align-items: center; padding: calc(env(safe-area-inset-top) + 12px) 16px 12px; }
-        .wa-title { font-size: 20px; font-weight: 600; letter-spacing: 0.5px; }
+        .wa-title { font-size: 20px; font-weight: 600; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
         .wa-icons { display: flex; gap: 20px; align-items: center; }
         .wa-icons svg { width: 22px; height: 22px; cursor: pointer; transition: color 0.3s; }
         
@@ -140,7 +140,7 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* --- CHATS LIST --- */
-        .chat-list-item { display: flex; padding: 12px 16px; align-items: center; cursor: pointer; transition: background 0.15s; }
+        .chat-list-item { display: flex; padding: 12px 16px; align-items: center; cursor: pointer; transition: background 0.15s; position: relative; }
         .chat-list-item:active { background-color: var(--wa-bg); }
         .avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; margin-right: 14px; flex-shrink: 0;}
         .chat-info { flex: 1; border-bottom: 1px solid var(--wa-border); padding-bottom: 12px; min-width: 0; }
@@ -202,6 +202,11 @@
         .sheet-input { width: 100%; background: var(--wa-bg); border: 1px solid var(--wa-border); color: var(--wa-text-main); padding: 14px; border-radius: 8px; font-size: 15px; margin-bottom: 16px; outline: none; }
         .sheet-input:focus { border-color: var(--wa-text-muted); }
         .sheet-btn { width: 100%; background: var(--wa-text-main); color: var(--wa-light); border: none; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
+
+        /* Blocked Users Settings List */
+        .blocked-user-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--wa-border); }
+        .blocked-user-name { font-size: 14px; font-weight: 500; color: var(--wa-text-main); }
+        .unblock-btn { background: var(--wa-primary); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
 
         /* Feed Comments Specific */
         .feed-comments-list { flex: 1; overflow-y: auto; margin-bottom: 16px; }
@@ -313,7 +318,9 @@
         </div>
 
         <div class="wa-top-bar">
-            <div class="wa-title">Vynsta</div>
+            <div class="wa-title">
+                <i data-feather="aperture" style="width: 24px; height: 24px;"></i> Vynsta
+            </div>
             <div class="wa-icons">
                 <i data-feather="wifi" id="ghost-toggle-icon" class="gb-wifi" onclick="toggleGhostMode()"></i>
                 <i data-feather="moon" onclick="toggleTheme()"></i>
@@ -408,7 +415,7 @@
         <div class="chat-list-item" onclick="openSettings()">
             <i data-feather="settings" style="color: var(--wa-text-main);"></i>
             <div class="chat-info" style="border-bottom: none; margin-left: 16px; padding-bottom: 0;">
-                <div class="chat-name" style="font-weight: 400;">Manage Account</div>
+                <div class="chat-name" style="font-weight: 400;">Manage Account & Privacy</div>
             </div>
         </div>
 
@@ -416,12 +423,6 @@
             <i data-feather="copy" style="color: var(--wa-text-main);"></i>
             <div class="chat-info" style="border-bottom: none; margin-left: 16px; padding-bottom: 0;">
                 <div class="chat-name" style="font-weight: 400;">Copy Vynsta ID to Invite Friends</div>
-            </div>
-        </div>
-        <div class="chat-list-item" onclick="showCustomDialog('Privacy', 'Your Vynsta ID keeps your real phone number hidden from other users.')">
-            <i data-feather="shield" style="color: var(--wa-text-main);"></i>
-            <div class="chat-info" style="border-bottom: none; margin-left: 16px; padding-bottom: 0;">
-                <div class="chat-name" style="font-weight: 400;">Privacy & Security</div>
             </div>
         </div>
         <div class="chat-list-item" onclick="handleLogout()">
@@ -443,9 +444,43 @@
         <h3>Account Settings</h3>
         <i data-feather="x" onclick="closeSettings()" style="cursor: pointer;"></i>
     </div>
+    
     <p style="font-size: 14px; color: var(--wa-text-muted); margin-bottom: 12px;">Update your unique Vynsta ID.</p>
     <input type="text" id="settings-id-input" class="sheet-input" placeholder="New Vynsta ID" autocomplete="off">
-    <button class="sheet-btn" onclick="saveSettings()">Save Changes</button>
+    <button class="sheet-btn" onclick="saveSettings()">Save ID Changes</button>
+    
+    <div style="margin-top: 30px;">
+        <h4 style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">Blocked Users</h4>
+        <div id="blocked-users-list" style="max-height: 180px; overflow-y: auto; background: var(--wa-bg); border-radius: 8px; padding: 8px 12px;">
+            <div style="font-size:13px; color:var(--wa-text-muted); text-align:center; padding:10px;">No blocked users</div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="chat-context-overlay" onclick="closeChatContext()"></div>
+<div class="bottom-sheet" id="chat-context-sheet" style="padding-bottom: calc(30px + env(safe-area-inset-bottom));">
+    <div class="sheet-header">
+        <h3 id="context-chat-name" style="color: var(--wa-text-muted); font-size: 15px;">Chat Options</h3>
+        <i data-feather="x" onclick="closeChatContext()" style="cursor: pointer;"></i>
+    </div>
+    <div class="chat-list-item" onclick="contextActionViewProfile()" style="padding: 16px 0;">
+        <i data-feather="user"></i>
+        <div class="chat-info" style="border:none; padding-bottom:0; margin-left:16px;">
+            <div class="chat-name">View Profile</div>
+        </div>
+    </div>
+    <div class="chat-list-item" onclick="contextActionDeleteChat()" style="padding: 16px 0;">
+        <i data-feather="trash-2" style="color:#ef4444;"></i>
+        <div class="chat-info" style="border:none; padding-bottom:0; margin-left:16px;">
+            <div class="chat-name" style="color:#ef4444;">Delete Chat</div>
+        </div>
+    </div>
+    <div class="chat-list-item" onclick="contextActionBlockUser()" style="padding: 16px 0;">
+        <i data-feather="slash" style="color:#ef4444;"></i>
+        <div class="chat-info" style="border:none; padding-bottom:0; margin-left:16px;">
+            <div class="chat-name" style="color:#ef4444;">Block User</div>
+        </div>
+    </div>
 </div>
 
 <div class="modal-overlay" id="friend-overlay" onclick="closeFriendSheet()"></div>
@@ -559,10 +594,18 @@ window.currentVynstaId = null;
 window.currentUserAvatar = 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png';
 
 let currentChatRef = null;
-let feedNotifRef = null; // New feed notification listener tracker
+let feedNotifRef = null; 
 window.currentChatPath = 'posts'; 
 let friendsLoaded = false;
 let feedLoaded = false;
+
+// Blocked Users State
+window.blockedUsers = {};
+
+// Context Menu State
+window.selectedChatUid = null;
+window.selectedChatName = null;
+window.selectedChatAvatar = null;
 
 // Variables for Feed
 let pendingFeedImage = null;
@@ -596,13 +639,74 @@ window.toggleGhostMode = () => {
 };
 
 window.updateLastSeen = () => {
-    // Only update Firebase if Ghost Mode is disabled
     if(window.currentUser && !window.ghostMode) {
         update(ref(db, `users/${window.currentUser.uid}`), { lastSeen: serverTimestamp() });
     }
 };
 
-// --- SETTINGS LOGIC ---
+// --- CHAT CONTEXT MENU (LONG PRESS LOGIC) ---
+window.openChatContext = (uid, name, avatar) => {
+    if (uid === window.currentUser.uid || uid === 'global') return; // Cannot modify global or self
+    window.selectedChatUid = uid;
+    window.selectedChatName = name;
+    window.selectedChatAvatar = avatar;
+    document.getElementById('context-chat-name').textContent = 'Options for ' + name;
+    document.getElementById('chat-context-overlay').classList.add('active');
+    
+    // Haptic feedback if supported
+    if(navigator.vibrate) navigator.vibrate(50);
+};
+
+window.closeChatContext = () => {
+    document.getElementById('chat-context-overlay').classList.remove('active');
+    setTimeout(() => { window.selectedChatUid = null; }, 200);
+};
+
+window.contextActionViewProfile = () => {
+    closeChatContext();
+    const avatar = window.selectedChatAvatar || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png';
+    showCustomDialog('Profile', `
+        <div style="text-align:center; padding-top: 10px;">
+            <img src="${avatar}" style="width:90px;height:90px;border-radius:50%;margin-bottom:12px;object-fit:cover;border:2px solid var(--wa-primary);">
+            <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 4px;">${escapeHtml(window.selectedChatName)}</h3>
+            <p style="font-size: 13px; color: var(--wa-text-muted);">Vynsta Secure Connection</p>
+        </div>
+    `);
+};
+
+window.contextActionDeleteChat = async () => {
+    if(!window.selectedChatUid) return;
+    const uid = window.selectedChatUid;
+    closeChatContext();
+    
+    // Remove from friends list in DB
+    await set(ref(db, `users/${window.currentUser.uid}/friends/${uid}`), null);
+    
+    // Remove from UI
+    const el = document.getElementById(`chat-item-${uid}`);
+    if (el) el.remove();
+};
+
+window.contextActionBlockUser = async () => {
+    if(!window.selectedChatUid) return;
+    const uid = window.selectedChatUid;
+    const name = window.selectedChatName;
+    closeChatContext();
+    
+    // Add to blocked list in DB
+    await set(ref(db, `users/${window.currentUser.uid}/blocked/${uid}`), { vynstaId: name, timestamp: serverTimestamp() });
+    
+    // Remove from active friends list
+    await set(ref(db, `users/${window.currentUser.uid}/friends/${uid}`), null);
+    
+    // Remove from UI
+    const el = document.getElementById(`chat-item-${uid}`);
+    if (el) el.remove();
+    
+    showCustomDialog('User Blocked', `${escapeHtml(name)} has been blocked. They can no longer interact with your chat.`);
+};
+
+// --- SETTINGS LOGIC & BLOCKED USERS ---
 window.openSettings = () => {
     document.getElementById('settings-id-input').value = window.currentVynstaId;
     document.getElementById('settings-overlay').classList.add('active');
@@ -623,6 +727,38 @@ window.saveSettings = async () => {
         showCustomDialog('Success', 'Your Vynsta ID was updated to ' + newId);
     } catch(e) {
         showCustomDialog('Error', 'Failed to update account settings.');
+    }
+};
+
+function renderBlockedUsers() {
+    const list = document.getElementById('blocked-users-list');
+    if(!list) return;
+    list.innerHTML = '';
+    
+    const uids = Object.keys(window.blockedUsers || {});
+    if(uids.length === 0) {
+        list.innerHTML = '<div style="font-size:13px; color:var(--wa-text-muted); text-align:center; padding:10px;">No blocked users</div>';
+        return;
+    }
+    
+    uids.forEach(uid => {
+        const b = window.blockedUsers[uid];
+        const item = document.createElement('div');
+        item.className = 'blocked-user-item';
+        item.innerHTML = `
+            <span class="blocked-user-name">${escapeHtml(b.vynstaId || 'Unknown User')}</span>
+            <button class="unblock-btn" onclick="unblockUser('${uid}')">Unblock</button>
+        `;
+        list.appendChild(item);
+    });
+}
+
+window.unblockUser = async (uid) => {
+    try {
+        await set(ref(db, `users/${window.currentUser.uid}/blocked/${uid}`), null);
+        showCustomDialog('Unblocked', 'User has been unblocked. You can now receive messages from them or re-add them as a friend.');
+    } catch (e) {
+        showCustomDialog('Error', 'Failed to unblock user.');
     }
 };
 
@@ -746,6 +882,10 @@ function listenToChatPreview(chatId, isGlobal, friendUid = null) {
         const isNewMessage = initialCount > 1; 
         
         const msg = snap.val();
+        
+        // Block check: Do not update preview or notify if sender is blocked
+        if (friendUid && window.blockedUsers && window.blockedUsers[friendUid]) return;
+
         const timeStr = formatTime(msg.timestamp);
         let textSnippet = msg.text ? msg.text : '📷 Photo';
         
@@ -850,21 +990,24 @@ window.handleLogout = async () => {
     } catch(e) { showCustomDialog('Error', 'Could not log out.'); }
 };
 
-// UPDATED AUTH STATE LISTENER WITH SPLASH DELAY
+// UPDATED AUTH STATE LISTENER WITH SPLASH DELAY & BLOCKED LIST BINDING
 onAuthStateChanged(auth, async (user) => {
-    // Add a minimum visual delay of 1.2 seconds so the splash screen feels deliberate
     const minimumSplashTime = new Promise(resolve => setTimeout(resolve, 1200));
     
     if (user) {
         window.currentUser = user;
-        
         requestNotificationPermission();
         window.updateLastSeen();
+        
+        // Listen to Blocked Users Node
+        onValue(ref(db, `users/${user.uid}/blocked`), (snap) => {
+            window.blockedUsers = snap.val() || {};
+            renderBlockedUsers();
+        });
         
         const snapshot = await get(ref(db, `users/${user.uid}`));
         if(snapshot.exists()) {
             const data = snapshot.val();
-            // Checking both legacy vynixId and new vynstaId to prevent breaks
             window.currentVynstaId = data.vynstaId || data.vynixId || data.username;
             document.getElementById('display-vynsta-id').textContent = window.currentVynstaId;
             
@@ -1194,6 +1337,11 @@ window.addFriend = async () => {
             snapshot.forEach(child => { friendUid = child.key; friendData = child.val(); });
             const displayId = friendUid === window.currentUser.uid ? friendData.vynstaId + " (You)" : friendData.vynstaId;
             
+            // Check block status before adding
+            if (window.blockedUsers && window.blockedUsers[friendUid]) {
+                return showCustomDialog('Blocked', 'This user is on your blocked list. Unblock them in settings first.');
+            }
+
             await set(ref(db, `users/${window.currentUser.uid}/friends/${friendUid}`), { vynstaId: displayId, addedAt: serverTimestamp() });
             if (friendUid !== window.currentUser.uid) {
                 await set(ref(db, `users/${friendUid}/friends/${window.currentUser.uid}`), { vynstaId: window.currentVynstaId, addedAt: serverTimestamp() });
@@ -1211,9 +1359,12 @@ function loadFriends() {
     const friendsRef = ref(db, `users/${window.currentUser.uid}/friends`);
     onChildAdded(friendsRef, async (snap) => {
         const friendUid = snap.key; const friendData = snap.val();
+        
+        // Prevent loading blocked users into the active chat list
+        if (window.blockedUsers && window.blockedUsers[friendUid]) return;
+
         let avatarUrl = null;
         try { const fs = await get(ref(db, `users/${friendUid}`)); if(fs.exists()) avatarUrl = fs.val().photoURL; } catch(e) {}
-        // Fallback to legacy vynixId for old friends in DB
         renderFriendChat(friendUid, friendData.vynstaId || friendData.vynixId, avatarUrl);
     });
 }
@@ -1227,9 +1378,13 @@ function renderFriendChat(uid, vynstaId, avatarUrl) {
     const item = document.createElement('div');
     item.className = 'chat-list-item'; item.id = `chat-item-${uid}`;
     
-    item.onclick = () => {
+    // Tap to open chat logic
+    let clickTimer = null;
+    let isLongPress = false;
+    
+    const handleOpenChat = () => {
+        if(isLongPress) return; // cancel tap if it was a long press
         document.getElementById('chat-room-title-text').textContent = vynstaId;
-        
         if (avatarUrl) document.getElementById('chat-room-avatar-img').src = avatarUrl;
         else document.getElementById('chat-room-avatar-img').src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23A8A8A8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="background-color:%23EFEFEF"%3E%3Cpath d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/%3E%3Ccircle cx="12" cy="7" r="4"/%3E%3C/svg%3E';
         
@@ -1237,6 +1392,26 @@ function renderFriendChat(uid, vynstaId, avatarUrl) {
         resetUnread(uid);
         openChatRoom(chatId, uid);
     };
+
+    // Long press logic for mobile
+    item.addEventListener('touchstart', () => {
+        isLongPress = false;
+        clickTimer = setTimeout(() => {
+            isLongPress = true;
+            openChatContext(uid, vynstaId, avatarUrl);
+        }, 600); 
+    }, {passive: true});
+
+    item.addEventListener('touchend', () => { clearTimeout(clickTimer); });
+    item.addEventListener('touchmove', () => { clearTimeout(clickTimer); });
+    
+    // Right click for desktop debugging
+    item.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        openChatContext(uid, vynstaId, avatarUrl);
+    });
+
+    item.onclick = handleOpenChat;
     
     let avatarHtml = avatarUrl ? `<img class="avatar" src="${avatarUrl}">` : `<div class="avatar" style="background: var(--wa-text-main); color: var(--wa-light); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold;">${(vynstaId || 'U').charAt(0).toUpperCase()}</div>`;
 
@@ -1256,6 +1431,7 @@ document.addEventListener('touchend', e => {
     if(document.getElementById('chat-room').classList.contains('open')) return;
     if(document.getElementById('friend-overlay').classList.contains('active')) return;
     if(document.getElementById('settings-overlay').classList.contains('active')) return;
+    if(document.getElementById('chat-context-overlay').classList.contains('active')) return;
     if(document.getElementById('feed-comments-overlay').classList.contains('active')) return;
     if(document.getElementById('custom-dialog').classList.contains('active')) return;
     if(document.getElementById('search-overlay').classList.contains('active')) return;
@@ -1382,6 +1558,7 @@ window.addEventListener('popstate', (e) => {
     
     // Always close top-level overlays when going back
     document.getElementById('image-viewer-overlay').classList.remove('active');
+    document.getElementById('chat-context-overlay').classList.remove('active');
     closeSearch(); 
     closeFriendSheet(); 
     closeSettings();
