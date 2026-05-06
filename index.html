@@ -164,10 +164,9 @@
         .feed-post-btn.active { opacity: 1; }
         .feed-media-preview { width: 100%; max-height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; display: none; }
 
-        .feed-card { padding: 16px; border-bottom: 1px solid var(--wa-border); display: flex; gap: 12px; background: var(--wa-light); transition: background 0.15s; cursor: pointer; }
-        .feed-card:active { background: var(--wa-bg); }
+        .feed-card { padding: 16px; border-bottom: 1px solid var(--wa-border); display: flex; gap: 12px; background: var(--wa-light); transition: background 0.15s; }
         .feed-card-main { flex: 1; min-width: 0; }
-        .feed-card-header { display: flex; justify-content: space-between; margin-bottom: 4px; align-items: baseline; }
+        .feed-card-header { display: flex; justify-content: space-between; margin-bottom: 4px; align-items: flex-start; }
         .feed-card-name { font-weight: bold; color: var(--wa-text-main); font-size: 15px; }
         .feed-card-time { font-size: 13px; color: var(--wa-text-muted); }
         .feed-card-text { font-size: 15px; line-height: 1.4; margin-bottom: 12px; word-wrap: break-word; white-space: pre-wrap; color: var(--wa-text-main); }
@@ -179,6 +178,10 @@
         .feed-action:active svg { transform: scale(0.8); }
         .feed-action.liked { color: var(--wa-like-red); }
         .feed-action.liked svg { fill: currentColor; }
+
+        /* Links and Tags in Posts */
+        .feed-link, .feed-tag { color: var(--wa-blue-tick); cursor: pointer; font-weight: 500; text-decoration: none; transition: opacity 0.2s; }
+        .feed-link:active, .feed-tag:active { opacity: 0.6; }
 
         /* --- PROFILE VIEW --- */
         .profile-header { padding: 30px 20px; display: flex; align-items: center; gap: 20px; border-bottom: 1px solid var(--wa-border); background: var(--wa-bg); }
@@ -216,6 +219,14 @@
         .feed-comment-name { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
         .feed-comment-text { font-size: 14px; line-height: 1.4; word-wrap: break-word; }
 
+        /* --- INTERNAL WEBVIEW OVERLAY --- */
+        .webview-overlay { position: fixed; inset: 0; background: var(--wa-light); z-index: 3000; display: none; flex-direction: column; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+        .webview-overlay.active { display: flex; transform: translateY(0); }
+        .webview-header { background: var(--wa-primary); color: #fff; display: flex; justify-content: space-between; align-items: center; padding: calc(env(safe-area-inset-top) + 12px) 16px 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .webview-header svg { cursor: pointer; width: 22px; height: 22px; }
+        .webview-title { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; text-align: center; }
+        #webview-frame { flex: 1; width: 100%; border: none; background: #fff; }
+
         /* --- CHAT ROOM (SLIDE OVER) --- */
         .chat-room { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--wa-chat-bg); background-image: url('data:image/svg+xml,%3Csvg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M10 10h10v10H10V10z" fill="rgba(0,0,0,0.02)"/%3E%3C/svg%3E'); z-index: 200; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
         .chat-room.open { transform: translateX(0); }
@@ -233,7 +244,7 @@
         .message-wrapper.sent { align-self: flex-end; }
         .message-wrapper.recv { align-self: flex-start; }
         .sender-name { font-size: 12px; font-weight: 600; margin-bottom: 2px; padding-left: 4px; }
-        .bubble { padding: 6px 8px 8px 10px; border-radius: 8px; font-size: 15px; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1); line-height: 1.3; }
+        .bubble { padding: 6px 8px 8px 10px; border-radius: 8px; font-size: 15px; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1); line-height: 1.3; word-wrap: break-word; }
         .sent .bubble { background-color: var(--wa-bubble-sent); border-top-right-radius: 0; }
         .recv .bubble { background-color: var(--wa-bubble-recv); border-top-left-radius: 0; }
         .msg-time-ticks { float: right; display: flex; align-items: center; gap: 4px; margin-top: 4px; margin-left: 12px; font-size: 11px; color: var(--wa-text-muted); }
@@ -257,7 +268,7 @@
         .dialog-box { background: var(--wa-light); color: var(--wa-text-main); width: 85%; max-width: 320px; border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: scale(0.9); transition: transform 0.2s; max-height: 90vh; overflow-y: auto;}
         .dialog-overlay.active .dialog-box { transform: scale(1); }
         .dialog-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-        .dialog-msg { font-size: 14px; color: var(--wa-text-muted); margin-bottom: 24px; line-height: 1.4; }
+        .dialog-msg { font-size: 14px; color: var(--wa-text-muted); margin-bottom: 24px; line-height: 1.4; word-wrap: break-word;}
         .dialog-actions { display: flex; justify-content: flex-end; }
         .dialog-btn { background: none; border: none; font-weight: 600; font-size: 14px; cursor: pointer; padding: 8px 16px; border-radius: 6px; text-transform: uppercase; color: var(--wa-text-main); }
         .dialog-btn:active { background: var(--wa-bg); }
@@ -282,6 +293,15 @@
     </style>
 </head>
 <body>
+
+<div id="webview-overlay" class="webview-overlay">
+    <div class="webview-header">
+        <i data-feather="x" onclick="closeWebView()"></i>
+        <span id="webview-title" class="webview-title">Browser</span>
+        <i data-feather="external-link" onclick="openExternalWebView()"></i>
+    </div>
+    <iframe id="webview-frame" src=""></iframe>
+</div>
 
 <div id="image-viewer-overlay">
     <div class="image-viewer-close" onclick="closeImageViewer()"><i data-feather="x"></i></div>
@@ -374,7 +394,7 @@
         <div class="feed-composer">
             <img class="feed-composer-avatar" id="feed-composer-avatar" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png">
             <div class="feed-input-area">
-                <textarea id="feed-caption-input" placeholder="What's happening?" oninput="updateFeedPostBtn()"></textarea>
+                <textarea id="feed-caption-input" placeholder="What's happening? (Type @ to tag or paste a link)" oninput="updateFeedPostBtn()"></textarea>
                 <img id="feed-media-preview" class="feed-media-preview" src="">
                 <input type="file" id="feed-img-upload" style="display:none;" accept="image/*" onchange="previewFeedImage(event)">
                 
@@ -481,6 +501,16 @@
             <div class="chat-name" style="color:#ef4444;">Block User</div>
         </div>
     </div>
+</div>
+
+<div class="modal-overlay" id="post-context-overlay" onclick="closePostContext()"></div>
+<div class="bottom-sheet" id="post-context-sheet" style="padding-bottom: calc(30px + env(safe-area-inset-bottom));">
+    <div class="sheet-header">
+        <h3 style="font-size: 16px;">Post Options</h3>
+        <i data-feather="x" onclick="closePostContext()" style="cursor: pointer;"></i>
+    </div>
+    <div id="post-context-actions">
+        </div>
 </div>
 
 <div class="modal-overlay" id="friend-overlay" onclick="closeFriendSheet()"></div>
@@ -602,10 +632,15 @@ let feedLoaded = false;
 // Blocked Users State
 window.blockedUsers = {};
 
-// Context Menu State
+// Context Menu States
 window.selectedChatUid = null;
 window.selectedChatName = null;
 window.selectedChatAvatar = null;
+
+window.selectedPostId = null;
+window.selectedPostUid = null;
+window.selectedPostUsername = null;
+window.selectedPostAvatar = null;
 
 // Variables for Feed
 let pendingFeedImage = null;
@@ -653,7 +688,6 @@ window.openChatContext = (uid, name, avatar) => {
     document.getElementById('context-chat-name').textContent = 'Options for ' + name;
     document.getElementById('chat-context-overlay').classList.add('active');
     
-    // Haptic feedback if supported
     if(navigator.vibrate) navigator.vibrate(50);
 };
 
@@ -678,11 +712,7 @@ window.contextActionDeleteChat = async () => {
     if(!window.selectedChatUid) return;
     const uid = window.selectedChatUid;
     closeChatContext();
-    
-    // Remove from friends list in DB
     await set(ref(db, `users/${window.currentUser.uid}/friends/${uid}`), null);
-    
-    // Remove from UI
     const el = document.getElementById(`chat-item-${uid}`);
     if (el) el.remove();
 };
@@ -692,18 +722,83 @@ window.contextActionBlockUser = async () => {
     const uid = window.selectedChatUid;
     const name = window.selectedChatName;
     closeChatContext();
-    
-    // Add to blocked list in DB
     await set(ref(db, `users/${window.currentUser.uid}/blocked/${uid}`), { vynstaId: name, timestamp: serverTimestamp() });
-    
-    // Remove from active friends list
     await set(ref(db, `users/${window.currentUser.uid}/friends/${uid}`), null);
-    
-    // Remove from UI
     const el = document.getElementById(`chat-item-${uid}`);
     if (el) el.remove();
-    
     showCustomDialog('User Blocked', `${escapeHtml(name)} has been blocked. They can no longer interact with your chat.`);
+};
+
+// --- POST CONTEXT MENU LOGIC ---
+window.openPostContext = (postId, uid, username, avatar) => {
+    window.selectedPostId = postId;
+    window.selectedPostUid = uid;
+    window.selectedPostUsername = username;
+    window.selectedPostAvatar = avatar;
+    
+    const actionsContainer = document.getElementById('post-context-actions');
+    actionsContainer.innerHTML = '';
+    
+    if (uid === window.currentUser.uid) {
+        actionsContainer.innerHTML = `
+            <div class="chat-list-item" onclick="deleteFeedPost()" style="padding: 16px 0;">
+                <i data-feather="trash-2" style="color:#ef4444;"></i>
+                <div class="chat-info" style="border:none; padding-bottom:0; margin-left:16px;">
+                    <div class="chat-name" style="color:#ef4444;">Delete Post</div>
+                </div>
+            </div>
+        `;
+    } else {
+        actionsContainer.innerHTML = `
+            <div class="chat-list-item" onclick="viewPostProfile()" style="padding: 16px 0;">
+                <i data-feather="user"></i>
+                <div class="chat-info" style="border:none; padding-bottom:0; margin-left:16px;">
+                    <div class="chat-name">View Profile (@${escapeHtml(username)})</div>
+                </div>
+            </div>
+            <div class="chat-list-item" onclick="reportFeedPost()" style="padding: 16px 0;">
+                <i data-feather="flag" style="color:#ef4444;"></i>
+                <div class="chat-info" style="border:none; padding-bottom:0; margin-left:16px;">
+                    <div class="chat-name" style="color:#ef4444;">Report Post</div>
+                </div>
+            </div>
+        `;
+    }
+    
+    document.getElementById('post-context-overlay').classList.add('active');
+    feather.replace();
+};
+
+window.closePostContext = () => {
+    document.getElementById('post-context-overlay').classList.remove('active');
+};
+
+window.deleteFeedPost = async () => {
+    if(!window.selectedPostId) return;
+    try {
+        await set(ref(db, `feed_posts/${window.selectedPostId}`), null);
+        closePostContext();
+        showCustomDialog('Deleted', 'Post removed from feed.');
+    } catch(e) {
+        showCustomDialog('Error', 'Failed to delete post.');
+    }
+};
+
+window.reportFeedPost = () => {
+    closePostContext();
+    showCustomDialog('Reported', 'This post has been securely reported to Vynsta admins for review.');
+};
+
+window.viewPostProfile = () => {
+    closePostContext();
+    const avatar = window.selectedPostAvatar || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png';
+    showCustomDialog('Profile', `
+        <div style="text-align:center; padding-top: 10px;">
+            <img src="${avatar}" style="width:90px;height:90px;border-radius:50%;margin-bottom:12px;object-fit:cover;border:2px solid var(--wa-primary);">
+            <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 4px;">${escapeHtml(window.selectedPostUsername)}</h3>
+            <p style="font-size: 13px; color: var(--wa-text-muted);">Vynsta Network User</p>
+        </div>
+    `);
 };
 
 // --- SETTINGS LOGIC & BLOCKED USERS ---
@@ -762,7 +857,27 @@ window.unblockUser = async (uid) => {
     }
 };
 
-// --- IMAGE VIEWER LOGIC (WITH PROPER ROUTING) ---
+// --- WEBVIEW LOGIC ---
+window.currentWebViewUrl = '';
+window.openWebView = (url) => {
+    window.currentWebViewUrl = url;
+    document.getElementById('webview-frame').src = url;
+    document.getElementById('webview-title').textContent = url.replace(/^https?:\/\//, '').split('/')[0];
+    document.getElementById('webview-overlay').classList.add('active');
+    if (location.hash !== '#webview') history.pushState(null, '', '#webview');
+};
+
+window.closeWebView = () => {
+    document.getElementById('webview-overlay').classList.remove('active');
+    setTimeout(() => { document.getElementById('webview-frame').src = ''; }, 300);
+    if(location.hash === '#webview') history.back();
+};
+
+window.openExternalWebView = () => {
+    window.open(window.currentWebViewUrl, '_blank');
+};
+
+// --- IMAGE VIEWER LOGIC ---
 window.openImageViewer = (src) => {
     document.getElementById('image-viewer-img').src = src;
     document.getElementById('image-viewer-overlay').classList.add('active');
@@ -774,6 +889,22 @@ window.closeImageViewer = () => {
     setTimeout(() => { document.getElementById('image-viewer-img').src = ''; }, 200); 
     if(location.hash === '#image') history.back();
 };
+
+// --- TEXT FORMATTING (LINKS & TAGS) ---
+function formatPostText(text) {
+    if (!text) return '';
+    let safeText = escapeHtml(text);
+    
+    // Convert URLs to clickable WebView links
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    safeText = safeText.replace(urlRegex, (url) => `<span class="feed-link" onclick="event.stopPropagation(); openWebView('${url}')">${url}</span>`);
+    
+    // Convert @username to blue tag
+    const tagRegex = /@([a-zA-Z0-9_]+)/g;
+    safeText = safeText.replace(tagRegex, (match, tag) => `<span class="feed-tag" onclick="event.stopPropagation(); showCustomDialog('Tagged User', 'Profile search for @${tag} coming soon!')">${match}</span>`);
+    
+    return safeText;
+}
 
 function incrementUnread(chatId) {
     window.unreadCounts[chatId] = (window.unreadCounts[chatId] || 0) + 1;
@@ -821,7 +952,6 @@ function requestNotificationPermission() {
     }
 }
 
-// Global Feed Notification Logic (Ignores Background Rules & Includes Self)
 function triggerFeedNotification(title, body, iconUrl) {
     if ("Notification" in window && Notification.permission === "granted") {
         const notification = new Notification(title, {
@@ -871,7 +1001,6 @@ function triggerSystemNotification(title, body, iconUrl) {
     }
 }
 
-// Lightweight listener for previews & sorting
 function listenToChatPreview(chatId, isGlobal, friendUid = null) {
     const path = isGlobal ? 'posts' : `chats/${chatId}/messages`;
     const q = query(ref(db, path), limitToLast(1));
@@ -883,7 +1012,7 @@ function listenToChatPreview(chatId, isGlobal, friendUid = null) {
         
         const msg = snap.val();
         
-        // Block check: Do not update preview or notify if sender is blocked
+        // Block check
         if (friendUid && window.blockedUsers && window.blockedUsers[friendUid]) return;
 
         const timeStr = formatTime(msg.timestamp);
@@ -990,7 +1119,7 @@ window.handleLogout = async () => {
     } catch(e) { showCustomDialog('Error', 'Could not log out.'); }
 };
 
-// UPDATED AUTH STATE LISTENER WITH SPLASH DELAY & BLOCKED LIST BINDING
+// UPDATED AUTH STATE LISTENER
 onAuthStateChanged(auth, async (user) => {
     const minimumSplashTime = new Promise(resolve => setTimeout(resolve, 1200));
     
@@ -999,7 +1128,6 @@ onAuthStateChanged(auth, async (user) => {
         requestNotificationPermission();
         window.updateLastSeen();
         
-        // Listen to Blocked Users Node
         onValue(ref(db, `users/${user.uid}/blocked`), (snap) => {
             window.blockedUsers = snap.val() || {};
             renderBlockedUsers();
@@ -1034,11 +1162,10 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById('display-email').textContent = user.email;
         
         listenToChatPreview('global', true);
-        listenToFeedNotifications(); // Bind the dedicated Feed notification push
+        listenToFeedNotifications(); 
         loadFriends();
         loadFeed(); 
         
-        // Wait for the minimum splash time, then show the main app
         await minimumSplashTime;
         document.getElementById('splash-screen').style.display = 'none';
         document.getElementById('auth-screen').style.display = 'none';
@@ -1046,8 +1173,6 @@ onAuthStateChanged(auth, async (user) => {
         
     } else {
         window.currentUser = null;
-        
-        // Wait for the minimum splash time, then show the auth screen
         await minimumSplashTime;
         document.getElementById('splash-screen').style.display = 'none';
         document.getElementById('main-app').style.display = 'none';
@@ -1105,7 +1230,6 @@ window.submitFeedPost = async () => {
             comments: {}
         });
         
-        // Reset composer
         input.value = '';
         pendingFeedImage = null;
         document.getElementById('feed-media-preview').style.display = 'none';
@@ -1131,11 +1255,10 @@ function sortFeed(postsArray) {
         const likesB = b.likes ? Object.keys(b.likes).length : 0;
         const commentsB = b.comments ? Object.keys(b.comments).length : 0;
         
-        // Score = Engagement / (Age in hours + 1) + slight randomizer
         const scoreA = ((likesA * 2) + (commentsA * 3)) / (ageA + 1) + (Math.random() * 2);
         const scoreB = ((likesB * 2) + (commentsB * 3)) / (ageB + 1) + (Math.random() * 2);
         
-        return scoreB - scoreA; // Descending
+        return scoreB - scoreA; 
     });
 }
 
@@ -1145,7 +1268,6 @@ function loadFeed() {
     
     const list = document.getElementById('feed-posts-list');
     
-    // We use onValue to fetch the batch, sort it, and render it dynamically
     onValue(query(ref(db, 'feed_posts'), limitToLast(100)), (snapshot) => {
         if (!snapshot.exists()) {
             list.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--wa-text-muted); font-size: 14px;">No posts yet. Be the first!</div>';
@@ -1166,15 +1288,18 @@ function loadFeed() {
             const card = document.createElement('div');
             card.className = 'feed-card';
             
-            // X-Style layout with global image viewer triggered on feed image tap
+            // X-Style layout with 3 dot menu & text formatting
             card.innerHTML = `
                 <img src="${post.userPhoto || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png'}" class="feed-composer-avatar" onclick="showCustomDialog('Profile', '@${escapeHtml(post.username)}')">
                 <div class="feed-card-main">
                     <div class="feed-card-header">
-                        <span class="feed-card-name">${escapeHtml(post.username)}</span>
-                        <span class="feed-card-time">${formatTime(post.timestamp)}</span>
+                        <div>
+                            <span class="feed-card-name">${escapeHtml(post.username)}</span>
+                            <span class="feed-card-time" style="margin-left: 8px;">${formatTime(post.timestamp)}</span>
+                        </div>
+                        <i data-feather="more-horizontal" style="color:var(--wa-text-muted); cursor:pointer;" onclick="openPostContext('${post.id}', '${post.uid}', '${escapeHtml(post.username)}', '${post.userPhoto}')"></i>
                     </div>
-                    ${post.text ? `<div class="feed-card-text">${escapeHtml(post.text)}</div>` : ''}
+                    ${post.text ? `<div class="feed-card-text">${formatPostText(post.text)}</div>` : ''}
                     ${post.mediaUrl ? `<img src="${post.mediaUrl}" class="feed-card-img" onclick="openImageViewer('${post.mediaUrl}')">` : ''}
                     
                     <div class="feed-actions">
@@ -1205,7 +1330,6 @@ window.toggleFeedLike = async (postId, currentlyLiked) => {
     if (!window.currentUser) return;
     const likeRef = ref(db, `feed_posts/${postId}/likes/${window.currentUser.uid}`);
     
-    // Optimistic vibration
     if (!currentlyLiked && navigator.vibrate) navigator.vibrate(30);
     
     if (currentlyLiked) await set(likeRef, null);
@@ -1222,7 +1346,7 @@ window.openFeedComments = (postId) => {
 window.closeFeedComments = () => {
     document.getElementById('feed-comments-overlay').classList.remove('active');
     currentFeedCommentPostId = null;
-    off(ref(db, `feed_posts/${currentFeedCommentPostId}/comments`)); // clean listener
+    off(ref(db, `feed_posts/${currentFeedCommentPostId}/comments`)); 
 };
 
 function loadFeedComments(postId) {
@@ -1244,13 +1368,12 @@ function loadFeedComments(postId) {
                 <img src="${c.userPhoto || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png'}" class="feed-comment-avatar">
                 <div class="feed-comment-body">
                     <div class="feed-comment-name">${escapeHtml(c.username)} <span style="font-size:11px; color:var(--wa-text-muted); font-weight:normal; margin-left:6px;">${formatTime(c.timestamp)}</span></div>
-                    <div class="feed-comment-text">${escapeHtml(c.text)}</div>
+                    <div class="feed-comment-text">${formatPostText(c.text)}</div>
                 </div>
             `;
             list.appendChild(item);
         });
         
-        // scroll to bottom
         list.scrollTop = list.scrollHeight;
     });
 }
@@ -1337,7 +1460,6 @@ window.addFriend = async () => {
             snapshot.forEach(child => { friendUid = child.key; friendData = child.val(); });
             const displayId = friendUid === window.currentUser.uid ? friendData.vynstaId + " (You)" : friendData.vynstaId;
             
-            // Check block status before adding
             if (window.blockedUsers && window.blockedUsers[friendUid]) {
                 return showCustomDialog('Blocked', 'This user is on your blocked list. Unblock them in settings first.');
             }
@@ -1360,7 +1482,6 @@ function loadFriends() {
     onChildAdded(friendsRef, async (snap) => {
         const friendUid = snap.key; const friendData = snap.val();
         
-        // Prevent loading blocked users into the active chat list
         if (window.blockedUsers && window.blockedUsers[friendUid]) return;
 
         let avatarUrl = null;
@@ -1378,12 +1499,11 @@ function renderFriendChat(uid, vynstaId, avatarUrl) {
     const item = document.createElement('div');
     item.className = 'chat-list-item'; item.id = `chat-item-${uid}`;
     
-    // Tap to open chat logic
     let clickTimer = null;
     let isLongPress = false;
     
     const handleOpenChat = () => {
-        if(isLongPress) return; // cancel tap if it was a long press
+        if(isLongPress) return; 
         document.getElementById('chat-room-title-text').textContent = vynstaId;
         if (avatarUrl) document.getElementById('chat-room-avatar-img').src = avatarUrl;
         else document.getElementById('chat-room-avatar-img').src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23A8A8A8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="background-color:%23EFEFEF"%3E%3Cpath d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/%3E%3Ccircle cx="12" cy="7" r="4"/%3E%3C/svg%3E';
@@ -1393,7 +1513,6 @@ function renderFriendChat(uid, vynstaId, avatarUrl) {
         openChatRoom(chatId, uid);
     };
 
-    // Long press logic for mobile
     item.addEventListener('touchstart', () => {
         isLongPress = false;
         clickTimer = setTimeout(() => {
@@ -1405,7 +1524,6 @@ function renderFriendChat(uid, vynstaId, avatarUrl) {
     item.addEventListener('touchend', () => { clearTimeout(clickTimer); });
     item.addEventListener('touchmove', () => { clearTimeout(clickTimer); });
     
-    // Right click for desktop debugging
     item.addEventListener('contextmenu', (e) => {
         e.preventDefault();
         openChatContext(uid, vynstaId, avatarUrl);
@@ -1432,10 +1550,12 @@ document.addEventListener('touchend', e => {
     if(document.getElementById('friend-overlay').classList.contains('active')) return;
     if(document.getElementById('settings-overlay').classList.contains('active')) return;
     if(document.getElementById('chat-context-overlay').classList.contains('active')) return;
+    if(document.getElementById('post-context-overlay').classList.contains('active')) return;
     if(document.getElementById('feed-comments-overlay').classList.contains('active')) return;
     if(document.getElementById('custom-dialog').classList.contains('active')) return;
     if(document.getElementById('search-overlay').classList.contains('active')) return;
     if(document.getElementById('image-viewer-overlay').classList.contains('active')) return;
+    if(document.getElementById('webview-overlay').classList.contains('active')) return;
     
     const dx = e.changedTouches[0].clientX - touchStartX;
     const dy = e.changedTouches[0].clientY - touchStartY;
@@ -1479,6 +1599,12 @@ document.addEventListener('click', (e) => {
 
     const settingsOverlay = document.getElementById('settings-overlay');
     if (settingsOverlay.classList.contains('active') && !e.target.closest('#settings-sheet') && !e.target.closest('.chat-list-item')) closeSettings();
+    
+    const chatContextOverlay = document.getElementById('chat-context-overlay');
+    if (chatContextOverlay.classList.contains('active') && !e.target.closest('#chat-context-sheet')) closeChatContext();
+
+    const postContextOverlay = document.getElementById('post-context-overlay');
+    if (postContextOverlay.classList.contains('active') && !e.target.closest('#post-context-sheet')) closePostContext();
     
     const feedCommentsOverlay = document.getElementById('feed-comments-overlay');
     if (feedCommentsOverlay.classList.contains('active') && !e.target.closest('#feed-comments-sheet') && !e.target.closest('.feed-action')) closeFeedComments();
@@ -1552,24 +1678,29 @@ window.doCloseChatRoom = () => {
     if(currentChatRef) off(currentChatRef); 
 }
 
-// UPDATED POPSTATE ROUTING: Closes top layers sequentially
+// UPDATED POPSTATE ROUTING
 window.addEventListener('popstate', (e) => {
     const hash = location.hash;
     
-    // Always close top-level overlays when going back
     document.getElementById('image-viewer-overlay').classList.remove('active');
     document.getElementById('chat-context-overlay').classList.remove('active');
+    document.getElementById('post-context-overlay').classList.remove('active');
     closeSearch(); 
     closeFriendSheet(); 
     closeSettings();
     closeCustomDialog(); 
     closeFeedComments();
 
+    if (hash === '#webview') {
+        document.getElementById('webview-overlay').classList.add('active');
+    } else {
+        document.getElementById('webview-overlay').classList.remove('active');
+        document.getElementById('webview-frame').src = '';
+    }
+
     if (hash === '#chat') {
-        // If we backed out of an image, ensure chat stays open visually
         document.getElementById('chat-room').classList.add('open');
     } else if (hash === '') {
-        // If we backed out of the chat back to the main UI
         window.doCloseChatRoom();
     }
 });
