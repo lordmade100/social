@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Vynix GB - Stealth</title>
+    <title>Vynsta - Stealth Network</title>
     <script src="https://unpkg.com/feather-icons"></script>
     <style>
         :root {
-            /* Vynix Stealth Black Theme */
+            /* Vynsta Stealth Black Theme */
             --wa-primary: #000000;
             --wa-primary-dark: #111111;
             --wa-light: #ffffff;
@@ -52,7 +52,7 @@
         * { 
             box-sizing: border-box; margin: 0; padding: 0; 
             -webkit-tap-highlight-color: transparent; 
-            -webkit-touch-callout: none; /* Prevents callout menu globally */
+            -webkit-touch-callout: none; 
             -webkit-user-select: none;   
             user-select: none;
         }
@@ -63,7 +63,7 @@
         img { 
             -webkit-user-drag: none; 
             pointer-events: auto; 
-            -webkit-touch-callout: none; /* Extra enforcement for images */
+            -webkit-touch-callout: none; 
         }
 
         body {
@@ -280,15 +280,15 @@
 </div>
 
 <div id="splash-screen">
-    <div class="splash-logo"><i data-feather="cpu"></i></div>
-    <div class="splash-title">VYNIX GB</div>
+    <div class="splash-logo"><i data-feather="aperture"></i></div>
+    <div class="splash-title">VYNSTA</div>
     <div class="splash-subtitle">Stealth Network</div>
     <div class="splash-spinner"></div>
 </div>
 
 <div id="auth-screen">
-    <div class="auth-logo"><i data-feather="cpu"></i></div>
-    <div class="auth-title">Vynix GB</div>
+    <div class="auth-logo"><i data-feather="aperture"></i></div>
+    <div class="auth-title">Vynsta</div>
     <div class="auth-sub">Stealth Communication Network</div>
     
     <input type="email" id="auth-email" class="auth-input" placeholder="Email Address">
@@ -304,12 +304,12 @@
         <div class="search-overlay" id="search-overlay">
             <i data-feather="arrow-left" onclick="closeSearch()"></i>
             <div class="search-input-wrapper">
-                <input type="text" id="global-search-input" placeholder="Search Vynix Network..." onkeypress="if(event.key==='Enter'){ handleGlobalSearch(); }">
+                <input type="text" id="global-search-input" placeholder="Search Vynsta Network..." onkeypress="if(event.key==='Enter'){ handleGlobalSearch(); }">
             </div>
         </div>
 
         <div class="wa-top-bar">
-            <div class="wa-title">Vynix GB</div>
+            <div class="wa-title">Vynsta</div>
             <div class="wa-icons">
                 <i data-feather="wifi" class="gb-wifi" onclick="showCustomDialog('Ghost Mode', 'Airplane / Ghost Mode Activated. Your status is now hidden.')"></i>
                 <i data-feather="moon" onclick="toggleTheme()"></i>
@@ -338,7 +338,7 @@
             <img class="avatar" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png" style="background: var(--wa-text-main);">
             <div class="chat-info">
                 <div class="chat-name-row">
-                    <span class="chat-name">Vynix Mainnet (Global)</span>
+                    <span class="chat-name">Vynsta Mainnet (Global)</span>
                     <span class="chat-time" id="global-last-time">Just now</span>
                 </div>
                 <div class="chat-msg-row">
@@ -373,7 +373,7 @@
 
     <div id="tab-calls" class="view-container">
         <div style="padding: 40px; text-align: center; color: var(--wa-text-muted);">
-            To call contacts on Vynix, open a chat and tap the phone icon.
+            To call contacts on Vynsta, open a chat and tap the phone icon.
         </div>
     </div>
 
@@ -386,20 +386,20 @@
             </div>
             <input type="file" id="profile-pic-input" style="display:none;" accept="image/*" onchange="handleProfilePicUpload(event)">
             <div>
-                <div class="profile-id" id="display-vynix-id">Loading...</div>
+                <div class="profile-id" id="display-vynsta-id">Loading...</div>
                 <div class="profile-email" id="display-email">loading@email.com</div>
             </div>
         </div>
         
         <div style="padding: 16px; font-size: 14px; font-weight: 600; color: var(--wa-text-muted); background: var(--wa-bg);">Account Actions</div>
         
-        <div class="chat-list-item" onclick="copyVynixID()">
+        <div class="chat-list-item" onclick="copyVynstaID()">
             <i data-feather="copy" style="color: var(--wa-text-main);"></i>
             <div class="chat-info" style="border-bottom: none; margin-left: 16px; padding-bottom: 0;">
-                <div class="chat-name" style="font-weight: 400;">Copy Vynix ID to Invite Friends</div>
+                <div class="chat-name" style="font-weight: 400;">Copy Vynsta ID to Invite Friends</div>
             </div>
         </div>
-        <div class="chat-list-item" onclick="showCustomDialog('Privacy', 'Your Vynix ID keeps your real phone number hidden from other users.')">
+        <div class="chat-list-item" onclick="showCustomDialog('Privacy', 'Your Vynsta ID keeps your real phone number hidden from other users.')">
             <i data-feather="shield" style="color: var(--wa-text-main);"></i>
             <div class="chat-info" style="border-bottom: none; margin-left: 16px; padding-bottom: 0;">
                 <div class="chat-name" style="font-weight: 400;">Privacy & Security</div>
@@ -424,7 +424,7 @@
         <h3>New Chat</h3>
         <i data-feather="x" onclick="closeFriendSheet()" style="cursor: pointer;"></i>
     </div>
-    <p style="font-size: 14px; color: var(--wa-text-muted); margin-bottom: 12px;">Enter a Vynix ID (You can also add your own ID).</p>
+    <p style="font-size: 14px; color: var(--wa-text-muted); margin-bottom: 12px;">Enter a Vynsta ID (You can also add your own ID).</p>
     <input type="text" id="friend-id-input" class="sheet-input" placeholder="e.g. NeonWolf88" autocomplete="off">
     <button class="sheet-btn" onclick="addFriend()">Add Friend</button>
 </div>
@@ -450,7 +450,7 @@
         </div>
         <img class="chat-room-avatar" id="chat-room-avatar-img" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png" style="background: white;" onclick="openImageViewer(this.src)">
         <div class="chat-room-title">
-            <h3 id="chat-room-title-text">Vynix Mainnet</h3>
+            <h3 id="chat-room-title-text">Vynsta Mainnet</h3>
             <p id="chat-room-subtitle">Global encrypted channel</p>
         </div>
         <i data-feather="video" onclick="showCustomDialog('Call', 'Calls are currently disabled.')"></i>
@@ -525,7 +525,7 @@ const CLOUDINARY_CLOUD_NAME = 'dqkujefxj';
 const CLOUDINARY_UPLOAD_PRESET = 'banter_box';
 
 window.currentUser = null;
-window.currentVynixId = null;
+window.currentVynstaId = null;
 window.currentUserAvatar = 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png';
 
 let currentChatRef = null;
@@ -597,7 +597,7 @@ function requestNotificationPermission() {
     if ("Notification" in window) {
         Notification.requestPermission().then(permission => {
             if (permission === "granted") {
-                console.log("Vynix Stealth: Notifications enabled.");
+                console.log("Vynsta Stealth: Notifications enabled.");
             }
         });
     }
@@ -641,7 +641,7 @@ function listenToChatPreview(chatId, isGlobal, friendUid = null) {
             document.getElementById('global-last-text').textContent = textSnippet;
             if (isNewMessage && window.currentChatPath !== 'posts' && !isSelf) {
                 incrementUnread('global');
-                triggerSystemNotification("Vynix Mainnet", `${msg.user?.username || 'User'}: ${msg.text ? msg.text : '📷 Photo'}`);
+                triggerSystemNotification("Vynsta Mainnet", `${msg.user?.username || 'User'}: ${msg.text ? msg.text : '📷 Photo'}`);
             }
         } else if (friendUid) {
             const timeEl = document.getElementById(`time-${friendUid}`);
@@ -673,7 +673,7 @@ async function uploadToCloudinary(file, isAvatar = false) {
     return data.secure_url.replace('/upload/', '/upload/f_auto,q_auto,w_1080/');
 }
 
-// --- VYNIX ID GENERATOR ---
+// --- VYNSTA ID GENERATOR ---
 function generateMemorableID() {
     const adjectives = ['Neon', 'Stealth', 'Cyber', 'Dark', 'Ghost', 'Nova', 'Phantom', 'Volt', 'Rogue', 'Apex'];
     const nouns = ['Wolf', 'Hawk', 'Viper', 'Raven', 'Fox', 'Dragon', 'Tiger', 'Lynx', 'Bear', 'Titan'];
@@ -692,18 +692,18 @@ window.handleSignUp = async () => {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
         const user = userCredential.user;
-        const newVynixID = generateMemorableID();
+        const newVynstaID = generateMemorableID();
         
         await set(ref(db, `users/${user.uid}`), {
-            email: email, vynixId: newVynixID, username: newVynixID,
+            email: email, vynstaId: newVynstaID, username: newVynstaID,
             createdAt: serverTimestamp(), lastSeen: serverTimestamp()
         });
         
         await set(ref(db, `users/${user.uid}/friends/${user.uid}`), {
-            vynixId: newVynixID + " (You)", addedAt: serverTimestamp()
+            vynstaId: newVynstaID + " (You)", addedAt: serverTimestamp()
         });
         
-        showCustomDialog('Welcome!', `Account created! Your unique Vynix ID is ${newVynixID}. Share it to connect.`);
+        showCustomDialog('Welcome!', `Account created! Your unique Vynsta ID is ${newVynstaID}. Share it to connect.`);
     } catch (e) { showCustomDialog('Sign Up Failed', e.message); }
 };
 
@@ -747,8 +747,9 @@ onAuthStateChanged(auth, async (user) => {
         const snapshot = await get(ref(db, `users/${user.uid}`));
         if(snapshot.exists()) {
             const data = snapshot.val();
-            window.currentVynixId = data.vynixId || data.username;
-            document.getElementById('display-vynix-id').textContent = window.currentVynixId;
+            // Checking both legacy vynixId and new vynstaId to prevent breaks
+            window.currentVynstaId = data.vynstaId || data.vynixId || data.username;
+            document.getElementById('display-vynsta-id').textContent = window.currentVynstaId;
             
             if (data.photoURL) {
                 window.currentUserAvatar = data.photoURL;
@@ -756,19 +757,19 @@ onAuthStateChanged(auth, async (user) => {
                 document.getElementById('profile-avatar-img').style.display = 'block';
                 document.getElementById('profile-letter').style.display = 'none';
             } else {
-                document.getElementById('profile-letter').textContent = window.currentVynixId.charAt(0).toUpperCase();
+                document.getElementById('profile-letter').textContent = window.currentVynstaId.charAt(0).toUpperCase();
             }
             
             document.getElementById('feed-composer-avatar').src = window.currentUserAvatar;
             
             if (!data.friends || !data.friends[user.uid]) {
                 await set(ref(db, `users/${user.uid}/friends/${user.uid}`), {
-                    vynixId: window.currentVynixId + " (You)", addedAt: serverTimestamp()
+                    vynstaId: window.currentVynstaId + " (You)", addedAt: serverTimestamp()
                 });
             }
         } else {
-            window.currentVynixId = "User_" + user.uid.substring(0,4);
-            document.getElementById('display-vynix-id').textContent = window.currentVynixId;
+            window.currentVynstaId = "User_" + user.uid.substring(0,4);
+            document.getElementById('display-vynsta-id').textContent = window.currentVynstaId;
         }
         document.getElementById('display-email').textContent = user.email;
         
@@ -834,7 +835,7 @@ window.submitFeedPost = async () => {
         
         await push(ref(db, 'feed_posts'), {
             uid: window.currentUser.uid,
-            username: window.currentVynixId,
+            username: window.currentVynstaId,
             userPhoto: window.currentUserAvatar,
             text: text,
             mediaUrl: mediaUrl,
@@ -1004,7 +1005,7 @@ window.submitFeedComment = async () => {
     try {
         await push(ref(db, `feed_posts/${currentFeedCommentPostId}/comments`), {
             uid: window.currentUser.uid,
-            username: window.currentVynixId,
+            username: window.currentVynstaId,
             userPhoto: window.currentUserAvatar,
             text: text,
             timestamp: serverTimestamp()
@@ -1039,7 +1040,7 @@ window.handleChatImageUpload = async (e) => {
         const photoURL = await uploadToCloudinary(file, false);
         await push(ref(db, window.currentChatPath), {
             uid: window.currentUser.uid, text: "", mediaUrl: photoURL,
-            timestamp: serverTimestamp(), user: { username: window.currentVynixId || 'User' }
+            timestamp: serverTimestamp(), user: { username: window.currentVynstaId || 'User' }
         });
         window.updateLastSeen();
         closeCustomDialog();
@@ -1066,22 +1067,22 @@ window.addFriend = async () => {
     if(!inputId) return;
     
     const usersRef = ref(db, 'users');
-    const q = query(usersRef, orderByChild('vynixId'), equalTo(inputId));
+    const q = query(usersRef, orderByChild('vynstaId'), equalTo(inputId));
     
     try {
         const snapshot = await get(q);
         if(snapshot.exists()) {
             let friendUid = null; let friendData = null;
             snapshot.forEach(child => { friendUid = child.key; friendData = child.val(); });
-            const displayId = friendUid === window.currentUser.uid ? friendData.vynixId + " (You)" : friendData.vynixId;
+            const displayId = friendUid === window.currentUser.uid ? friendData.vynstaId + " (You)" : friendData.vynstaId;
             
-            await set(ref(db, `users/${window.currentUser.uid}/friends/${friendUid}`), { vynixId: displayId, addedAt: serverTimestamp() });
+            await set(ref(db, `users/${window.currentUser.uid}/friends/${friendUid}`), { vynstaId: displayId, addedAt: serverTimestamp() });
             if (friendUid !== window.currentUser.uid) {
-                await set(ref(db, `users/${friendUid}/friends/${window.currentUser.uid}`), { vynixId: window.currentVynixId, addedAt: serverTimestamp() });
+                await set(ref(db, `users/${friendUid}/friends/${window.currentUser.uid}`), { vynstaId: window.currentVynstaId, addedAt: serverTimestamp() });
             }
             closeFriendSheet();
             showCustomDialog('Success', `${displayId} added to your chats!`);
-        } else { showCustomDialog('Not Found', 'No user found with that Vynix ID.'); }
+        } else { showCustomDialog('Not Found', 'No user found with that Vynsta ID.'); }
     } catch(e) { showCustomDialog('Error', 'Failed to search for user.'); }
 };
 
@@ -1094,13 +1095,14 @@ function loadFriends() {
         const friendUid = snap.key; const friendData = snap.val();
         let avatarUrl = null;
         try { const fs = await get(ref(db, `users/${friendUid}`)); if(fs.exists()) avatarUrl = fs.val().photoURL; } catch(e) {}
-        renderFriendChat(friendUid, friendData.vynixId, avatarUrl);
+        // Fallback to legacy vynixId for old friends in DB
+        renderFriendChat(friendUid, friendData.vynstaId || friendData.vynixId, avatarUrl);
     });
 }
 
 function getChatId(uid1, uid2) { return uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`; }
 
-function renderFriendChat(uid, vynixId, avatarUrl) {
+function renderFriendChat(uid, vynstaId, avatarUrl) {
     const list = document.getElementById('private-chats-list');
     if(document.getElementById(`chat-item-${uid}`)) return;
     
@@ -1108,7 +1110,7 @@ function renderFriendChat(uid, vynixId, avatarUrl) {
     item.className = 'chat-list-item'; item.id = `chat-item-${uid}`;
     
     item.onclick = () => {
-        document.getElementById('chat-room-title-text').textContent = vynixId;
+        document.getElementById('chat-room-title-text').textContent = vynstaId;
         
         if (avatarUrl) document.getElementById('chat-room-avatar-img').src = avatarUrl;
         else document.getElementById('chat-room-avatar-img').src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23A8A8A8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="background-color:%23EFEFEF"%3E%3Cpath d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/%3E%3Ccircle cx="12" cy="7" r="4"/%3E%3C/svg%3E';
@@ -1118,9 +1120,9 @@ function renderFriendChat(uid, vynixId, avatarUrl) {
         openChatRoom(chatId, uid);
     };
     
-    let avatarHtml = avatarUrl ? `<img class="avatar" src="${avatarUrl}">` : `<div class="avatar" style="background: var(--wa-text-main); color: var(--wa-light); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold;">${vynixId.charAt(0).toUpperCase()}</div>`;
+    let avatarHtml = avatarUrl ? `<img class="avatar" src="${avatarUrl}">` : `<div class="avatar" style="background: var(--wa-text-main); color: var(--wa-light); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold;">${(vynstaId || 'U').charAt(0).toUpperCase()}</div>`;
 
-    item.innerHTML = `${avatarHtml}<div class="chat-info"><div class="chat-name-row"><span class="chat-name">${escapeHtml(vynixId)}</span><span class="chat-time" id="time-${uid}"></span></div><div class="chat-msg-row"><span class="chat-msg-text" id="text-${uid}">Tap to open chat...</span><div class="unread-badge" id="unread-${uid}"></div></div></div>`;
+    item.innerHTML = `${avatarHtml}<div class="chat-info"><div class="chat-name-row"><span class="chat-name">${escapeHtml(vynstaId)}</span><span class="chat-time" id="time-${uid}"></span></div><div class="chat-msg-row"><span class="chat-msg-text" id="text-${uid}">Tap to open chat...</span><div class="unread-badge" id="unread-${uid}"></div></div></div>`;
     list.appendChild(item);
     
     listenToChatPreview(getChatId(window.currentUser.uid, uid), false, uid);
@@ -1159,10 +1161,10 @@ window.closeCustomDialog = () => { document.getElementById('custom-dialog').clas
 // --- DARK MODE LOGIC ---
 window.toggleTheme = () => {
     const doc = document.documentElement;
-    if (doc.getAttribute('data-theme') === 'dark') { doc.removeAttribute('data-theme'); localStorage.setItem('vynix_gb_theme', 'light'); } 
-    else { doc.setAttribute('data-theme', 'dark'); localStorage.setItem('vynix_gb_theme', 'dark'); }
+    if (doc.getAttribute('data-theme') === 'dark') { doc.removeAttribute('data-theme'); localStorage.setItem('vynsta_theme', 'light'); } 
+    else { doc.setAttribute('data-theme', 'dark'); localStorage.setItem('vynsta_theme', 'dark'); }
 };
-if(localStorage.getItem('vynix_gb_theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+if(localStorage.getItem('vynsta_theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
 
 // --- SEARCH LOGIC ---
 window.openSearch = () => { document.getElementById('search-overlay').classList.add('active'); setTimeout(() => document.getElementById('global-search-input').focus(), 100); };
@@ -1185,7 +1187,7 @@ document.addEventListener('click', (e) => {
 });
 
 // --- PROFILE ACTIONS ---
-window.copyVynixID = () => { if(window.currentVynixId) { navigator.clipboard.writeText(window.currentVynixId).then(() => { showCustomDialog('Copied', `Your Vynix ID (${window.currentVynixId}) was copied to your clipboard.`); }); } };
+window.copyVynstaID = () => { if(window.currentVynstaId) { navigator.clipboard.writeText(window.currentVynstaId).then(() => { showCustomDialog('Copied', `Your Vynsta ID (${window.currentVynstaId}) was copied to your clipboard.`); }); } };
 
 // --- UTILS ---
 function formatTime(timestamp) { 
@@ -1217,7 +1219,7 @@ window.switchTab = (tabId) => {
 
 // --- DYNAMIC CHAT LOADING & HISTORY API ---
 window.openGlobalChat = () => {
-    document.getElementById('chat-room-title-text').textContent = 'Vynix Mainnet';
+    document.getElementById('chat-room-title-text').textContent = 'Vynsta Mainnet';
     document.getElementById('chat-room-avatar-img').src = 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png';
     resetUnread('global');
     openChatRoom('global');
@@ -1276,7 +1278,7 @@ function loadChat(chatId) {
         
         let contentHtml = escapeHtml(post.text);
         
-        // Replaced custom dialog with new full-screen image viewer inside chat
+        // Full-screen image viewer inside chat
         if(post.mediaUrl) contentHtml = `<img src="${post.mediaUrl}" style="max-width:100%; border-radius:8px; margin-bottom:4px; cursor:pointer;" onclick="openImageViewer('${post.mediaUrl}')"><div style="margin-top: 4px;">${contentHtml}</div>`;
 
         const msgDiv = document.createElement('div');
@@ -1303,7 +1305,7 @@ window.sendMessage = async () => {
     try {
         await push(ref(db, window.currentChatPath), {
             uid: window.currentUser.uid, text: text, timestamp: serverTimestamp(),
-            user: { username: window.currentVynixId || 'User' } 
+            user: { username: window.currentVynstaId || 'User' } 
         });
         window.updateLastSeen();
         if(navigator.vibrate) navigator.vibrate(20);
