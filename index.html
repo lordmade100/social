@@ -117,7 +117,9 @@
             color: var(--pill-inactive-text); background-color: var(--pill-inactive-bg); 
             cursor: pointer; text-transform: uppercase; border-radius: 9999px; 
             transition: all 0.2s; position: relative; 
+            display: flex; align-items: center;
         }
+        .wa-tab svg { width: 14px; height: 14px; margin-right: 6px; }
         .wa-tab.active { color: var(--pill-active-text); background-color: var(--pill-active-bg); }
         
         .pill-badge { position: absolute; top: -4px; right: -4px; background: var(--wa-blue-tick); color: #fff; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 10px; display: none; align-items: center; justify-content: center; }
@@ -328,10 +330,18 @@
         </div>
         
         <div class="wa-tabs">
-            <div class="wa-tab active" onclick="switchTab('chats')">CHATS <span class="pill-badge" id="tab-badge-chats"></span></div>
-            <div class="wa-tab" onclick="switchTab('feed')">FEED</div>
-            <div class="wa-tab" onclick="switchTab('calls')">CALLS</div>
-            <div class="wa-tab" onclick="switchTab('profile')">PROFILE</div>
+            <div class="wa-tab active" onclick="switchTab('chats')">
+                <i data-feather="message-circle"></i> CHATS <span class="pill-badge" id="tab-badge-chats"></span>
+            </div>
+            <div class="wa-tab" onclick="switchTab('feed')">
+                <i data-feather="activity"></i> FEED
+            </div>
+            <div class="wa-tab" onclick="switchTab('calls')">
+                <i data-feather="phone"></i> CALLS
+            </div>
+            <div class="wa-tab" onclick="switchTab('profile')">
+                <i data-feather="user"></i> PROFILE
+            </div>
         </div>
     </div>
 
@@ -395,6 +405,13 @@
         
         <div style="padding: 16px; font-size: 14px; font-weight: 600; color: var(--wa-text-muted); background: var(--wa-bg);">Account Actions</div>
         
+        <div class="chat-list-item" onclick="openSettings()">
+            <i data-feather="settings" style="color: var(--wa-text-main);"></i>
+            <div class="chat-info" style="border-bottom: none; margin-left: 16px; padding-bottom: 0;">
+                <div class="chat-name" style="font-weight: 400;">Manage Account</div>
+            </div>
+        </div>
+
         <div class="chat-list-item" onclick="copyVynstaID()">
             <i data-feather="copy" style="color: var(--wa-text-main);"></i>
             <div class="chat-info" style="border-bottom: none; margin-left: 16px; padding-bottom: 0;">
@@ -418,6 +435,17 @@
     <div class="fab" id="main-fab" onclick="handleFabClick()">
         <i data-feather="message-square"></i>
     </div>
+</div>
+
+<div class="modal-overlay" id="settings-overlay" onclick="closeSettings()"></div>
+<div class="bottom-sheet" id="settings-sheet">
+    <div class="sheet-header">
+        <h3>Account Settings</h3>
+        <i data-feather="x" onclick="closeSettings()" style="cursor: pointer;"></i>
+    </div>
+    <p style="font-size: 14px; color: var(--wa-text-muted); margin-bottom: 12px;">Update your unique Vynsta ID.</p>
+    <input type="text" id="settings-id-input" class="sheet-input" placeholder="New Vynsta ID" autocomplete="off">
+    <button class="sheet-btn" onclick="saveSettings()">Save Changes</button>
 </div>
 
 <div class="modal-overlay" id="friend-overlay" onclick="closeFriendSheet()"></div>
@@ -531,6 +559,7 @@ window.currentVynstaId = null;
 window.currentUserAvatar = 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png';
 
 let currentChatRef = null;
+let feedNotifRef = null; // New feed notification listener tracker
 window.currentChatPath = 'posts'; 
 let friendsLoaded = false;
 let feedLoaded = false;
@@ -570,6 +599,30 @@ window.updateLastSeen = () => {
     // Only update Firebase if Ghost Mode is disabled
     if(window.currentUser && !window.ghostMode) {
         update(ref(db, `users/${window.currentUser.uid}`), { lastSeen: serverTimestamp() });
+    }
+};
+
+// --- SETTINGS LOGIC ---
+window.openSettings = () => {
+    document.getElementById('settings-id-input').value = window.currentVynstaId;
+    document.getElementById('settings-overlay').classList.add('active');
+};
+window.closeSettings = () => {
+    document.getElementById('settings-overlay').classList.remove('active');
+};
+window.saveSettings = async () => {
+    const newId = document.getElementById('settings-id-input').value.trim();
+    if(!newId) return showCustomDialog('Error', 'Vynsta ID cannot be empty.');
+    if(newId === window.currentVynstaId) return closeSettings();
+
+    try {
+        await update(ref(db, `users/${window.currentUser.uid}`), { vynstaId: newId });
+        window.currentVynstaId = newId;
+        document.getElementById('display-vynsta-id').textContent = newId;
+        closeSettings();
+        showCustomDialog('Success', 'Your Vynsta ID was updated to ' + newId);
+    } catch(e) {
+        showCustomDialog('Error', 'Failed to update account settings.');
     }
 };
 
@@ -630,6 +683,40 @@ function requestNotificationPermission() {
             }
         });
     }
+}
+
+// Global Feed Notification Logic (Ignores Background Rules & Includes Self)
+function triggerFeedNotification(title, body, iconUrl) {
+    if ("Notification" in window && Notification.permission === "granted") {
+        const notification = new Notification(title, {
+            body: body,
+            icon: iconUrl || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png',
+            badge: 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png',
+            vibrate: [200, 100, 200]
+        });
+        
+        notification.onclick = function() {
+            window.focus();
+            switchTab('feed');
+            this.close();
+        };
+    }
+}
+
+function listenToFeedNotifications() {
+    if (feedNotifRef) off(feedNotifRef);
+    feedNotifRef = query(ref(db, 'feed_posts'), limitToLast(1));
+    
+    let initialCount = 0;
+    onChildAdded(feedNotifRef, (snap) => {
+        initialCount++;
+        // Trigger notification only for new posts after the initial listener bind
+        if (initialCount > 1) { 
+            const post = snap.val();
+            let bodyStr = post.text ? post.text : '📷 Photo';
+            triggerFeedNotification("New Post from " + post.username, bodyStr);
+        }
+    });
 }
 
 function triggerSystemNotification(title, body, iconUrl) {
@@ -758,6 +845,7 @@ window.handleLogout = async () => {
         updateTotalUnread();
         document.getElementById('private-chats-list').innerHTML = '';
         if(currentChatRef) off(currentChatRef);
+        if(feedNotifRef) off(feedNotifRef);
         off(ref(db, 'feed_posts')); // Stop listening to feed
     } catch(e) { showCustomDialog('Error', 'Could not log out.'); }
 };
@@ -803,6 +891,7 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById('display-email').textContent = user.email;
         
         listenToChatPreview('global', true);
+        listenToFeedNotifications(); // Bind the dedicated Feed notification push
         loadFriends();
         loadFeed(); 
         
@@ -1166,6 +1255,7 @@ document.addEventListener('touchend', e => {
     if(!window.currentUser) return; 
     if(document.getElementById('chat-room').classList.contains('open')) return;
     if(document.getElementById('friend-overlay').classList.contains('active')) return;
+    if(document.getElementById('settings-overlay').classList.contains('active')) return;
     if(document.getElementById('feed-comments-overlay').classList.contains('active')) return;
     if(document.getElementById('custom-dialog').classList.contains('active')) return;
     if(document.getElementById('search-overlay').classList.contains('active')) return;
@@ -1210,6 +1300,9 @@ document.addEventListener('click', (e) => {
     
     const friendOverlay = document.getElementById('friend-overlay');
     if (friendOverlay.classList.contains('active') && !e.target.closest('#friend-sheet') && !e.target.closest('#main-fab')) closeFriendSheet();
+
+    const settingsOverlay = document.getElementById('settings-overlay');
+    if (settingsOverlay.classList.contains('active') && !e.target.closest('#settings-sheet') && !e.target.closest('.chat-list-item')) closeSettings();
     
     const feedCommentsOverlay = document.getElementById('feed-comments-overlay');
     if (feedCommentsOverlay.classList.contains('active') && !e.target.closest('#feed-comments-sheet') && !e.target.closest('.feed-action')) closeFeedComments();
@@ -1291,6 +1384,7 @@ window.addEventListener('popstate', (e) => {
     document.getElementById('image-viewer-overlay').classList.remove('active');
     closeSearch(); 
     closeFriendSheet(); 
+    closeSettings();
     closeCustomDialog(); 
     closeFeedComments();
 
