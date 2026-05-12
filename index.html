@@ -291,6 +291,7 @@
 
         ::-webkit-scrollbar { display: none; }
     </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -325,6 +326,21 @@
     
     <button class="auth-btn" onclick="handleLogin()">Login</button>
     <button class="auth-btn outline" onclick="handleSignUp()">Create Account</button>
+
+    <div style="width:100%; max-width:320px; display:flex; align-items:center; gap:12px; margin: 8px 0 16px;">
+        <div style="flex:1; height:1px; background:var(--wa-border);"></div>
+        <span style="font-size:12px; color:var(--wa-text-muted); text-transform:uppercase;">or</span>
+        <div style="flex:1; height:1px; background:var(--wa-border);"></div>
+    </div>
+
+    <button class="auth-btn outline" onclick="handleGoogleSignIn()" style="display:flex; align-items:center; justify-content:center; gap:10px; border-color:#4285F4; color:#4285F4;">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google
+    </button>
+
+    <button class="auth-btn outline" onclick="handleGuestMode()" style="margin-top:8px; border-color:var(--wa-text-muted); color:var(--wa-text-muted);">
+        👁️ Continue as Guest (View Only)
+    </button>
 </div>
 
 <div id="main-app">
@@ -585,7 +601,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
-    getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut 
+    getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
+    GoogleAuthProvider, signInWithPopup
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // Prevent long press (context menu) and dragging globally on all images
@@ -622,6 +639,8 @@ const CLOUDINARY_UPLOAD_PRESET = 'banter_box';
 window.currentUser = null;
 window.currentVynstaId = null;
 window.currentUserAvatar = 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png';
+window.isGuest = false;
+window.guestUser = { uid: 'guest_' + Math.random().toString(36).substr(2, 9), email: 'guest@vynsta.net' };
 
 let currentChatRef = null;
 let feedNotifRef = null; 
@@ -709,6 +728,7 @@ window.contextActionViewProfile = () => {
 };
 
 window.contextActionDeleteChat = async () => {
+    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to manage chats.');
     if(!window.selectedChatUid) return;
     const uid = window.selectedChatUid;
     closeChatContext();
@@ -718,6 +738,7 @@ window.contextActionDeleteChat = async () => {
 };
 
 window.contextActionBlockUser = async () => {
+    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to block users.');
     if(!window.selectedChatUid) return;
     const uid = window.selectedChatUid;
     const name = window.selectedChatName;
@@ -775,7 +796,20 @@ window.closePostContext = () => {
 
 window.deleteFeedPost = async () => {
     if(!window.selectedPostId) return;
+    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to manage posts.');
+
+    // Verify ownership before deleting
     try {
+        const snap = await get(ref(db, `feed_posts/${window.selectedPostId}`));
+        if (!snap.exists()) {
+            closePostContext();
+            return showCustomDialog('Error', 'Post not found.');
+        }
+        const post = snap.val();
+        if (post.uid !== window.currentUser.uid) {
+            closePostContext();
+            return showCustomDialog('Error', 'You can only delete your own posts.');
+        }
         await set(ref(db, `feed_posts/${window.selectedPostId}`), null);
         closePostContext();
         showCustomDialog('Deleted', 'Post removed from feed.');
@@ -786,6 +820,7 @@ window.deleteFeedPost = async () => {
 
 window.reportFeedPost = () => {
     closePostContext();
+    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to report posts.');
     showCustomDialog('Reported', 'This post has been securely reported to Vynsta admins for review.');
 };
 
@@ -803,6 +838,7 @@ window.viewPostProfile = () => {
 
 // --- SETTINGS LOGIC & BLOCKED USERS ---
 window.openSettings = () => {
+    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to manage settings.');
     document.getElementById('settings-id-input').value = window.currentVynstaId;
     document.getElementById('settings-overlay').classList.add('active');
 };
@@ -810,6 +846,7 @@ window.closeSettings = () => {
     document.getElementById('settings-overlay').classList.remove('active');
 };
 window.saveSettings = async () => {
+    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to manage settings.');
     const newId = document.getElementById('settings-id-input').value.trim();
     if(!newId) return showCustomDialog('Error', 'Vynsta ID cannot be empty.');
     if(newId === window.currentVynstaId) return closeSettings();
@@ -1103,6 +1140,23 @@ window.handleLogin = async () => {
 
 window.handleLogout = async () => {
     try {
+        if (window.isGuest) {
+            window.isGuest = false;
+            window.currentUser = null;
+            window.currentVynstaId = null;
+            document.getElementById('main-app').style.display = 'none';
+            document.getElementById('splash-screen').style.display = 'none';
+            document.getElementById('auth-screen').style.display = 'flex';
+            friendsLoaded = false;
+            feedLoaded = false;
+            window.unreadCounts = {};
+            updateTotalUnread();
+            document.getElementById('private-chats-list').innerHTML = '';
+            if(currentChatRef) off(currentChatRef);
+            if(feedNotifRef) off(feedNotifRef);
+            off(ref(db, 'feed_posts'));
+            return;
+        }
         await signOut(auth);
         document.getElementById('main-app').style.display = 'none';
         document.getElementById('splash-screen').style.display = 'none';
@@ -1327,6 +1381,7 @@ function loadFeed() {
 }
 
 window.toggleFeedLike = async (postId, currentlyLiked) => {
+    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to like posts.');
     if (!window.currentUser) return;
     const likeRef = ref(db, `feed_posts/${postId}/likes/${window.currentUser.uid}`);
     
@@ -1341,6 +1396,17 @@ window.openFeedComments = (postId) => {
     currentFeedCommentPostId = postId;
     document.getElementById('feed-comments-overlay').classList.add('active');
     loadFeedComments(postId);
+
+    // Disable comment input for guests
+    const commentInput = document.getElementById('feed-comment-input');
+    const commentBtn = commentInput.nextElementSibling || document.querySelector('#feed-comments-sheet .sheet-btn');
+    if (window.isGuest) {
+        commentInput.placeholder = 'Sign in to comment...';
+        commentInput.disabled = true;
+    } else {
+        commentInput.placeholder = 'Add a comment...';
+        commentInput.disabled = false;
+    }
 };
 
 window.closeFeedComments = () => {
@@ -1379,6 +1445,7 @@ function loadFeedComments(postId) {
 }
 
 window.submitFeedComment = async () => {
+    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to comment.');
     if (!currentFeedCommentPostId || !window.currentUser) return;
     const input = document.getElementById('feed-comment-input');
     const text = input.value.trim();
@@ -1401,6 +1468,7 @@ window.submitFeedComment = async () => {
 
 // --- PROFILE PICTURE UPLOAD ---
 window.handleProfilePicUpload = async (e) => {
+    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to update your profile.');
     const file = e.target.files[0];
     if (!file) return;
     showCustomDialog('Uploading', 'Updating your profile picture...');
@@ -1417,6 +1485,7 @@ window.handleProfilePicUpload = async (e) => {
 };
 
 window.handleChatImageUpload = async (e) => {
+    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to send images.');
     const file = e.target.files[0];
     if (!file) return;
     showCustomDialog('Uploading', 'Sending image...');
@@ -1434,6 +1503,10 @@ window.handleChatImageUpload = async (e) => {
 // --- ADD FRIEND & FAB LOGIC ---
 window.handleFabClick = () => {
     const activeTabContainer = document.querySelector('.view-container.active').id;
+    if (window.isGuest) {
+        showCustomDialog('Guest Mode', 'Sign in to use this feature.');
+        return;
+    }
     if(activeTabContainer === 'tab-chats') {
         document.getElementById('friend-overlay').classList.add('active');
         setTimeout(() => document.getElementById('friend-id-input').focus(), 100);
@@ -1447,6 +1520,7 @@ window.handleFabClick = () => {
 window.closeFriendSheet = () => { document.getElementById('friend-overlay').classList.remove('active'); document.getElementById('friend-id-input').value = ''; };
 
 window.addFriend = async () => {
+    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to add friends.');
     const inputId = document.getElementById('friend-id-input').value.trim();
     if(!inputId) return;
     
@@ -1611,7 +1685,10 @@ document.addEventListener('click', (e) => {
 });
 
 // --- PROFILE ACTIONS ---
-window.copyVynstaID = () => { if(window.currentVynstaId) { navigator.clipboard.writeText(window.currentVynstaId).then(() => { showCustomDialog('Copied', `Your Vynsta ID (${window.currentVynstaId}) was copied to your clipboard.`); }); } };
+window.copyVynstaID = () => { 
+    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to get your Vynsta ID.');
+    if(window.currentVynstaId) { navigator.clipboard.writeText(window.currentVynstaId).then(() => { showCustomDialog('Copied', `Your Vynsta ID (${window.currentVynstaId}) was copied to your clipboard.`); }); } 
+};
 
 // --- UTILS ---
 function formatTime(timestamp) { 
@@ -1645,13 +1722,26 @@ window.switchTab = (tabId) => {
 window.openGlobalChat = () => {
     document.getElementById('chat-room-title-text').textContent = 'Vynsta Mainnet';
     document.getElementById('chat-room-avatar-img').src = 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png';
-    resetUnread('global');
+    if (!window.isGuest) resetUnread('global');
     openChatRoom('global');
 };
 
 window.openChatRoom = (chatId, friendUid = null) => {
     document.getElementById('chat-room').classList.add('open');
     if (location.hash !== '#chat') history.pushState(null, '', '#chat');
+
+    // Guest mode: disable input
+    const msgInput = document.getElementById('msg-input');
+    const sendBtn = document.getElementById('send-btn');
+    if (window.isGuest) {
+        msgInput.placeholder = 'Sign in to send messages...';
+        msgInput.disabled = true;
+        sendBtn.style.opacity = '0.4';
+    } else {
+        msgInput.placeholder = 'Message';
+        msgInput.disabled = false;
+        sendBtn.style.opacity = '1';
+    }
     
     if (chatId === 'global') document.getElementById('chat-room-subtitle').textContent = 'Global encrypted channel';
     else if (friendUid === window.currentUser.uid) document.getElementById('chat-room-subtitle').textContent = 'Message yourself';
@@ -1671,6 +1761,11 @@ window.openChatRoom = (chatId, friendUid = null) => {
 window.uiCloseChatRoom = () => { 
     if(location.hash === '#chat') history.back(); 
     else window.doCloseChatRoom(); 
+    // Reset input state
+    const msgInput = document.getElementById('msg-input');
+    msgInput.placeholder = 'Message';
+    msgInput.disabled = false;
+    document.getElementById('send-btn').style.opacity = '1';
 }
 window.doCloseChatRoom = () => { 
     document.getElementById('chat-room').classList.remove('open'); 
@@ -1747,6 +1842,7 @@ function loadChat(chatId) {
 
 // --- SEND MESSAGE ---
 window.sendMessage = async () => {
+    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to send messages.');
     const input = document.getElementById('msg-input');
     const text = input.value.trim();
     if(!text) return showCustomDialog('Action Blocked', 'Voice messages are disabled in GB Ghost Mode.');
