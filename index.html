@@ -291,7 +291,6 @@
 
         ::-webkit-scrollbar { display: none; }
     </style>
-<base target="_blank">
 </head>
 <body>
 
@@ -693,7 +692,7 @@ window.toggleGhostMode = () => {
 };
 
 window.updateLastSeen = () => {
-    if(window.currentUser && !window.ghostMode) {
+    if(window.currentUser && !window.ghostMode && !window.isGuest) {
         update(ref(db, `users/${window.currentUser.uid}`), { lastSeen: serverTimestamp() });
     }
 };
@@ -760,7 +759,7 @@ window.openPostContext = (postId, uid, username, avatar) => {
     const actionsContainer = document.getElementById('post-context-actions');
     actionsContainer.innerHTML = '';
     
-    if (uid === window.currentUser.uid) {
+    if (window.currentUser && uid === window.currentUser.uid) {
         actionsContainer.innerHTML = `
             <div class="chat-list-item" onclick="deleteFeedPost()" style="padding: 16px 0;">
                 <i data-feather="trash-2" style="color:#ef4444;"></i>
@@ -794,13 +793,13 @@ window.closePostContext = () => {
     document.getElementById('post-context-overlay').classList.remove('active');
 };
 
-window.deleteFeedPost = async () => {
-    if(!window.selectedPostId) return;
+window.deleteFeedPost = async (optionalPostId) => {
+    const postId = optionalPostId || window.selectedPostId;
+    if(!postId) return;
     if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to manage posts.');
 
-    // Verify ownership before deleting
     try {
-        const snap = await get(ref(db, `feed_posts/${window.selectedPostId}`));
+        const snap = await get(ref(db, `feed_posts/${postId}`));
         if (!snap.exists()) {
             closePostContext();
             return showCustomDialog('Error', 'Post not found.');
@@ -810,7 +809,7 @@ window.deleteFeedPost = async () => {
             closePostContext();
             return showCustomDialog('Error', 'You can only delete your own posts.');
         }
-        await set(ref(db, `feed_posts/${window.selectedPostId}`), null);
+        await set(ref(db, `feed_posts/${postId}`), null);
         closePostContext();
         showCustomDialog('Deleted', 'Post removed from feed.');
     } catch(e) {
@@ -1138,6 +1137,55 @@ window.handleLogin = async () => {
     catch (e) { showCustomDialog('Login Failed', 'Invalid email or password.'); }
 };
 
+window.handleGoogleSignIn = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        // Check if user exists in DB, if not create default data
+        const snap = await get(ref(db, `users/${user.uid}`));
+        if (!snap.exists()) {
+            const newVynstaID = generateMemorableID();
+            await set(ref(db, `users/${user.uid}`), {
+                email: user.email,
+                vynstaId: newVynstaID,
+                username: user.displayName || newVynstaID,
+                photoURL: user.photoURL || '',
+                createdAt: serverTimestamp(),
+                lastSeen: serverTimestamp()
+            });
+            await set(ref(db, `users/${user.uid}/friends/${user.uid}`), {
+                vynstaId: newVynstaID + " (You)", addedAt: serverTimestamp()
+            });
+        }
+        // Auth state listener handles transition UI
+    } catch(error) {
+        showCustomDialog('Google Sign-In Failed', error.message);
+    }
+};
+
+window.handleGuestMode = () => {
+    window.isGuest = true;
+    window.currentUser = window.guestUser;
+    window.currentVynstaId = "Guest_" + Math.floor(Math.random() * 10000);
+    window.currentUserAvatar = 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png';
+
+    document.getElementById('display-vynsta-id').textContent = window.currentVynstaId;
+    document.getElementById('display-email').textContent = window.currentUser.email;
+    document.getElementById('profile-letter').textContent = "G";
+    document.getElementById('profile-avatar-img').style.display = 'none';
+    document.getElementById('profile-letter').style.display = 'flex';
+
+    document.getElementById('splash-screen').style.display = 'none';
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'flex';
+
+    document.getElementById('private-chats-list').innerHTML = '<div style="padding: 20px; text-align: center; color: var(--wa-text-muted);">Sign in to add friends and view private chats.</div>';
+
+    listenToChatPreview('global', true);
+    loadFeed();
+};
+
 window.handleLogout = async () => {
     try {
         if (window.isGuest) {
@@ -1155,6 +1203,7 @@ window.handleLogout = async () => {
             if(currentChatRef) off(currentChatRef);
             if(feedNotifRef) off(feedNotifRef);
             off(ref(db, 'feed_posts'));
+            document.getElementById('gb-menu').classList.remove('active');
             return;
         }
         await signOut(auth);
@@ -1177,7 +1226,7 @@ window.handleLogout = async () => {
 onAuthStateChanged(auth, async (user) => {
     const minimumSplashTime = new Promise(resolve => setTimeout(resolve, 1200));
     
-    if (user) {
+    if (user && !window.isGuest) {
         window.currentUser = user;
         requestNotificationPermission();
         window.updateLastSeen();
@@ -1225,7 +1274,7 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('main-app').style.display = 'flex';
         
-    } else {
+    } else if (!window.isGuest) {
         window.currentUser = null;
         await minimumSplashTime;
         document.getElementById('splash-screen').style.display = 'none';
@@ -1335,9 +1384,12 @@ function loadFeed() {
         
         list.innerHTML = '';
         sortedPosts.forEach(post => {
-            const isLiked = post.likes && post.likes[window.currentUser.uid];
+            const isLiked = post.likes && post.likes[window.currentUser?.uid];
             const likeCount = post.likes ? Object.keys(post.likes).length : 0;
             const commentCount = post.comments ? Object.keys(post.comments).length : 0;
+            
+            const isOwnPost = window.currentUser && post.uid === window.currentUser.uid && !window.isGuest;
+            const deleteBtnHtml = isOwnPost ? `<i data-feather="trash-2" style="color:#ef4444; cursor:pointer; margin-left:16px; width:18px; height:18px;" onclick="deleteFeedPost('${post.id}')"></i>` : '';
             
             const card = document.createElement('div');
             card.className = 'feed-card';
@@ -1351,7 +1403,10 @@ function loadFeed() {
                             <span class="feed-card-name">${escapeHtml(post.username)}</span>
                             <span class="feed-card-time" style="margin-left: 8px;">${formatTime(post.timestamp)}</span>
                         </div>
-                        <i data-feather="more-horizontal" style="color:var(--wa-text-muted); cursor:pointer;" onclick="openPostContext('${post.id}', '${post.uid}', '${escapeHtml(post.username)}', '${post.userPhoto}')"></i>
+                        <div style="display:flex; align-items:center;">
+                            <i data-feather="more-horizontal" style="color:var(--wa-text-muted); cursor:pointer; width:18px; height:18px;" onclick="openPostContext('${post.id}', '${post.uid}', '${escapeHtml(post.username)}', '${post.userPhoto}')"></i>
+                            ${deleteBtnHtml}
+                        </div>
                     </div>
                     ${post.text ? `<div class="feed-card-text">${formatPostText(post.text)}</div>` : ''}
                     ${post.mediaUrl ? `<img src="${post.mediaUrl}" class="feed-card-img" onclick="openImageViewer('${post.mediaUrl}')">` : ''}
@@ -1549,7 +1604,7 @@ window.addFriend = async () => {
 };
 
 function loadFriends() {
-    if(friendsLoaded || !window.currentUser) return;
+    if(friendsLoaded || !window.currentUser || window.isGuest) return;
     friendsLoaded = true;
     
     const friendsRef = ref(db, `users/${window.currentUser.uid}/friends`);
