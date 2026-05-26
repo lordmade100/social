@@ -3,17 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SME Risk Engine - SA Microlender AI.</title>
+    <title>SME Risk Engine - SA Microlender AI</title>
 
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
-    <!-- Brain.js -->
     <script src="https://unpkg.com/brain.js@2.0.0-beta.23/dist/browser.js"></script>
 
-    <!-- PDF.js for PDF parsing in browser -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
     <style>
@@ -360,11 +357,9 @@
             font-size: 0.8rem;
         }
     </style>
-<base target="_blank">
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
 <div id="loginScreen" class="login-screen">
     <div class="login-box">
         <h2>🔐 SME Risk Engine</h2>
@@ -374,24 +369,28 @@
 
         <div class="form-group">
             <label>Email</label>
-            <input type="email" id="loginEmail" placeholder="lender@example.com" value="">
+            <input type="email" id="loginEmail" placeholder="lender@example.co.za" value="">
         </div>
         <div class="form-group">
             <label>Password</label>
             <input type="password" id="loginPassword" placeholder="••••••••" value="">
         </div>
 
-        <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="app.login()">
-            <span id="loginBtnText">Sign In</span>
-        </button>
+        <div style="display: flex; gap: 12px; margin-top: 8px;">
+            <button class="btn btn-primary" style="flex: 1; justify-content: center;" onclick="app.login()">
+                <span>Sign In</span>
+            </button>
+            <button class="btn btn-secondary" style="flex: 1; justify-content: center;" onclick="app.register()">
+                <span>Sign Up</span>
+            </button>
+        </div>
 
         <p style="text-align:center; margin-top:16px; font-size:0.85rem; color:var(--text-muted);">
-            Demo: <code>demo@lender.co.za / password123</code>
+            Enter details to Sign In, or click Sign Up to register a new account.
         </p>
     </div>
 </div>
 
-<!-- MAIN APP -->
 <div id="mainApp" class="hidden">
     <header>
         <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
@@ -407,7 +406,6 @@
     </header>
 
     <div class="container">
-        <!-- NAVIGATION -->
         <div class="nav-tabs">
             <button class="nav-tab active" onclick="app.switchTab('dashboard')">📊 Dashboard</button>
             <button class="nav-tab" onclick="app.switchTab('assess')">📝 New Assessment</button>
@@ -416,7 +414,6 @@
             <button class="nav-tab" onclick="app.switchTab('settings')">⚙️ Settings</button>
         </div>
 
-        <!-- DASHBOARD TAB -->
         <div id="tab-dashboard" class="tab-content active">
             <div class="grid-3">
                 <div class="card metric-card">
@@ -477,7 +474,6 @@
             </div>
         </div>
 
-        <!-- NEW ASSESSMENT TAB -->
         <div id="tab-assess" class="tab-content">
             <div class="grid-2">
                 <div class="card">
@@ -533,7 +529,6 @@
             </div>
         </div>
 
-        <!-- TRAIN MODEL TAB -->
         <div id="tab-train" class="tab-content">
             <div class="grid-2">
                 <div class="card">
@@ -644,7 +639,6 @@
             </div>
         </div>
 
-        <!-- PORTFOLIO TAB -->
         <div id="tab-portfolio" class="tab-content">
             <div class="card">
                 <h2>📁 All Assessments</h2>
@@ -669,7 +663,6 @@
             </div>
         </div>
 
-        <!-- SETTINGS TAB -->
         <div id="tab-settings" class="tab-content">
             <div class="grid-2">
                 <div class="card">
@@ -775,16 +768,24 @@ const app = {
         try {
             await auth.signInWithEmailAndPassword(email, password);
         } catch (error) {
-            // If user doesn't exist, create demo account
-            if (error.code === 'auth/user-not-found' && email === 'demo@lender.co.za') {
-                try {
-                    await auth.createUserWithEmailAndPassword(email, password);
-                } catch (createError) {
-                    this.showAlert('loginAlert', createError.message, 'danger');
-                }
-            } else {
-                this.showAlert('loginAlert', error.message, 'danger');
-            }
+            this.showAlert('loginAlert', error.message, 'danger');
+        }
+    },
+
+    async register() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+
+        if (!email || !password) {
+            this.showAlert('loginAlert', 'Please enter email and password to register', 'danger');
+            return;
+        }
+
+        try {
+            await auth.createUserWithEmailAndPassword(email, password);
+            this.showAlert('loginAlert', 'Account successfully registered! Logging in...', 'success');
+        } catch (error) {
+            this.showAlert('loginAlert', error.message, 'danger');
         }
     },
 
@@ -933,16 +934,10 @@ const app = {
     },
 
     extractTransactionsFromText(text) {
-        // This is a heuristic parser for South African bank statements
-        // Real implementation would need format-specific parsers for FNB, ABSA, Standard Bank, etc.
-
-        const lines = text.split(/
-|
-/).filter(l => l.trim());
+        const lines = text.split(/[\r\n]+/).filter(l => l.trim());
         const transactions = [];
         const balances = [];
 
-        // Common patterns in SA bank statements
         const amountPattern = /(?:R\s?)?([0-9,]+\.\d{2})/g;
         const datePattern = /(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/;
 
@@ -954,7 +949,7 @@ const app = {
                 const isDebit = line.includes('DEBIT') || line.includes('-R') || line.includes('DR');
                 const isCredit = line.includes('CREDIT') || line.includes('CR') || (!isDebit && amounts.length > 0);
 
-                const amount = amounts[amounts.length - 1]; // Last amount is usually balance or transaction amount
+                const amount = amounts[amounts.length - 1];
 
                 transactions.push({
                     date: dateMatch[1],
@@ -965,7 +960,6 @@ const app = {
                 });
             }
 
-            // Extract balance figures
             const balanceMatches = line.match(/Balance[\s:]+R?\s?([0-9,]+\.\d{2})/i);
             if (balanceMatches) {
                 balances.push(parseFloat(balanceMatches[1].replace(',', '')));
@@ -982,7 +976,6 @@ const app = {
             throw new Error('No transactions found in PDF. The statement format may not be supported yet.');
         }
 
-        // 1. Cash Flow Volatility (std dev of daily net cash flow normalized)
         const dailyFlows = {};
         transactions.forEach(t => {
             const day = t.date;
@@ -994,36 +987,29 @@ const app = {
         const variance = flows.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / flows.length;
         const volatility = Math.min(Math.sqrt(variance) / (Math.abs(mean) + 1), 1);
 
-        // 2. End-of-day balance trend (slope normalized)
         const balanceTrend = balances.length > 1 
             ? Math.min(Math.max((balances[balances.length - 1] - balances[0]) / (balances[0] + 1), -1), 1)
             : 0.5;
-        const normalizedTrend = (balanceTrend + 1) / 2; // Convert -1..1 to 0..1
+        const normalizedTrend = (balanceTrend + 1) / 2;
 
-        // 3. Debit to Credit ratio
         const totalDebits = transactions.filter(t => t.type === 'debit').reduce((s, t) => s + t.amount, 0);
         const totalCredits = transactions.filter(t => t.type === 'credit').reduce((s, t) => s + t.amount, 0);
         const debitCreditRatio = totalCredits > 0 ? Math.min(totalDebits / totalCredits, 2) / 2 : 1;
 
-        // 4. Weekend/Evening transactions (heuristic - assume 20% if can't determine)
-        const weekendEveningRatio = 0.2; // Would need timestamp data
+        const weekendEveningRatio = 0.2;
 
-        // 5. Reversal/NSF frequency
         const reversalKeywords = ['reversal', 'returned', 'insufficient', 'nsf', 'dishonoured', 'bounce'];
         const reversalCount = transactions.filter(t => 
             reversalKeywords.some(kw => t.description.toLowerCase().includes(kw))
         ).length;
-        const reversalRatio = Math.min(reversalCount / transactions.length * 5, 1); // Scale up
+        const reversalRatio = Math.min(reversalCount / transactions.length * 5, 1);
 
-        // 6. Salary vs Revenue mix (regular monthly deposits = salary-like)
         const monthlyDeposits = this.detectRegularDeposits(transactions);
         const salaryMix = Math.min(monthlyDeposits / (totalCredits + 1), 1);
 
-        // 7. Largest single deposit percentage
         const maxDeposit = Math.max(...transactions.filter(t => t.type === 'credit').map(t => t.amount), 0);
         const largestDepositRatio = totalCredits > 0 ? Math.min(maxDeposit / totalCredits, 1) : 0;
 
-        // 8. Days with zero balance (estimated from transaction gaps)
         const zeroBalanceDays = balances.filter(b => b <= 0).length / Math.max(balances.length, 1);
 
         return {
@@ -1047,11 +1033,9 @@ const app = {
     },
 
     detectRegularDeposits(transactions) {
-        // Simple heuristic: deposits within 5% of each other, monthly
         const credits = transactions.filter(t => t.type === 'credit').map(t => t.amount).sort((a, b) => a - b);
         if (credits.length < 3) return 0;
 
-        // Find clusters of similar amounts
         const clusters = [];
         let current = [credits[0]];
         for (let i = 1; i < credits.length; i++) {
@@ -1091,15 +1075,12 @@ const app = {
         btn.innerHTML = '<span class="spinner"></span> Processing...';
 
         try {
-            // Parse PDF
             const txData = await this.parsePdf(this.currentPdfFile);
             const featureData = this.calculateFeatures(txData);
 
-            // Run model
             const result = this.currentModel.run(featureData.features);
             const riskScore = result[0];
 
-            // Determine recommendation
             let recommendation, statusClass, statusText;
             if (riskScore <= this.settings.approveThreshold) {
                 recommendation = 'APPROVE';
@@ -1115,7 +1096,6 @@ const app = {
                 statusText = '⚠️ MANUAL REVIEW';
             }
 
-            // Display result
             const resultHtml = `
                 <div style="text-align:center; padding:20px;">
                     <div class="risk-score" style="color: ${riskScore < 0.35 ? 'var(--success)' : riskScore < 0.6 ? 'var(--warning)' : 'var(--danger)'};">
@@ -1138,7 +1118,6 @@ const app = {
             `;
             document.getElementById('assessResult').innerHTML = resultHtml;
 
-            // Show features
             document.getElementById('extractedFeaturesCard').style.display = 'block';
             const featureNames = [
                 'Cash Flow Volatility',
@@ -1157,7 +1136,6 @@ const app = {
                 </div>
             `).join('');
 
-            // Save to Firebase
             const assessment = {
                 id: Date.now().toString(),
                 timestamp: Date.now(),
@@ -1175,7 +1153,6 @@ const app = {
             this.assessments.unshift(assessment);
             this.updateDashboard();
 
-            // Clear file
             this.currentPdfFile = null;
             document.getElementById('pdfName').textContent = '';
             document.getElementById('pdfFile').value = '';
@@ -1216,8 +1193,6 @@ const app = {
     parseCsv(text) {
         const lines = text.trim().split('\n');
         const data = [];
-
-        // Skip header if present
         const startIdx = lines[0].includes('f1') || lines[0].includes('feature') ? 1 : 0;
 
         for (let i = startIdx; i < lines.length; i++) {
@@ -1229,7 +1204,6 @@ const app = {
                 });
             }
         }
-
         return data;
     },
 
@@ -1250,20 +1224,17 @@ const app = {
         const progressEl = document.getElementById('trainProgress');
         progressEl.innerHTML = '<p>Initializing neural network...</p>';
 
-        // Create and train
         const net = new brain.NeuralNetwork({
             hiddenLayers: hiddenLayers,
             activation: 'sigmoid'
         });
 
-        // Split for validation
         const splitIdx = Math.floor(this.trainingData.length * 0.8);
         const trainSet = this.trainingData.slice(0, splitIdx);
         const testSet = this.trainingData.slice(splitIdx);
 
         progressEl.innerHTML = `<p>Training on ${trainSet.length} examples...</p><div class="progress-bar"><div class="progress-fill" id="trainBar" style="width:0%; background:var(--primary);"></div></div>`;
 
-        // Train with progress logging
         const result = net.train(trainSet, {
             iterations: iterations,
             errorThresh: 0.005,
@@ -1279,7 +1250,6 @@ const app = {
             }
         });
 
-        // Validate
         let correct = 0;
         testSet.forEach(ex => {
             const pred = net.run(ex.input)[0];
@@ -1289,7 +1259,6 @@ const app = {
         });
         const accuracy = testSet.length > 0 ? (correct / testSet.length * 100).toFixed(1) : 'N/A';
 
-        // Save model
         this.currentModel = net;
         const modelJson = net.toJSON();
 
@@ -1319,7 +1288,6 @@ const app = {
         btn.innerHTML = '🧠 Train Neural Network';
     },
 
-    // Manual training
     addManualTraining() {
         const features = [
             parseFloat(document.getElementById('mtF1').value),
