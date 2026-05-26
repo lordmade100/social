@@ -13,8 +13,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -531,16 +529,16 @@
                 <div class="card">
                     <h2>📚 Upload Training Data</h2>
                     <div class="alert alert-info">
-                        Upload historical loan dataset documents. Format requirement: 8 feature columns + 1 outcome column (0=repaid, 1=defaulted).
+                        Upload a CSV with historical loans. Format: 8 feature columns + 1 outcome column (0=repaid, 1=defaulted).
                     </div>
 
-                    <div class="upload-area" id="trainingUpload" onclick="document.getElementById('trainingFile').click()">
+                    <div class="upload-area" id="csvUpload" onclick="document.getElementById('csvFile').click()">
                         <p style="font-size:2rem; margin-bottom:8px;">📊</p>
-                        <p style="font-weight:600;">Upload Dataset File</p>
-                        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">Accepted extensions: .csv, .json, .xlsx, .xls</p>
+                        <p style="font-weight:600;">Upload Training CSV</p>
+                        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">Columns: f1,f2,f3,f4,f5,f6,f7,f8,outcome</p>
                     </div>
-                    <input type="file" id="trainingFile" accept=".csv, .json, .xlsx, .xls" style="display:none;" onchange="app.handleTrainingUpload(event)">
-                    <p id="trainingFileName" style="margin-top:8px; font-size:0.85rem; color:var(--text-muted);"></p>
+                    <input type="file" id="csvFile" accept=".csv" style="display:none;" onchange="app.handleCsvUpload(event)">
+                    <p id="csvName" style="margin-top:8px; font-size:0.85rem; color:var(--text-muted);"></p>
 
                     <div class="form-group" style="margin-top:16px;">
                         <label>Model Name</label>
@@ -575,7 +573,7 @@
             <div class="card">
                 <h2>💡 Manual Training (Alternative)</h2>
                 <p style="margin-bottom:12px; color:var(--text-muted);">
-                    If you don't have a file, manually add training examples below. Each example needs 8 features and an outcome.
+                    If you don't have a CSV, manually add training examples below. Each example needs 8 features and an outcome.
                 </p>
 
                 <div class="grid-2">
@@ -633,6 +631,23 @@
                 <div id="manualExamples" style="margin-top:16px;">
                     <p style="color:var(--text-muted); font-size:0.85rem;">No manual examples added yet.</p>
                 </div>
+            </div>
+
+            <div class="card">
+                <h2>💾 JSON Model Management</h2>
+                <p style="margin-bottom: 12px; color: var(--text-muted); font-size: 0.9rem;">
+                    Export the current network setup or drop in an external <code>model.json</code> structure to write it directly into Firebase Realtime Database.
+                </p>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button class="btn btn-secondary" onclick="app.exportModelJSON()">
+                        📥 Export Current Model (JSON)
+                    </button>
+                    <button class="btn btn-primary" onclick="document.getElementById('modelJsonFile').click()">
+                        📤 Import Model JSON to Firebase
+                    </button>
+                    <input type="file" id="modelJsonFile" accept=".json" style="display: none;" onchange="app.importModelJSON(event)">
+                </div>
+                <p id="modelJsonStatus" style="margin-top: 10px; font-size: 0.85rem; color: var(--text-muted);"></p>
             </div>
         </div>
 
@@ -923,7 +938,7 @@ const app = {
     },
 
     extractTransactionsFromText(text) {
-        const lines = text.split(/\r?\n/).filter(l => l.trim());
+        const lines = text.split(/[\r\n]+/).filter(l => l.trim());
         const transactions = [];
         const balances = [];
 
@@ -1161,118 +1176,40 @@ const app = {
     },
 
     // ============================================
-    // MULTI-FORMAT MODEL TRAINING
+    // MODEL TRAINING
     // ============================================
-    handleTrainingUpload(event) {
+    handleCsvUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
 
-        document.getElementById('trainingFileName').textContent = `Selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-        const ext = file.name.split('.').pop().toLowerCase();
-        const reader = new FileReader();
+        document.getElementById('csvName').textContent = `Selected: ${file.name}`;
 
-        if (ext === 'json') {
-            reader.onload = (e) => {
-                try {
-                    this.trainingData = this.parseJson(e.target.result);
-                    document.getElementById('trainBtn').disabled = false;
-                    alert(`Loaded ${this.trainingData.length} examples from JSON successfully.`);
-                } catch (err) {
-                    alert(`JSON Error: ${err.message}`);
-                }
-            };
-            reader.readAsText(file);
-        } 
-        else if (ext === 'xlsx' || ext === 'xls') {
-            reader.onload = (e) => {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const sheetName = workbook.SheetNames[0];
-                    const sheet = workbook.Sheets[sheetName];
-                    // Turn sheet rows into an array of arrays
-                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-                    this.trainingData = this.parseArrayRows(rows);
-                    document.getElementById('trainBtn').disabled = false;
-                    alert(`Loaded ${this.trainingData.length} examples from Excel sheet successfully.`);
-                } catch (err) {
-                    alert(`Excel Error: ${err.message}`);
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        } 
-        else {
-            // Default treatment as CSV text fallback
-            reader.onload = (e) => {
-                try {
-                    this.trainingData = this.parseCsv(e.target.result);
-                    document.getElementById('trainBtn').disabled = false;
-                    alert(`Loaded ${this.trainingData.length} examples from CSV successfully.`);
-                } catch (err) {
-                    alert(`CSV Error: ${err.message}`);
-                }
-            };
-            reader.readAsText(file);
-        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const text = e.target.result;
+            this.trainingData = this.parseCsv(text);
+            document.getElementById('trainBtn').disabled = false;
+            alert(`Loaded ${this.trainingData.length} training examples. Ready to train.`);
+        };
+        reader.readAsText(file);
     },
 
     parseCsv(text) {
         const lines = text.trim().split('\n');
-        const rows = lines.map(line => line.split(',').map(c => c.trim()));
-        return this.parseArrayRows(rows);
-    },
-
-    parseJson(text) {
-        const parsed = JSON.parse(text);
         const data = [];
 
-        if (Array.isArray(parsed)) {
-            parsed.forEach(item => {
-                // Supports explicit structural scheme: { input: [8 features], output: [1 value] }
-                if (item && item.input && Array.isArray(item.input) && item.output && Array.isArray(item.output)) {
-                    if (item.input.length === 8 && item.output.length === 1) {
-                        data.push({
-                            input: item.input.map(Number),
-                            output: item.output.map(Number)
-                        });
-                    }
-                } 
-                // Supports flat arrays format row: [f1, f2, f3, f4, f5, f6, f7, f8, outcome]
-                else if (Array.isArray(item) && item.length >= 9) {
-                    const cleanRow = item.slice(0, 9).map(Number);
-                    if (cleanRow.every(val => !isNaN(val))) {
-                        data.push({
-                            input: cleanRow.slice(0, 8),
-                            output: [cleanRow[8]]
-                        });
-                    }
-                }
-            });
-        }
-        if (data.length === 0) throw new Error("No structured features found match. Expecting arrays or schema elements.");
-        return data;
-    },
+        const startIdx = lines[0].includes('f1') || lines[0].includes('feature') ? 1 : 0;
 
-    parseArrayRows(rows) {
-        const data = [];
-        if (!rows || rows.length === 0) return data;
-
-        // Skip standard label headers row text automatically if detected
-        const startIdx = (rows[0] && rows[0].some(cell => typeof cell === 'string' && isNaN(parseFloat(cell)))) ? 1 : 0;
-
-        for (let i = startIdx; i < rows.length; i++) {
-            const row = rows[i];
-            if (row && row.length >= 9) {
-                const values = row.slice(0, 9).map(c => parseFloat(c));
-                if (values.every(v => !isNaN(v))) {
-                    data.push({
-                        input: values.slice(0, 8),
-                        output: [values[8]]
-                    });
-                }
+        for (let i = startIdx; i < lines.length; i++) {
+            const cols = lines[i].split(',').map(c => parseFloat(c.trim()));
+            if (cols.length >= 9 && cols.every(c => !isNaN(c))) {
+                data.push({
+                    input: cols.slice(0, 8),
+                    output: [cols[8]]
+                });
             }
         }
-        if (data.length === 0) throw new Error("Could not parse numeric vectors. Check structural layout requirements.");
+
         return data;
     },
 
@@ -1312,7 +1249,7 @@ const app = {
             callback: (stats) => {
                 const pct = Math.round((stats.iterations / iterations) * 100);
                 const trainBarEl = document.getElementById('trainBar');
-                if(trainBarEl) trainBarEl.style.width = pct + '%';
+                if (trainBarEl) trainBarEl.style.width = pct + '%';
                 progressEl.innerHTML = `
                     <p>Iteration ${stats.iterations}/${iterations} — Error: ${stats.error.toFixed(5)}</p>
                     <div class="progress-bar"><div class="progress-fill" style="width:${pct}%; background:var(--primary);"></div></div>
@@ -1388,6 +1325,78 @@ const app = {
         this.trainingData = this.manualTrainingData;
         document.getElementById('trainBtn').disabled = false;
         this.trainModel();
+    },
+
+    // ============================================
+    // FIREBASE JSON IMPORT / EXPORT MANAGEMENT
+    // ============================================
+    async exportModelJSON() {
+        const userId = this.currentUser.uid;
+        const statusEl = document.getElementById('modelJsonStatus');
+        
+        try {
+            statusEl.textContent = "Fetching parameters from Firebase Realtime Database...";
+            const snapshot = await db.ref('users/' + userId + '/currentModel').once('value');
+            
+            if (!snapshot.exists()) {
+                alert("No model structure found under your Firebase user node. Train a network profile first.");
+                statusEl.textContent = "";
+                return;
+            }
+
+            const modelData = snapshot.val();
+            const jsonString = JSON.stringify(modelData, null, 2);
+            
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${modelData.name || 'sme-risk-model'}-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            
+            URL.revokeObjectURL(url);
+            statusEl.textContent = "Configuration blueprint generated and exported successfully!";
+        } catch (error) {
+            statusEl.textContent = `Blueprint export failed: ${error.message}`;
+        }
+    },
+
+    importModelJSON(event) {
+        const file = event.target.files[0];
+        const statusEl = document.getElementById('modelJsonStatus');
+        if (!file) return;
+
+        statusEl.textContent = `Reading structure of ${file.name}...`;
+        const reader = new FileReader();
+        
+        reader.onload = async (e) => {
+            try {
+                const parsedModel = JSON.parse(e.target.result);
+                
+                // Assert structural properties match brain.js layouts
+                if (!parsedModel.layers && !parsedModel.sizes) {
+                    throw new Error("Missing standard layer architectures (sizes/layers indices mapping values).");
+                }
+
+                if (!parsedModel.name) parsedModel.name = file.name.replace('.json', '');
+                if (!parsedModel.trainedAt) parsedModel.trainedAt = Date.now();
+
+                statusEl.textContent = "Writing parameters to Firebase...";
+                
+                const userId = this.currentUser.uid;
+                await db.ref('users/' + userId + '/currentModel').set(parsedModel);
+                
+                this.currentModel = new brain.NeuralNetwork();
+                this.currentModel.fromJSON(parsedModel);
+                this.updateModelStatus(true, parsedModel.name);
+                
+                statusEl.innerHTML = `<span style="color: var(--success)">✅ Successfully synced model "${parsedModel.name}" directly to Firebase!</span>`;
+            } catch (err) {
+                statusEl.innerHTML = `<span style="color: var(--danger)">❌ Syntax mapping error: ${err.message}</span>`;
+            }
+        };
+        
+        reader.readAsText(file);
     },
 
     // ============================================
@@ -1477,6 +1486,9 @@ const app = {
         alert('Models deleted');
     },
 
+    // ============================================
+    // UTILITIES
+    // ============================================
     showAlert(id, message, type) {
         const el = document.getElementById(id);
         el.className = `alert alert-${type}`;
