@@ -2,1920 +2,1480 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Vynsta - Stealth Network</title>
-    <script src="https://unpkg.com/feather-icons"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SME Risk Engine - SA Microlender AI</title>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+    <!-- Brain.js -->
+    <script src="https://unpkg.com/brain.js@2.0.0-beta.23/dist/browser.js"></script>
+
+    <!-- PDF.js for PDF parsing in browser -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         :root {
-            /* Vynsta Stealth Black Theme */
-            --wa-primary: #000000;
-            --wa-primary-dark: #111111;
-            --wa-light: #ffffff;
-            --wa-bg: #f3f4f6;
-            --wa-chat-bg: #e5e5e5;
-            --wa-text-main: #111b21;
-            --wa-text-muted: #667781;
-            --wa-border: #e9edef;
-            --wa-bubble-sent: #e2e8f0; 
-            --wa-bubble-recv: #ffffff;
-            --wa-blue-tick: #3b82f6;
-            --wa-like-red: #f91880;
-            
-            /* Pill Variables */
-            --pill-active-bg: #ffffff;
-            --pill-active-text: #000000;
-            --pill-inactive-bg: rgba(255, 255, 255, 0.15);
-            --pill-inactive-text: rgba(255, 255, 255, 0.7);
-        }
-
-        [data-theme="dark"] {
-            --wa-primary: #000000; 
-            --wa-primary-dark: #000000;
-            --wa-light: #111b21;
-            --wa-bg: #0b141a;
-            --wa-chat-bg: #0b141a;
-            --wa-text-main: #e9edef;
-            --wa-text-muted: #8696a0;
-            --wa-border: #222e35;
-            --wa-bubble-sent: #374151; 
-            --wa-bubble-recv: #202c33;
-            --wa-blue-tick: #53bdeb;
-            --wa-like-red: #f91880;
-
-            --pill-active-bg: #374151;
-            --pill-active-text: #ffffff;
-            --pill-inactive-bg: rgba(255, 255, 255, 0.1);
-            --pill-inactive-text: rgba(255, 255, 255, 0.5);
-        }
-
-        /* --- NATIVE APP FEEL --- */
-        * { 
-            box-sizing: border-box; margin: 0; padding: 0; 
-            -webkit-tap-highlight-color: transparent; 
-            -webkit-touch-callout: none; 
-            -webkit-user-select: none;   
-            user-select: none;
-        }
-
-        input, textarea { -webkit-user-select: auto; user-select: auto; }
-        
-        /* Enforce strict image restrictions */
-        img { 
-            -webkit-user-drag: none; 
-            pointer-events: auto; 
-            -webkit-touch-callout: none; 
+            --primary: #1a5f7a;
+            --primary-dark: #134b61;
+            --secondary: #c84b31;
+            --success: #2d6a4f;
+            --warning: #e9c46a;
+            --danger: #e63946;
+            --bg: #f8f9fa;
+            --card: #ffffff;
+            --text: #212529;
+            --text-muted: #6c757d;
+            --border: #dee2e6;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--wa-light); color: var(--wa-text-main);
-            height: 100dvh; width: 100vw; overflow: hidden; display: flex; flex-direction: column;
-            transition: background-color 0.3s, color 0.3s;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
         }
 
-        /* --- SPLASH SCREEN --- */
-        #splash-screen { position: fixed; inset: 0; background-color: var(--wa-primary); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
-        .splash-logo { width: 100px; height: 100px; background: var(--wa-light); border-radius: 24px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; animation: pulse 2s infinite ease-in-out; }
-        .splash-logo svg { color: var(--wa-primary); width: 50px; height: 50px; }
-        .splash-title { font-size: 28px; font-weight: 800; letter-spacing: 2px; margin-bottom: 8px;}
-        .splash-subtitle { font-size: 14px; color: rgba(255,255,255,0.6); letter-spacing: 4px; text-transform: uppercase; }
-        .splash-spinner { width: 30px; height: 30px; border: 3px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; margin-top: 40px; animation: spin 1s linear infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 20px 0;
+            box-shadow: var(--shadow);
+        }
+
+        header h1 { font-size: 1.5rem; font-weight: 700; }
+        header p { opacity: 0.9; font-size: 0.9rem; margin-top: 4px; }
+
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin: 24px 0;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover { color: var(--primary); }
+        .nav-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        input[type="file"] {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: border 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26,95,122,0.1);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover { background: var(--primary-dark); }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-success:hover { background: #1b4d3a; }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        .btn-danger:hover { background: #c1121f; }
+
+        .btn-secondary {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+        }
+        .alert-info { background: #e7f3ff; color: #004085; border-left: 4px solid var(--primary); }
+        .alert-success { background: #d4edda; color: #155724; border-left: 4px solid var(--success); }
+        .alert-warning { background: #fff3cd; color: #856404; border-left: 4px solid var(--warning); }
+        .alert-danger { background: #f8d7da; color: #721c24; border-left: 4px solid var(--danger); }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .nav-tabs { overflow-x: auto; }
+        }
+
+        .metric-card {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-approve { background: #d4edda; color: var(--success); }
+        .status-review { background: #fff3cd; color: #856404; }
+        .status-reject { background: #f8d7da; color: var(--danger); }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-weight: 700;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover { background: #f8f9fa; }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .feature-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .feature-name { color: var(--text-muted); }
+        .feature-value { font-weight: 700; color: var(--primary); }
+
+        .risk-gauge {
+            width: 200px;
+            height: 100px;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .risk-score {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 800;
+        }
+
+        .risk-label {
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 24px;
+            color: var(--primary-dark);
+        }
+
+        .hidden { display: none !important; }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* --- AUTH SCREEN --- */
-        #auth-screen { display: none; flex-direction: column; justify-content: center; align-items: center; height: 100%; padding: 24px; background-color: var(--wa-light); text-align: center; }
-        .auth-logo { width: 80px; height: 80px; background: var(--wa-primary); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
-        .auth-logo svg { color: #fff; width: 40px; height: 40px; }
-        .auth-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
-        .auth-sub { font-size: 14px; color: var(--wa-text-muted); margin-bottom: 32px; }
-        .auth-input { width: 100%; max-width: 320px; background: var(--wa-bg); border: 1px solid var(--wa-border); color: var(--wa-text-main); padding: 14px 16px; border-radius: 8px; font-size: 15px; margin-bottom: 12px; outline: none; }
-        .auth-input:focus { border-color: var(--wa-primary); }
-        .auth-btn { width: 100%; max-width: 320px; background: var(--wa-primary); color: #fff; border: none; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .auth-btn.outline { background: transparent; color: var(--wa-text-main); border: 1px solid var(--wa-border); }
-
-        /* Main App Wrapper */
-        #main-app { display: none; flex: 1; flex-direction: column; height: 100%; }
-
-        /* --- HEADER & PILL TABS --- */
-        .wa-header-container { background-color: var(--wa-primary); color: #ffffff; display: flex; flex-direction: column; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 100; position: relative; }
-        .wa-top-bar { display: flex; justify-content: space-between; align-items: center; padding: calc(env(safe-area-inset-top) + 12px) 16px 12px; }
-        .wa-title { font-size: 20px; font-weight: 600; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
-        .wa-icons { display: flex; gap: 20px; align-items: center; }
-        .wa-icons svg { width: 22px; height: 22px; cursor: pointer; transition: color 0.3s; }
-        
-        /* Ghost Mode Active Style */
-        .gb-wifi.ghost-active { color: var(--wa-like-red); }
-
-        .wa-tabs { 
-            display: flex; align-items: center; padding: 12px 16px; gap: 10px; 
-            overflow-x: auto; scrollbar-width: none; background-color: var(--wa-primary);
-        }
-        .wa-tabs::-webkit-scrollbar { display: none; }
-        .wa-tab { 
-            flex: none; padding: 8px 18px; font-size: 13px; font-weight: 600; 
-            color: var(--pill-inactive-text); background-color: var(--pill-inactive-bg); 
-            cursor: pointer; text-transform: uppercase; border-radius: 9999px; 
-            transition: all 0.2s; position: relative; 
-            display: flex; align-items: center;
-        }
-        .wa-tab svg { width: 14px; height: 14px; margin-right: 6px; }
-        .wa-tab.active { color: var(--pill-active-text); background-color: var(--pill-active-bg); }
-        
-        .pill-badge { position: absolute; top: -4px; right: -4px; background: var(--wa-blue-tick); color: #fff; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 10px; display: none; align-items: center; justify-content: center; }
-        .pill-badge.show { display: flex; }
-        .unread-badge { background-color: var(--wa-blue-tick); color: white; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 10px; display: none; margin-left: auto; }
-        .unread-badge.show { display: block; }
-
-        /* --- SEARCH OVERLAY --- */
-        .search-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--wa-primary); display: none; align-items: center; padding: calc(env(safe-area-inset-top) + 8px) 16px 8px; gap: 16px; z-index: 110; }
-        .search-overlay.active { display: flex; animation: fadeIn 0.2s; }
-        .search-overlay svg { color: #ffffff; cursor: pointer; width: 24px; height: 24px; }
-        .search-input-wrapper { flex: 1; background-color: var(--wa-light); border-radius: 24px; display: flex; align-items: center; padding: 6px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .search-input-wrapper input { flex: 1; border: none; outline: none; background: transparent; color: var(--wa-text-main); font-size: 15px; }
-
-        /* --- MAIN VIEWS --- */
-        .view-container { display: none; flex: 1; overflow-y: auto; background-color: var(--wa-light); }
-        .view-container.active { display: block; animation: fadeIn 0.2s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* --- CHATS LIST --- */
-        .chat-list-item { display: flex; padding: 12px 16px; align-items: center; cursor: pointer; transition: background 0.15s; position: relative; }
-        .chat-list-item:active { background-color: var(--wa-bg); }
-        .avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; margin-right: 14px; flex-shrink: 0;}
-        .chat-info { flex: 1; border-bottom: 1px solid var(--wa-border); padding-bottom: 12px; min-width: 0; }
-        .chat-name-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-        .chat-name { font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-        .chat-time { font-size: 12px; color: var(--wa-text-muted); flex-shrink: 0;}
-        .chat-msg-row { display: flex; align-items: center; font-size: 14px; color: var(--wa-text-muted); gap: 4px; }
-        .chat-msg-text { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; flex: 1; }
-        .tick-icon { width: 16px; height: 16px; color: var(--wa-blue-tick); flex-shrink: 0; }
-
-        #private-chats-list { display: flex; flex-direction: column; }
-
-        /* --- X-STYLE FEED --- */
-        .feed-composer { padding: 16px; border-bottom: 1px solid var(--wa-border); display: flex; gap: 12px; background: var(--wa-light); }
-        .feed-composer-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
-        .feed-input-area { flex: 1; display: flex; flex-direction: column; }
-        .feed-input-area textarea { border: none; outline: none; background: transparent; color: var(--wa-text-main); font-size: 16px; resize: none; min-height: 50px; font-family: inherit; margin-bottom: 8px; }
-        .feed-composer-actions { display: flex; justify-content: space-between; align-items: center; }
-        .feed-composer-actions svg { color: var(--wa-blue-tick); width: 20px; height: 20px; cursor: pointer; }
-        .feed-post-btn { background: var(--wa-primary); color: #fff; border: none; padding: 6px 16px; border-radius: 9999px; font-weight: bold; font-size: 14px; opacity: 0.6; cursor: pointer; transition: opacity 0.2s; }
-        .feed-post-btn.active { opacity: 1; }
-        .feed-media-preview { width: 100%; max-height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; display: none; }
-
-        .feed-card { padding: 16px; border-bottom: 1px solid var(--wa-border); display: flex; gap: 12px; background: var(--wa-light); transition: background 0.15s; }
-        .feed-card-main { flex: 1; min-width: 0; }
-        .feed-card-header { display: flex; justify-content: space-between; margin-bottom: 4px; align-items: flex-start; }
-        .feed-card-name { font-weight: bold; color: var(--wa-text-main); font-size: 15px; }
-        .feed-card-time { font-size: 13px; color: var(--wa-text-muted); }
-        .feed-card-text { font-size: 15px; line-height: 1.4; margin-bottom: 12px; word-wrap: break-word; white-space: pre-wrap; color: var(--wa-text-main); }
-        .feed-card-img { width: 100%; border-radius: 16px; border: 1px solid var(--wa-border); margin-bottom: 12px; object-fit: cover; max-height: 400px; cursor: pointer; }
-        
-        .feed-actions { display: flex; justify-content: space-between; max-width: 300px; color: var(--wa-text-muted); }
-        .feed-action { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: color 0.2s; }
-        .feed-action svg { width: 18px; height: 18px; transition: transform 0.2s; }
-        .feed-action:active svg { transform: scale(0.8); }
-        .feed-action.liked { color: var(--wa-like-red); }
-        .feed-action.liked svg { fill: currentColor; }
-
-        /* Links and Tags in Posts */
-        .feed-link, .feed-tag { color: var(--wa-blue-tick); cursor: pointer; font-weight: 500; text-decoration: none; transition: opacity 0.2s; }
-        .feed-link:active, .feed-tag:active { opacity: 0.6; }
-
-        /* --- PROFILE VIEW --- */
-        .profile-header { padding: 30px 20px; display: flex; align-items: center; gap: 20px; border-bottom: 1px solid var(--wa-border); background: var(--wa-bg); }
-        .profile-avatar { width: 72px; height: 72px; border-radius: 50%; background: var(--wa-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; overflow: hidden; position: relative;}
-        .profile-avatar-wrapper { position: relative; cursor: pointer; }
-        .profile-cam-icon { position: absolute; bottom: 0; right: -4px; background: var(--wa-primary); border: 2px solid var(--wa-light); border-radius: 50%; padding: 6px; display: flex; align-items: center; justify-content: center; }
-        .profile-id { font-size: 22px; font-weight: 700; color: var(--wa-text-main); margin-bottom: 4px; }
-        .profile-email { font-size: 14px; color: var(--wa-text-muted); }
-
-        /* --- FLOATING ACTION BUTTON --- */
-        .fab { position: fixed; bottom: calc(env(safe-area-inset-bottom) + 20px); right: 20px; width: 56px; height: 56px; background-color: var(--wa-text-main); color: var(--wa-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 90; transition: transform 0.1s; }
-        .fab:active { transform: scale(0.95); }
-
-        /* --- BOTTOM SHEETS --- */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 500; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-        .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        .bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: var(--wa-light); color: var(--wa-text-main); border-radius: 16px 16px 0 0; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); z-index: 501; box-shadow: 0 -4px 12px rgba(0,0,0,0.1); max-height: 85vh; display: flex; flex-direction: column; }
-        .modal-overlay.active + .bottom-sheet { transform: translateY(0); }
-        .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-shrink: 0; }
-        .sheet-header h3 { font-size: 18px; font-weight: 600; }
-        .sheet-input { width: 100%; background: var(--wa-bg); border: 1px solid var(--wa-border); color: var(--wa-text-main); padding: 14px; border-radius: 8px; font-size: 15px; margin-bottom: 16px; outline: none; }
-        .sheet-input:focus { border-color: var(--wa-text-muted); }
-        .sheet-btn { width: 100%; background: var(--wa-text-main); color: var(--wa-light); border: none; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
-
-        /* Blocked Users Settings List */
-        .blocked-user-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--wa-border); }
-        .blocked-user-name { font-size: 14px; font-weight: 500; color: var(--wa-text-main); }
-        .unblock-btn { background: var(--wa-primary); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
-
-        /* Feed Comments Specific */
-        .feed-comments-list { flex: 1; overflow-y: auto; margin-bottom: 16px; }
-        .feed-comment-item { display: flex; gap: 12px; margin-bottom: 16px; }
-        .feed-comment-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
-        .feed-comment-body { background: var(--wa-bg); padding: 10px 14px; border-radius: 16px; border-top-left-radius: 4px; flex: 1; }
-        .feed-comment-name { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
-        .feed-comment-text { font-size: 14px; line-height: 1.4; word-wrap: break-word; }
-
-        /* --- INTERNAL WEBVIEW OVERLAY --- */
-        .webview-overlay { position: fixed; inset: 0; background: var(--wa-light); z-index: 3000; display: none; flex-direction: column; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
-        .webview-overlay.active { display: flex; transform: translateY(0); }
-        .webview-header { background: var(--wa-primary); color: #fff; display: flex; justify-content: space-between; align-items: center; padding: calc(env(safe-area-inset-top) + 12px) 16px 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .webview-header svg { cursor: pointer; width: 22px; height: 22px; }
-        .webview-title { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; text-align: center; }
-        #webview-frame { flex: 1; width: 100%; border: none; background: #fff; }
-
-        /* --- CHAT ROOM (SLIDE OVER) --- */
-        .chat-room { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--wa-chat-bg); background-image: url('data:image/svg+xml,%3Csvg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M10 10h10v10H10V10z" fill="rgba(0,0,0,0.02)"/%3E%3C/svg%3E'); z-index: 200; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
-        .chat-room.open { transform: translateX(0); }
-        .chat-room-header { background-color: var(--wa-primary); color: #ffffff; display: flex; align-items: center; padding: calc(env(safe-area-inset-top) + 8px) 16px 8px; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .back-btn { display: flex; align-items: center; cursor: pointer; margin-left: -8px; }
-        .back-btn svg { width: 24px; height: 24px; }
-        .chat-room-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; cursor: pointer; }
-        .chat-room-title { flex: 1; min-width: 0; }
-        .chat-room-title h3 { font-size: 16px; font-weight: 600; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-        .chat-room-title p { font-size: 12px; color: rgba(255,255,255,0.7); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-
-        /* --- MESSAGES --- */
-        .messages-container { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 4px; }
-        .message-wrapper { display: flex; flex-direction: column; max-width: 85%; }
-        .message-wrapper.sent { align-self: flex-end; }
-        .message-wrapper.recv { align-self: flex-start; }
-        .sender-name { font-size: 12px; font-weight: 600; margin-bottom: 2px; padding-left: 4px; }
-        .bubble { padding: 6px 8px 8px 10px; border-radius: 8px; font-size: 15px; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1); line-height: 1.3; word-wrap: break-word; }
-        .sent .bubble { background-color: var(--wa-bubble-sent); border-top-right-radius: 0; }
-        .recv .bubble { background-color: var(--wa-bubble-recv); border-top-left-radius: 0; }
-        .msg-time-ticks { float: right; display: flex; align-items: center; gap: 4px; margin-top: 4px; margin-left: 12px; font-size: 11px; color: var(--wa-text-muted); }
-
-        /* --- INPUT AREA --- */
-        .chat-input-area { display: flex; align-items: flex-end; padding: 8px; padding-bottom: calc(env(safe-area-inset-bottom) + 8px); background-color: transparent; gap: 8px; }
-        .input-bar { flex: 1; background-color: var(--wa-light); border-radius: 24px; display: flex; align-items: center; padding: 8px 12px; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
-        .input-bar svg { color: var(--wa-text-muted); width: 24px; height: 24px; cursor: pointer; }
-        .input-bar input { flex: 1; border: none; outline: none; font-size: 16px; padding: 4px 12px; background: transparent; color: var(--wa-text-main); }
-        .mic-btn { width: 48px; height: 48px; background-color: var(--wa-text-main); color: var(--wa-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2); border: none; cursor: pointer; flex-shrink: 0; transition: opacity 0.2s; }
-
-        /* GB Settings Menu */
-        .gb-menu { position: absolute; top: 50px; right: 16px; background: var(--wa-light); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: none; flex-direction: column; z-index: 200; overflow: hidden; width: 200px; color: var(--wa-text-main); }
-        .gb-menu.active { display: flex; }
-        .gb-menu-item { padding: 14px 16px; font-size: 15px; cursor: pointer; }
-        .gb-menu-item:hover { background: var(--wa-bg); }
-
-        /* CUSTOM DIALOG */
-        .dialog-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
-        .dialog-overlay.active { display: flex; opacity: 1; }
-        .dialog-box { background: var(--wa-light); color: var(--wa-text-main); width: 85%; max-width: 320px; border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: scale(0.9); transition: transform 0.2s; max-height: 90vh; overflow-y: auto;}
-        .dialog-overlay.active .dialog-box { transform: scale(1); }
-        .dialog-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-        .dialog-msg { font-size: 14px; color: var(--wa-text-muted); margin-bottom: 24px; line-height: 1.4; word-wrap: break-word;}
-        .dialog-actions { display: flex; justify-content: flex-end; }
-        .dialog-btn { background: none; border: none; font-weight: 600; font-size: 14px; cursor: pointer; padding: 8px 16px; border-radius: 6px; text-transform: uppercase; color: var(--wa-text-main); }
-        .dialog-btn:active { background: var(--wa-bg); }
-        
-        /* --- FULL SCREEN IMAGE VIEWER --- */
-        #image-viewer-overlay {
-            position: fixed; inset: 0; background: #000000; z-index: 2000;
-            display: none; align-items: center; justify-content: center;
-            opacity: 0; transition: opacity 0.2s; flex-direction: column;
-        }
-        #image-viewer-overlay.active { display: flex; opacity: 1; }
-        .image-viewer-close {
-            position: absolute; top: calc(env(safe-area-inset-top) + 20px); left: 20px;
-            color: #ffffff; cursor: pointer; z-index: 2010; padding: 8px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center;
-        }
-        .image-viewer-img {
-            max-width: 100vw; max-height: 100dvh; object-fit: contain; pointer-events: auto;
-            user-select: none; -webkit-user-drag: none; -webkit-touch-callout: none;
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        ::-webkit-scrollbar { display: none; }
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: #f8f9fa;
+        }
+
+        .upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(26,95,122,0.05);
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin: 24px 0 12px;
+            font-weight: 700;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.8rem;
+        }
     </style>
+<base target="_blank">
 </head>
 <body>
 
-<div id="webview-overlay" class="webview-overlay">
-    <div class="webview-header">
-        <i data-feather="x" onclick="closeWebView()"></i>
-        <span id="webview-title" class="webview-title">Browser</span>
-        <i data-feather="external-link" onclick="openExternalWebView()"></i>
-    </div>
-    <iframe id="webview-frame" src=""></iframe>
-</div>
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="login-screen">
+    <div class="login-box">
+        <h2>🔐 SME Risk Engine</h2>
+        <p style="text-align:center; color: var(--text-muted); margin-bottom: 24px;">South African Microlender AI</p>
 
-<div id="image-viewer-overlay">
-    <div class="image-viewer-close" onclick="closeImageViewer()"><i data-feather="x"></i></div>
-    <img id="image-viewer-img" class="image-viewer-img" src="">
-</div>
+        <div id="loginAlert"></div>
 
-<div id="splash-screen">
-    <div class="splash-logo"><i data-feather="aperture"></i></div>
-    <div class="splash-title">VYNSTA</div>
-    <div class="splash-subtitle">Stealth Network</div>
-    <div class="splash-spinner"></div>
-</div>
-
-<div id="auth-screen">
-    <div class="auth-logo"><i data-feather="aperture"></i></div>
-    <div class="auth-title">Vynsta</div>
-    <div class="auth-sub">Stealth Communication Network</div>
-    
-    <input type="email" id="auth-email" class="auth-input" placeholder="Email Address">
-    <input type="password" id="auth-password" class="auth-input" placeholder="Password">
-    
-    <button class="auth-btn" onclick="handleLogin()">Login</button>
-    <button class="auth-btn outline" onclick="handleSignUp()">Create Account</button>
-
-    <div style="width:100%; max-width:320px; display:flex; align-items:center; gap:12px; margin: 8px 0 16px;">
-        <div style="flex:1; height:1px; background:var(--wa-border);"></div>
-        <span style="font-size:12px; color:var(--wa-text-muted); text-transform:uppercase;">or</span>
-        <div style="flex:1; height:1px; background:var(--wa-border);"></div>
-    </div>
-
-    <button class="auth-btn outline" onclick="handleGoogleSignIn()" style="display:flex; align-items:center; justify-content:center; gap:10px; border-color:#4285F4; color:#4285F4;">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-        Continue with Google
-    </button>
-
-    <button class="auth-btn outline" onclick="handleGuestMode()" style="margin-top:8px; border-color:var(--wa-text-muted); color:var(--wa-text-muted);">
-        👁️ Continue as Guest (View Only)
-    </button>
-</div>
-
-<div id="main-app">
-    <div class="wa-header-container">
-        
-        <div class="search-overlay" id="search-overlay">
-            <i data-feather="arrow-left" onclick="closeSearch()"></i>
-            <div class="search-input-wrapper">
-                <input type="text" id="global-search-input" placeholder="Search Vynsta Network..." onkeypress="if(event.key==='Enter'){ handleGlobalSearch(); }">
-            </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="loginEmail" placeholder="lender@example.com" value="">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" value="">
         </div>
 
-        <div class="wa-top-bar">
-            <div class="wa-title">
-                <i data-feather="aperture" style="width: 24px; height: 24px;"></i> Vynsta
-            </div>
-            <div class="wa-icons">
-                <i data-feather="wifi" id="ghost-toggle-icon" class="gb-wifi" onclick="toggleGhostMode()"></i>
-                <i data-feather="moon" onclick="toggleTheme()"></i>
-                <i data-feather="search" id="search-trigger" onclick="openSearch()"></i>
-                <i data-feather="more-vertical" onclick="document.getElementById('gb-menu').classList.toggle('active')"></i>
-            </div>
-            
-            <div class="gb-menu" id="gb-menu">
-                <div class="gb-menu-item" style="font-weight: bold;">GB Settings</div>
-                <div class="gb-menu-item">Message Scheduler</div>
-                <div class="gb-menu-item">Auto Reply</div>
-                <div class="gb-menu-item" onclick="handleLogout()">Log Out</div>
-            </div>
-        </div>
-        
-        <div class="wa-tabs">
-            <div class="wa-tab active" onclick="switchTab('chats')">
-                <i data-feather="message-circle"></i> CHATS <span class="pill-badge" id="tab-badge-chats"></span>
-            </div>
-            <div class="wa-tab" onclick="switchTab('feed')">
-                <i data-feather="activity"></i> FEED
-            </div>
-            <div class="wa-tab" onclick="switchTab('calls')">
-                <i data-feather="phone"></i> CALLS
-            </div>
-            <div class="wa-tab" onclick="switchTab('profile')">
-                <i data-feather="user"></i> PROFILE
-            </div>
-        </div>
-    </div>
-
-    <div id="tab-chats" class="view-container active">
-        <div class="chat-list-item" onclick="openGlobalChat()">
-            <img class="avatar" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png" style="background: var(--wa-text-main);">
-            <div class="chat-info">
-                <div class="chat-name-row">
-                    <span class="chat-name">Vynsta Mainnet (Global)</span>
-                    <span class="chat-time" id="global-last-time">Just now</span>
-                </div>
-                <div class="chat-msg-row">
-                    <i data-feather="check-all" class="tick-icon"></i>
-                    <span id="global-last-text" class="chat-msg-text">Tap to enter global chat...</span>
-                    <div class="unread-badge" id="global-unread"></div>
-                </div>
-            </div>
-        </div>
-        <div id="private-chats-list"></div>
-    </div>
-
-    <div id="tab-feed" class="view-container">
-        <div class="feed-composer">
-            <img class="feed-composer-avatar" id="feed-composer-avatar" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png">
-            <div class="feed-input-area">
-                <textarea id="feed-caption-input" placeholder="What's happening? (Type @ to tag or paste a link)" oninput="updateFeedPostBtn()"></textarea>
-                <img id="feed-media-preview" class="feed-media-preview" src="">
-                <input type="file" id="feed-img-upload" style="display:none;" accept="image/*" onchange="previewFeedImage(event)">
-                
-                <div class="feed-composer-actions">
-                    <i data-feather="image" onclick="document.getElementById('feed-img-upload').click()"></i>
-                    <button class="feed-post-btn" id="feed-post-btn" disabled onclick="submitFeedPost()">Post</button>
-                </div>
-            </div>
-        </div>
-        
-        <div id="feed-posts-list">
-            <div style="padding: 40px; text-align: center; color: var(--wa-text-muted); font-size: 14px;">Loading feed...</div>
-        </div>
-    </div>
-
-    <div id="tab-calls" class="view-container">
-        <div style="padding: 40px; text-align: center; color: var(--wa-text-muted);">
-            To call contacts on Vynsta, open a chat and tap the phone icon.
-        </div>
-    </div>
-
-    <div id="tab-profile" class="view-container">
-        <div class="profile-header">
-            <div class="profile-avatar-wrapper" onclick="document.getElementById('profile-pic-input').click()">
-                <img id="profile-avatar-img" class="profile-avatar" src="" style="display:none; object-fit:cover;">
-                <div class="profile-avatar" id="profile-letter">V</div>
-                <div class="profile-cam-icon"><i data-feather="camera" style="color:white; width:14px; height:14px;"></i></div>
-            </div>
-            <input type="file" id="profile-pic-input" style="display:none;" accept="image/*" onchange="handleProfilePicUpload(event)">
-            <div>
-                <div class="profile-id" id="display-vynsta-id">Loading...</div>
-                <div class="profile-email" id="display-email">loading@email.com</div>
-            </div>
-        </div>
-        
-        <div style="padding: 16px; font-size: 14px; font-weight: 600; color: var(--wa-text-muted); background: var(--wa-bg);">Account Actions</div>
-        
-        <div class="chat-list-item" onclick="openSettings()">
-            <i data-feather="settings" style="color: var(--wa-text-main);"></i>
-            <div class="chat-info" style="border-bottom: none; margin-left: 16px; padding-bottom: 0;">
-                <div class="chat-name" style="font-weight: 400;">Manage Account & Privacy</div>
-            </div>
-        </div>
-
-        <div class="chat-list-item" onclick="copyVynstaID()">
-            <i data-feather="copy" style="color: var(--wa-text-main);"></i>
-            <div class="chat-info" style="border-bottom: none; margin-left: 16px; padding-bottom: 0;">
-                <div class="chat-name" style="font-weight: 400;">Copy Vynsta ID to Invite Friends</div>
-            </div>
-        </div>
-        <div class="chat-list-item" onclick="handleLogout()">
-            <i data-feather="log-out" style="color: #ef4444;"></i>
-            <div class="chat-info" style="border-bottom: none; margin-left: 16px; padding-bottom: 0;">
-                <div class="chat-name" style="font-weight: 400; color: #ef4444;">Log Out</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="fab" id="main-fab" onclick="handleFabClick()">
-        <i data-feather="message-square"></i>
-    </div>
-</div>
-
-<div class="modal-overlay" id="settings-overlay" onclick="closeSettings()"></div>
-<div class="bottom-sheet" id="settings-sheet">
-    <div class="sheet-header">
-        <h3>Account Settings</h3>
-        <i data-feather="x" onclick="closeSettings()" style="cursor: pointer;"></i>
-    </div>
-    
-    <p style="font-size: 14px; color: var(--wa-text-muted); margin-bottom: 12px;">Update your unique Vynsta ID.</p>
-    <input type="text" id="settings-id-input" class="sheet-input" placeholder="New Vynsta ID" autocomplete="off">
-    <button class="sheet-btn" onclick="saveSettings()">Save ID Changes</button>
-    
-    <div style="margin-top: 30px;">
-        <h4 style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">Blocked Users</h4>
-        <div id="blocked-users-list" style="max-height: 180px; overflow-y: auto; background: var(--wa-bg); border-radius: 8px; padding: 8px 12px;">
-            <div style="font-size:13px; color:var(--wa-text-muted); text-align:center; padding:10px;">No blocked users</div>
-        </div>
-    </div>
-</div>
-
-<div class="modal-overlay" id="chat-context-overlay" onclick="closeChatContext()"></div>
-<div class="bottom-sheet" id="chat-context-sheet" style="padding-bottom: calc(30px + env(safe-area-inset-bottom));">
-    <div class="sheet-header">
-        <h3 id="context-chat-name" style="color: var(--wa-text-muted); font-size: 15px;">Chat Options</h3>
-        <i data-feather="x" onclick="closeChatContext()" style="cursor: pointer;"></i>
-    </div>
-    <div class="chat-list-item" onclick="contextActionViewProfile()" style="padding: 16px 0;">
-        <i data-feather="user"></i>
-        <div class="chat-info" style="border:none; padding-bottom:0; margin-left:16px;">
-            <div class="chat-name">View Profile</div>
-        </div>
-    </div>
-    <div class="chat-list-item" onclick="contextActionDeleteChat()" style="padding: 16px 0;">
-        <i data-feather="trash-2" style="color:#ef4444;"></i>
-        <div class="chat-info" style="border:none; padding-bottom:0; margin-left:16px;">
-            <div class="chat-name" style="color:#ef4444;">Delete Chat</div>
-        </div>
-    </div>
-    <div class="chat-list-item" onclick="contextActionBlockUser()" style="padding: 16px 0;">
-        <i data-feather="slash" style="color:#ef4444;"></i>
-        <div class="chat-info" style="border:none; padding-bottom:0; margin-left:16px;">
-            <div class="chat-name" style="color:#ef4444;">Block User</div>
-        </div>
-    </div>
-</div>
-
-<div class="modal-overlay" id="post-context-overlay" onclick="closePostContext()"></div>
-<div class="bottom-sheet" id="post-context-sheet" style="padding-bottom: calc(30px + env(safe-area-inset-bottom));">
-    <div class="sheet-header">
-        <h3 style="font-size: 16px;">Post Options</h3>
-        <i data-feather="x" onclick="closePostContext()" style="cursor: pointer;"></i>
-    </div>
-    <div id="post-context-actions">
-        </div>
-</div>
-
-<div class="modal-overlay" id="friend-overlay" onclick="closeFriendSheet()"></div>
-<div class="bottom-sheet" id="friend-sheet">
-    <div class="sheet-header">
-        <h3>New Chat</h3>
-        <i data-feather="x" onclick="closeFriendSheet()" style="cursor: pointer;"></i>
-    </div>
-    <p style="font-size: 14px; color: var(--wa-text-muted); margin-bottom: 12px;">Enter a Vynsta ID (You can also add your own ID).</p>
-    <input type="text" id="friend-id-input" class="sheet-input" placeholder="e.g. NeonWolf88" autocomplete="off">
-    <button class="sheet-btn" onclick="addFriend()">Add Friend</button>
-</div>
-
-<div class="modal-overlay" id="feed-comments-overlay" onclick="closeFeedComments()"></div>
-<div class="bottom-sheet" id="feed-comments-sheet" style="height: 80vh;">
-    <div class="sheet-header">
-        <h3>Comments</h3>
-        <i data-feather="x" onclick="closeFeedComments()" style="cursor: pointer;"></i>
-    </div>
-    <div class="feed-comments-list" id="feed-comments-list">
-        </div>
-    <div style="display: flex; gap: 8px; margin-top: auto;">
-        <input type="text" id="feed-comment-input" class="sheet-input" style="margin-bottom: 0;" placeholder="Add a comment..." autocomplete="off">
-        <button class="sheet-btn" style="width: auto; padding: 0 20px;" onclick="submitFeedComment()">Post</button>
-    </div>
-</div>
-
-<div class="chat-room" id="chat-room">
-    <div class="chat-room-header">
-        <div class="back-btn" onclick="uiCloseChatRoom()">
-            <i data-feather="arrow-left"></i>
-        </div>
-        <img class="chat-room-avatar" id="chat-room-avatar-img" src="https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png" style="background: white;" onclick="openImageViewer(this.src)">
-        <div class="chat-room-title">
-            <h3 id="chat-room-title-text">Vynsta Mainnet</h3>
-            <p id="chat-room-subtitle">Global encrypted channel</p>
-        </div>
-        <i data-feather="video" onclick="showCustomDialog('Call', 'Calls are currently disabled.')"></i>
-        <i data-feather="phone" onclick="showCustomDialog('Call', 'Calls are currently disabled.')"></i>
-        <i data-feather="more-vertical"></i>
-    </div>
-
-    <div class="messages-container" id="messages-container"></div>
-
-    <div class="chat-input-area">
-        <div class="input-bar">
-            <i data-feather="smile"></i>
-            <input type="text" id="msg-input" placeholder="Message" autocomplete="off" oninput="toggleMicSendIcon()" onkeypress="if(event.key==='Enter')sendMessage()">
-            <i data-feather="paperclip" style="margin-left: 12px;" onclick="document.getElementById('chat-img-upload').click()"></i>
-            <i data-feather="camera" style="margin-left: 16px;"></i>
-            <input type="file" id="chat-img-upload" style="display:none;" accept="image/*" onchange="handleChatImageUpload(event)">
-        </div>
-        <button class="mic-btn" id="send-btn" onclick="sendMessage()">
-            <i data-feather="mic" id="action-icon"></i>
+        <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="app.login()">
+            <span id="loginBtnText">Sign In</span>
         </button>
+
+        <p style="text-align:center; margin-top:16px; font-size:0.85rem; color:var(--text-muted);">
+            Demo: <code>demo@lender.co.za / password123</code>
+        </p>
     </div>
 </div>
 
-<div class="dialog-overlay" id="custom-dialog">
-    <div class="dialog-box">
-        <h4 class="dialog-title" id="cd-title">Title</h4>
-        <div class="dialog-msg" id="cd-msg">Message goes here...</div>
-        <div class="dialog-actions">
-            <button class="dialog-btn" onclick="closeCustomDialog()">OK</button>
+<!-- MAIN APP -->
+<div id="mainApp" class="hidden">
+    <header>
+        <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <h1>🏦 SME Risk Engine</h1>
+                <p>AI-powered credit risk scoring for South African SMEs</p>
+            </div>
+            <div style="display:flex; gap:12px; align-items:center;">
+                <span id="userEmail" style="font-size:0.85rem; opacity:0.9;"></span>
+                <button class="btn btn-secondary" onclick="app.logout()" style="font-size:0.8rem;">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- NAVIGATION -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="app.switchTab('dashboard')">📊 Dashboard</button>
+            <button class="nav-tab" onclick="app.switchTab('assess')">📝 New Assessment</button>
+            <button class="nav-tab" onclick="app.switchTab('train')">🧠 Train Model</button>
+            <button class="nav-tab" onclick="app.switchTab('portfolio')">📁 Portfolio</button>
+            <button class="nav-tab" onclick="app.switchTab('settings')">⚙️ Settings</button>
+        </div>
+
+        <!-- DASHBOARD TAB -->
+        <div id="tab-dashboard" class="tab-content active">
+            <div class="grid-3">
+                <div class="card metric-card">
+                    <div class="metric-value" id="dashTotalAssessments">0</div>
+                    <div class="metric-label">Total Assessments</div>
+                </div>
+                <div class="card metric-card">
+                    <div class="metric-value" id="dashApprovalRate">0%</div>
+                    <div class="metric-label">Approval Rate</div>
+                </div>
+                <div class="card metric-card">
+                    <div class="metric-value" id="dashAvgRisk">0%</div>
+                    <div class="metric-label">Avg Default Risk</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>⚡ Quick Stats</h2>
+                <div class="grid-2">
+                    <div>
+                        <p class="section-title">Risk Distribution</p>
+                        <div id="riskDistribution">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                                <span>Low Risk (0-35%)</span>
+                                <span id="countLow">0</span>
+                            </div>
+                            <div class="progress-bar"><div class="progress-fill" id="barLow" style="width:0%; background:var(--success);"></div></div>
+
+                            <div style="display:flex; justify-content:space-between; margin:12px 0 8px;">
+                                <span>Medium Risk (35-60%)</span>
+                                <span id="countMedium">0</span>
+                            </div>
+                            <div class="progress-bar"><div class="progress-fill" id="barMedium" style="width:0%; background:var(--warning);"></div></div>
+
+                            <div style="display:flex; justify-content:space-between; margin:12px 0 8px;">
+                                <span>High Risk (60%+)</span>
+                                <span id="countHigh">0</span>
+                            </div>
+                            <div class="progress-bar"><div class="progress-fill" id="barHigh" style="width:0%; background:var(--danger);"></div></div>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="section-title">Recent Activity</p>
+                        <div id="recentActivity" style="max-height:200px; overflow-y:auto;">
+                            <p style="color:var(--text-muted); font-size:0.9rem;">No recent assessments</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📋 Model Status</h2>
+                <div id="modelStatus">
+                    <div class="alert alert-warning">
+                        ⚠️ No trained model found. Please train a model first using historical data.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW ASSESSMENT TAB -->
+        <div id="tab-assess" class="tab-content">
+            <div class="grid-2">
+                <div class="card">
+                    <h2>📄 Upload Bank Statement</h2>
+                    <div class="alert alert-info">
+                        Upload a 3-month bank statement PDF. We'll extract risk features and calculate default probability.
+                    </div>
+
+                    <div class="form-group">
+                        <label>Applicant Name</label>
+                        <input type="text" id="appName" placeholder="e.g. Thabo Mokoena">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Business Name</label>
+                        <input type="text" id="appBusiness" placeholder="e.g. Mokoena Logistics">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Loan Amount (R)</label>
+                        <input type="number" id="appAmount" placeholder="e.g. 50000">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Bank Statement PDF</label>
+                        <div class="upload-area" id="pdfUpload" onclick="document.getElementById('pdfFile').click()">
+                            <p style="font-size:2rem; margin-bottom:8px;">📤</p>
+                            <p style="font-weight:600;">Click to upload PDF</p>
+                            <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">or drag and drop</p>
+                        </div>
+                        <input type="file" id="pdfFile" accept=".pdf" style="display:none;" onchange="app.handlePdfUpload(event)">
+                        <p id="pdfName" style="margin-top:8px; font-size:0.85rem; color:var(--text-muted);"></p>
+                    </div>
+
+                    <button class="btn btn-primary" id="assessBtn" onclick="app.runAssessment()" disabled>
+                        Calculate Risk Score
+                    </button>
+                </div>
+
+                <div class="card">
+                    <h2>🎯 Risk Assessment Result</h2>
+                    <div id="assessResult">
+                        <p style="text-align:center; color:var(--text-muted); padding:40px 0;">
+                            Upload a bank statement and click "Calculate Risk Score" to see results.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" id="extractedFeaturesCard" style="display:none;">
+                <h2>🔍 Extracted Features</h2>
+                <div class="feature-list" id="featureList"></div>
+            </div>
+        </div>
+
+        <!-- TRAIN MODEL TAB -->
+        <div id="tab-train" class="tab-content">
+            <div class="grid-2">
+                <div class="card">
+                    <h2>📚 Upload Training Data</h2>
+                    <div class="alert alert-info">
+                        Upload a CSV with historical loans. Format: 8 feature columns + 1 outcome column (0=repaid, 1=defaulted).
+                    </div>
+
+                    <div class="upload-area" id="csvUpload" onclick="document.getElementById('csvFile').click()">
+                        <p style="font-size:2rem; margin-bottom:8px;">📊</p>
+                        <p style="font-weight:600;">Upload Training CSV</p>
+                        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">Columns: f1,f2,f3,f4,f5,f6,f7,f8,outcome</p>
+                    </div>
+                    <input type="file" id="csvFile" accept=".csv" style="display:none;" onchange="app.handleCsvUpload(event)">
+                    <p id="csvName" style="margin-top:8px; font-size:0.85rem; color:var(--text-muted);"></p>
+
+                    <div class="form-group" style="margin-top:16px;">
+                        <label>Model Name</label>
+                        <input type="text" id="modelName" placeholder="e.g. Q1-2024-SME-Model" value="SME-Default-Predictor">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Hidden Layers (comma-separated)</label>
+                        <input type="text" id="hiddenLayers" placeholder="16,8" value="16,8">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Training Iterations</label>
+                        <input type="number" id="iterations" value="10000" min="1000" max="50000">
+                    </div>
+
+                    <button class="btn btn-success" id="trainBtn" onclick="app.trainModel()" disabled>
+                        🧠 Train Neural Network
+                    </button>
+                </div>
+
+                <div class="card">
+                    <h2>📈 Training Progress</h2>
+                    <div id="trainProgress">
+                        <p style="text-align:center; color:var(--text-muted); padding:20px;">
+                            Upload training data to begin.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>💡 Manual Training (Alternative)</h2>
+                <p style="margin-bottom:12px; color:var(--text-muted);">
+                    If you don't have a CSV, manually add training examples below. Each example needs 8 features and an outcome.
+                </p>
+
+                <div class="grid-2">
+                    <div>
+                        <div class="form-group">
+                            <label>Feature 1: Cash Flow Volatility (0-1)</label>
+                            <input type="number" id="mtF1" step="0.01" min="0" max="1" value="0.5">
+                        </div>
+                        <div class="form-group">
+                            <label>Feature 2: Balance Trend (0-1)</label>
+                            <input type="number" id="mtF2" step="0.01" min="0" max="1" value="0.5">
+                        </div>
+                        <div class="form-group">
+                            <label>Feature 3: Debit/Credit Ratio (0-1)</label>
+                            <input type="number" id="mtF3" step="0.01" min="0" max="1" value="0.5">
+                        </div>
+                        <div class="form-group">
+                            <label>Feature 4: Weekend/Evening % (0-1)</label>
+                            <input type="number" id="mtF4" step="0.01" min="0" max="1" value="0.3">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label>Feature 5: Reversal/NSF Frequency (0-1)</label>
+                            <input type="number" id="mtF5" step="0.01" min="0" max="1" value="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Feature 6: Salary vs Revenue Mix (0-1)</label>
+                            <input type="number" id="mtF6" step="0.01" min="0" max="1" value="0.5">
+                        </div>
+                        <div class="form-group">
+                            <label>Feature 7: Largest Deposit % (0-1)</label>
+                            <input type="number" id="mtF7" step="0.01" min="0" max="1" value="0.3">
+                        </div>
+                        <div class="form-group">
+                            <label>Feature 8: Zero Balance Days (0-1)</label>
+                            <input type="number" id="mtF8" step="0.01" min="0" max="1" value="0.2">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Outcome</label>
+                    <select id="mtOutcome" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border);">
+                        <option value="0">✅ Repaid Successfully (0)</option>
+                        <option value="1">❌ Defaulted (1)</option>
+                    </select>
+                </div>
+
+                <div style="display:flex; gap:12px;">
+                    <button class="btn btn-primary" onclick="app.addManualTraining()">Add Example</button>
+                    <button class="btn btn-success" onclick="app.trainManualModel()">Train on Manual Data</button>
+                </div>
+
+                <div id="manualExamples" style="margin-top:16px;">
+                    <p style="color:var(--text-muted); font-size:0.85rem;">No manual examples added yet.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PORTFOLIO TAB -->
+        <div id="tab-portfolio" class="tab-content">
+            <div class="card">
+                <h2>📁 All Assessments</h2>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Applicant</th>
+                                <th>Business</th>
+                                <th>Amount</th>
+                                <th>Risk Score</th>
+                                <th>Recommendation</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="portfolioTable">
+                            <tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No assessments yet</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SETTINGS TAB -->
+        <div id="tab-settings" class="tab-content">
+            <div class="grid-2">
+                <div class="card">
+                    <h2>⚙️ Risk Thresholds</h2>
+                    <div class="form-group">
+                        <label>Auto-Approve Threshold (0-1)</label>
+                        <input type="number" id="threshApprove" step="0.01" min="0" max="1" value="0.35">
+                        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Applications below this risk score are automatically approved.</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Auto-Reject Threshold (0-1)</label>
+                        <input type="number" id="threshReject" step="0.01" min="0" max="1" value="0.60">
+                        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Applications above this risk score are automatically rejected.</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Review Range</label>
+                        <p style="padding:10px; background:#f8f9fa; border-radius:6px; font-size:0.9rem;">
+                            Between <span id="reviewLow">0.35</span> and <span id="reviewHigh">0.60</span> = Manual Review
+                        </p>
+                    </div>
+                    <button class="btn btn-primary" onclick="app.saveSettings()">Save Thresholds</button>
+                </div>
+
+                <div class="card">
+                    <h2>🔒 POPIA Compliance</h2>
+                    <div class="alert alert-info">
+                        This system processes personal financial data. Ensure compliance with POPIA.
+                    </div>
+                    <ul style="font-size:0.9rem; color:var(--text); line-height:2;">
+                        <li>✅ Raw PDFs are parsed and immediately discarded</li>
+                        <li>✅ Only extracted features and scores are stored</li>
+                        <li>✅ Data is encrypted in transit and at rest (Firebase)</li>
+                        <li>✅ Access is authenticated and logged</li>
+                        <li>⚠️ Register an Information Officer with the SA Information Regulator</li>
+                    </ul>
+                    <button class="btn btn-secondary" onclick="app.exportData()">📥 Export Assessment Data (CSV)</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🗑️ Data Management</h2>
+                <div class="alert alert-danger">
+                    ⚠️ Deleting data is irreversible. Ensure you have backups if required for regulatory compliance.
+                </div>
+                <div style="display:flex; gap:12px;">
+                    <button class="btn btn-danger" onclick="app.clearAssessments()">Clear All Assessments</button>
+                    <button class="btn btn-danger" onclick="app.clearModels()">Delete All Models</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<script type="module">
-import {
-    getDatabase, ref, onChildAdded, onValue, push, set, get, update, off, serverTimestamp, query, limitToLast, orderByChild, equalTo
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { 
-    getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
-    GoogleAuthProvider, signInWithPopup
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-// Prevent long press (context menu) and dragging globally on all images
-document.addEventListener('contextmenu', (e) => {
-    if (e.target.tagName === 'IMG' || e.target.classList.contains('avatar') || e.target.classList.contains('feed-composer-avatar')) {
-        e.preventDefault();
-    }
-});
-document.addEventListener('dragstart', (e) => {
-    if (e.target.tagName === 'IMG') {
-        e.preventDefault();
-    }
-});
-
-// Firebase Config
+<script>
+// ============================================
+// FIREBASE CONFIG (HARDCODED FOR TESTING)
+// ============================================
 const firebaseConfig = {
-    apiKey: "AIzaSyBOyZ3As4GTuNvjemvPF_SpsC6m6vqtNhc",
-    authDomain: "fire-b-a8878.firebaseapp.com",
-    databaseURL: "https://fire-b-a8878.firebaseio.com",
-    projectId: "fire-b-a8878",
-    storageBucket: "fire-b-a8878.appspot.com",
-    messagingSenderId: "658673187627",
-    appId: "1:658673187627:web:6e4c29af661785f0afa36e"
+    apiKey: "AIzaSyCh7Ute6LeSAxcNDEQwZg5m0cA4ujnLCfg",
+    authDomain: "test-17881.firebaseapp.com",
+    databaseURL: "https://test-17881-default-rtdb.firebaseio.com",
+    projectId: "test-17881",
+    storageBucket: "test-17881.firebasestorage.app",
+    messagingSenderId: "1057428047643",
+    appId: "1:1057428047643:web:f3801c0d933225a5cd35be",
+    measurementId: "G-65PFSJ1MDS"
 };
 
-const app  = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db   = getDatabase(app);
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const auth = firebase.auth();
 
-// Cloudinary Setup
-const CLOUDINARY_CLOUD_NAME = 'dqkujefxj';
-const CLOUDINARY_UPLOAD_PRESET = 'banter_box';
+// PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-window.currentUser = null;
-window.currentVynstaId = null;
-window.currentUserAvatar = 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png';
-window.isGuest = false;
-window.guestUser = { uid: 'guest_' + Math.random().toString(36).substr(2, 9), email: 'guest@vynsta.net' };
+// ============================================
+// APPLICATION STATE
+// ============================================
+const app = {
+    currentUser: null,
+    currentModel: null,
+    trainingData: [],
+    manualTrainingData: [],
+    assessments: [],
+    settings: {
+        approveThreshold: 0.35,
+        rejectThreshold: 0.60
+    },
 
-let currentChatRef = null;
-let feedNotifRef = null; 
-window.currentChatPath = 'posts'; 
-let friendsLoaded = false;
-let feedLoaded = false;
+    // ============================================
+    // AUTHENTICATION
+    // ============================================
+    async login() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
 
-// Blocked Users State
-window.blockedUsers = {};
-
-// Context Menu States
-window.selectedChatUid = null;
-window.selectedChatName = null;
-window.selectedChatAvatar = null;
-
-window.selectedPostId = null;
-window.selectedPostUid = null;
-window.selectedPostUsername = null;
-window.selectedPostAvatar = null;
-
-// Variables for Feed
-let pendingFeedImage = null;
-let currentFeedCommentPostId = null;
-
-// Session Unread Count Trackers
-window.unreadCounts = {};
-
-// --- GHOST MODE LOGIC ---
-window.ghostMode = localStorage.getItem('vynsta_ghost') === 'true';
-
-document.addEventListener("DOMContentLoaded", () => {
-    if (window.ghostMode) {
-        document.getElementById('ghost-toggle-icon').classList.add('ghost-active');
-    }
-});
-
-window.toggleGhostMode = () => {
-    window.ghostMode = !window.ghostMode;
-    localStorage.setItem('vynsta_ghost', window.ghostMode);
-    const icon = document.getElementById('ghost-toggle-icon');
-    
-    if (window.ghostMode) {
-        icon.classList.add('ghost-active');
-        showCustomDialog('Ghost Mode Activated', 'Your presence is now hidden. Last Seen updates and read receipts are disabled.');
-    } else {
-        icon.classList.remove('ghost-active');
-        window.updateLastSeen();
-        showCustomDialog('Ghost Mode Disabled', 'You are now visible on the network.');
-    }
-};
-
-window.updateLastSeen = () => {
-    if(window.currentUser && !window.ghostMode && !window.isGuest) {
-        update(ref(db, `users/${window.currentUser.uid}`), { lastSeen: serverTimestamp() });
-    }
-};
-
-// --- CHAT CONTEXT MENU (LONG PRESS LOGIC) ---
-window.openChatContext = (uid, name, avatar) => {
-    if (uid === window.currentUser.uid || uid === 'global') return; // Cannot modify global or self
-    window.selectedChatUid = uid;
-    window.selectedChatName = name;
-    window.selectedChatAvatar = avatar;
-    document.getElementById('context-chat-name').textContent = 'Options for ' + name;
-    document.getElementById('chat-context-overlay').classList.add('active');
-    
-    if(navigator.vibrate) navigator.vibrate(50);
-};
-
-window.closeChatContext = () => {
-    document.getElementById('chat-context-overlay').classList.remove('active');
-    setTimeout(() => { window.selectedChatUid = null; }, 200);
-};
-
-window.contextActionViewProfile = () => {
-    closeChatContext();
-    const avatar = window.selectedChatAvatar || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png';
-    showCustomDialog('Profile', `
-        <div style="text-align:center; padding-top: 10px;">
-            <img src="${avatar}" style="width:90px;height:90px;border-radius:50%;margin-bottom:12px;object-fit:cover;border:2px solid var(--wa-primary);">
-            <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 4px;">${escapeHtml(window.selectedChatName)}</h3>
-            <p style="font-size: 13px; color: var(--wa-text-muted);">Vynsta Secure Connection</p>
-        </div>
-    `);
-};
-
-window.contextActionDeleteChat = async () => {
-    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to manage chats.');
-    if(!window.selectedChatUid) return;
-    const uid = window.selectedChatUid;
-    closeChatContext();
-    await set(ref(db, `users/${window.currentUser.uid}/friends/${uid}`), null);
-    const el = document.getElementById(`chat-item-${uid}`);
-    if (el) el.remove();
-};
-
-window.contextActionBlockUser = async () => {
-    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to block users.');
-    if(!window.selectedChatUid) return;
-    const uid = window.selectedChatUid;
-    const name = window.selectedChatName;
-    closeChatContext();
-    await set(ref(db, `users/${window.currentUser.uid}/blocked/${uid}`), { vynstaId: name, timestamp: serverTimestamp() });
-    await set(ref(db, `users/${window.currentUser.uid}/friends/${uid}`), null);
-    const el = document.getElementById(`chat-item-${uid}`);
-    if (el) el.remove();
-    showCustomDialog('User Blocked', `${escapeHtml(name)} has been blocked. They can no longer interact with your chat.`);
-};
-
-// --- POST CONTEXT MENU LOGIC ---
-window.openPostContext = (postId, uid, username, avatar) => {
-    window.selectedPostId = postId;
-    window.selectedPostUid = uid;
-    window.selectedPostUsername = username;
-    window.selectedPostAvatar = avatar;
-    
-    const actionsContainer = document.getElementById('post-context-actions');
-    actionsContainer.innerHTML = '';
-    
-    if (window.currentUser && uid === window.currentUser.uid) {
-        actionsContainer.innerHTML = `
-            <div class="chat-list-item" onclick="deleteFeedPost()" style="padding: 16px 0;">
-                <i data-feather="trash-2" style="color:#ef4444;"></i>
-                <div class="chat-info" style="border:none; padding-bottom:0; margin-left:16px;">
-                    <div class="chat-name" style="color:#ef4444;">Delete Post</div>
-                </div>
-            </div>
-        `;
-    } else {
-        actionsContainer.innerHTML = `
-            <div class="chat-list-item" onclick="viewPostProfile()" style="padding: 16px 0;">
-                <i data-feather="user"></i>
-                <div class="chat-info" style="border:none; padding-bottom:0; margin-left:16px;">
-                    <div class="chat-name">View Profile (@${escapeHtml(username)})</div>
-                </div>
-            </div>
-            <div class="chat-list-item" onclick="reportFeedPost()" style="padding: 16px 0;">
-                <i data-feather="flag" style="color:#ef4444;"></i>
-                <div class="chat-info" style="border:none; padding-bottom:0; margin-left:16px;">
-                    <div class="chat-name" style="color:#ef4444;">Report Post</div>
-                </div>
-            </div>
-        `;
-    }
-    
-    document.getElementById('post-context-overlay').classList.add('active');
-    feather.replace();
-};
-
-window.closePostContext = () => {
-    document.getElementById('post-context-overlay').classList.remove('active');
-};
-
-window.deleteFeedPost = async (optionalPostId) => {
-    const postId = optionalPostId || window.selectedPostId;
-    if(!postId) return;
-    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to manage posts.');
-
-    try {
-        const snap = await get(ref(db, `feed_posts/${postId}`));
-        if (!snap.exists()) {
-            closePostContext();
-            return showCustomDialog('Error', 'Post not found.');
-        }
-        const post = snap.val();
-        if (post.uid !== window.currentUser.uid) {
-            closePostContext();
-            return showCustomDialog('Error', 'You can only delete your own posts.');
-        }
-        await set(ref(db, `feed_posts/${postId}`), null);
-        closePostContext();
-        showCustomDialog('Deleted', 'Post removed from feed.');
-    } catch(e) {
-        showCustomDialog('Error', 'Failed to delete post.');
-    }
-};
-
-window.reportFeedPost = () => {
-    closePostContext();
-    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to report posts.');
-    showCustomDialog('Reported', 'This post has been securely reported to Vynsta admins for review.');
-};
-
-window.viewPostProfile = () => {
-    closePostContext();
-    const avatar = window.selectedPostAvatar || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png';
-    showCustomDialog('Profile', `
-        <div style="text-align:center; padding-top: 10px;">
-            <img src="${avatar}" style="width:90px;height:90px;border-radius:50%;margin-bottom:12px;object-fit:cover;border:2px solid var(--wa-primary);">
-            <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 4px;">${escapeHtml(window.selectedPostUsername)}</h3>
-            <p style="font-size: 13px; color: var(--wa-text-muted);">Vynsta Network User</p>
-        </div>
-    `);
-};
-
-// --- SETTINGS LOGIC & BLOCKED USERS ---
-window.openSettings = () => {
-    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to manage settings.');
-    document.getElementById('settings-id-input').value = window.currentVynstaId;
-    document.getElementById('settings-overlay').classList.add('active');
-};
-window.closeSettings = () => {
-    document.getElementById('settings-overlay').classList.remove('active');
-};
-window.saveSettings = async () => {
-    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to manage settings.');
-    const newId = document.getElementById('settings-id-input').value.trim();
-    if(!newId) return showCustomDialog('Error', 'Vynsta ID cannot be empty.');
-    if(newId === window.currentVynstaId) return closeSettings();
-
-    try {
-        await update(ref(db, `users/${window.currentUser.uid}`), { vynstaId: newId });
-        window.currentVynstaId = newId;
-        document.getElementById('display-vynsta-id').textContent = newId;
-        closeSettings();
-        showCustomDialog('Success', 'Your Vynsta ID was updated to ' + newId);
-    } catch(e) {
-        showCustomDialog('Error', 'Failed to update account settings.');
-    }
-};
-
-function renderBlockedUsers() {
-    const list = document.getElementById('blocked-users-list');
-    if(!list) return;
-    list.innerHTML = '';
-    
-    const uids = Object.keys(window.blockedUsers || {});
-    if(uids.length === 0) {
-        list.innerHTML = '<div style="font-size:13px; color:var(--wa-text-muted); text-align:center; padding:10px;">No blocked users</div>';
-        return;
-    }
-    
-    uids.forEach(uid => {
-        const b = window.blockedUsers[uid];
-        const item = document.createElement('div');
-        item.className = 'blocked-user-item';
-        item.innerHTML = `
-            <span class="blocked-user-name">${escapeHtml(b.vynstaId || 'Unknown User')}</span>
-            <button class="unblock-btn" onclick="unblockUser('${uid}')">Unblock</button>
-        `;
-        list.appendChild(item);
-    });
-}
-
-window.unblockUser = async (uid) => {
-    try {
-        await set(ref(db, `users/${window.currentUser.uid}/blocked/${uid}`), null);
-        showCustomDialog('Unblocked', 'User has been unblocked. You can now receive messages from them or re-add them as a friend.');
-    } catch (e) {
-        showCustomDialog('Error', 'Failed to unblock user.');
-    }
-};
-
-// --- WEBVIEW LOGIC ---
-window.currentWebViewUrl = '';
-window.openWebView = (url) => {
-    window.currentWebViewUrl = url;
-    document.getElementById('webview-frame').src = url;
-    document.getElementById('webview-title').textContent = url.replace(/^https?:\/\//, '').split('/')[0];
-    document.getElementById('webview-overlay').classList.add('active');
-    if (location.hash !== '#webview') history.pushState(null, '', '#webview');
-};
-
-window.closeWebView = () => {
-    document.getElementById('webview-overlay').classList.remove('active');
-    setTimeout(() => { document.getElementById('webview-frame').src = ''; }, 300);
-    if(location.hash === '#webview') history.back();
-};
-
-window.openExternalWebView = () => {
-    window.open(window.currentWebViewUrl, '_blank');
-};
-
-// --- IMAGE VIEWER LOGIC ---
-window.openImageViewer = (src) => {
-    document.getElementById('image-viewer-img').src = src;
-    document.getElementById('image-viewer-overlay').classList.add('active');
-    if (location.hash !== '#image') history.pushState(null, '', '#image');
-};
-
-window.closeImageViewer = () => {
-    document.getElementById('image-viewer-overlay').classList.remove('active');
-    setTimeout(() => { document.getElementById('image-viewer-img').src = ''; }, 200); 
-    if(location.hash === '#image') history.back();
-};
-
-// --- TEXT FORMATTING (LINKS & TAGS) ---
-function formatPostText(text) {
-    if (!text) return '';
-    let safeText = escapeHtml(text);
-    
-    // Convert URLs to clickable WebView links
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    safeText = safeText.replace(urlRegex, (url) => `<span class="feed-link" onclick="event.stopPropagation(); openWebView('${url}')">${url}</span>`);
-    
-    // Convert @username to blue tag
-    const tagRegex = /@([a-zA-Z0-9_]+)/g;
-    safeText = safeText.replace(tagRegex, (match, tag) => `<span class="feed-tag" onclick="event.stopPropagation(); showCustomDialog('Tagged User', 'Profile search for @${tag} coming soon!')">${match}</span>`);
-    
-    return safeText;
-}
-
-function incrementUnread(chatId) {
-    window.unreadCounts[chatId] = (window.unreadCounts[chatId] || 0) + 1;
-    updateUnreadUI(chatId);
-    updateTotalUnread();
-}
-
-function resetUnread(chatId) {
-    window.unreadCounts[chatId] = 0;
-    updateUnreadUI(chatId);
-    updateTotalUnread();
-}
-
-function updateUnreadUI(chatId) {
-    const badge = document.getElementById(chatId === 'global' ? 'global-unread' : `unread-${chatId}`);
-    if (!badge) return;
-    const count = window.unreadCounts[chatId];
-    if (count > 0) {
-        badge.textContent = count;
-        badge.classList.add('show');
-    } else {
-        badge.classList.remove('show');
-    }
-}
-
-function updateTotalUnread() {
-    const total = Object.values(window.unreadCounts).reduce((a, b) => a + b, 0);
-    const tabBadge = document.getElementById('tab-badge-chats');
-    if (total > 0) {
-        tabBadge.textContent = total;
-        tabBadge.classList.add('show');
-    } else {
-        tabBadge.classList.remove('show');
-    }
-}
-
-// --- NOTIFICATION API LOGIC ---
-function requestNotificationPermission() {
-    if ("Notification" in window) {
-        Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-                console.log("Vynsta Stealth: Notifications enabled.");
-            }
-        });
-    }
-}
-
-function triggerFeedNotification(title, body, iconUrl) {
-    if ("Notification" in window && Notification.permission === "granted") {
-        const notification = new Notification(title, {
-            body: body,
-            icon: iconUrl || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png',
-            badge: 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png',
-            vibrate: [200, 100, 200]
-        });
-        
-        notification.onclick = function() {
-            window.focus();
-            switchTab('feed');
-            this.close();
-        };
-    }
-}
-
-function listenToFeedNotifications() {
-    if (feedNotifRef) off(feedNotifRef);
-    feedNotifRef = query(ref(db, 'feed_posts'), limitToLast(1));
-    
-    let initialCount = 0;
-    onChildAdded(feedNotifRef, (snap) => {
-        initialCount++;
-        // Trigger notification only for new posts after the initial listener bind
-        if (initialCount > 1) { 
-            const post = snap.val();
-            let bodyStr = post.text ? post.text : '📷 Photo';
-            triggerFeedNotification("New Post from " + post.username, bodyStr);
-        }
-    });
-}
-
-function triggerSystemNotification(title, body, iconUrl) {
-    if ("Notification" in window && Notification.permission === "granted" && document.visibilityState === 'hidden') {
-        const notification = new Notification(title, {
-            body: body,
-            icon: iconUrl || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png',
-            badge: 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png',
-            vibrate: [200, 100, 200]
-        });
-        
-        notification.onclick = function() {
-            window.focus();
-            this.close();
-        };
-    }
-}
-
-function listenToChatPreview(chatId, isGlobal, friendUid = null) {
-    const path = isGlobal ? 'posts' : `chats/${chatId}/messages`;
-    const q = query(ref(db, path), limitToLast(1));
-    
-    let initialCount = 0;
-    onChildAdded(q, (snap) => {
-        initialCount++;
-        const isNewMessage = initialCount > 1; 
-        
-        const msg = snap.val();
-        
-        // Block check
-        if (friendUid && window.blockedUsers && window.blockedUsers[friendUid]) return;
-
-        const timeStr = formatTime(msg.timestamp);
-        let textSnippet = msg.text ? msg.text : '📷 Photo';
-        
-        const isSelf = window.currentUser && msg.uid === window.currentUser.uid;
-        if (isSelf) textSnippet = 'You: ' + textSnippet;
-        
-        if (isGlobal) {
-            document.getElementById('global-last-time').textContent = timeStr;
-            document.getElementById('global-last-text').textContent = textSnippet;
-            if (isNewMessage && window.currentChatPath !== 'posts' && !isSelf) {
-                incrementUnread('global');
-                triggerSystemNotification("Vynsta Mainnet", `${msg.user?.username || 'User'}: ${msg.text ? msg.text : '📷 Photo'}`);
-            }
-        } else if (friendUid) {
-            const timeEl = document.getElementById(`time-${friendUid}`);
-            const textEl = document.getElementById(`text-${friendUid}`);
-            const itemEl = document.getElementById(`chat-item-${friendUid}`);
-            
-            if (timeEl) timeEl.textContent = timeStr;
-            if (textEl) textEl.textContent = textSnippet;
-            if (itemEl && msg.timestamp) itemEl.style.order = -msg.timestamp;
-            if (isNewMessage && window.currentChatPath !== path && !isSelf) {
-                incrementUnread(friendUid);
-                triggerSystemNotification("New Stealth Message", msg.text ? msg.text : '📷 Photo');
-            }
-        }
-    });
-}
-
-// --- CLOUDINARY UPLOAD HELPER ---
-async function uploadToCloudinary(file, isAvatar = false) {
-    const fd = new FormData();
-    fd.append('file', file);
-    fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-    
-    const r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`, { method: 'POST', body: fd });
-    if (!r.ok) throw new Error('Upload failed');
-    const data = await r.json();
-    
-    if (isAvatar) return data.secure_url.replace('/upload/', '/upload/f_auto,q_auto,w_200,h_200,c_fill/');
-    return data.secure_url.replace('/upload/', '/upload/f_auto,q_auto,w_1080/');
-}
-
-// --- VYNSTA ID GENERATOR ---
-function generateMemorableID() {
-    const adjectives = ['Neon', 'Stealth', 'Cyber', 'Dark', 'Ghost', 'Nova', 'Phantom', 'Volt', 'Rogue', 'Apex'];
-    const nouns = ['Wolf', 'Hawk', 'Viper', 'Raven', 'Fox', 'Dragon', 'Tiger', 'Lynx', 'Bear', 'Titan'];
-    const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
-    const noun = nouns[Math.floor(Math.random() * nouns.length)];
-    const num = Math.floor(Math.random() * 90) + 10;
-    return `${adj}${noun}${num}`;
-}
-
-// --- AUTHENTICATION LOGIC ---
-window.handleSignUp = async () => {
-    const email = document.getElementById('auth-email').value.trim();
-    const pass = document.getElementById('auth-password').value.trim();
-    if(!email || !pass) return showCustomDialog('Error', 'Please enter an email and password.');
-    
-    try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-        const user = userCredential.user;
-        const newVynstaID = generateMemorableID();
-        
-        await set(ref(db, `users/${user.uid}`), {
-            email: email, vynstaId: newVynstaID, username: newVynstaID,
-            createdAt: serverTimestamp(), lastSeen: serverTimestamp()
-        });
-        
-        await set(ref(db, `users/${user.uid}/friends/${user.uid}`), {
-            vynstaId: newVynstaID + " (You)", addedAt: serverTimestamp()
-        });
-        
-        showCustomDialog('Welcome!', `Account created! Your unique Vynsta ID is ${newVynstaID}. Share it to connect.`);
-    } catch (e) { showCustomDialog('Sign Up Failed', e.message); }
-};
-
-window.handleLogin = async () => {
-    const email = document.getElementById('auth-email').value.trim();
-    const pass = document.getElementById('auth-password').value.trim();
-    if(!email || !pass) return showCustomDialog('Error', 'Please enter your email and password.');
-    
-    try { await signInWithEmailAndPassword(auth, email, pass); } 
-    catch (e) { showCustomDialog('Login Failed', 'Invalid email or password.'); }
-};
-
-window.handleGoogleSignIn = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-        // Check if user exists in DB, if not create default data
-        const snap = await get(ref(db, `users/${user.uid}`));
-        if (!snap.exists()) {
-            const newVynstaID = generateMemorableID();
-            await set(ref(db, `users/${user.uid}`), {
-                email: user.email,
-                vynstaId: newVynstaID,
-                username: user.displayName || newVynstaID,
-                photoURL: user.photoURL || '',
-                createdAt: serverTimestamp(),
-                lastSeen: serverTimestamp()
-            });
-            await set(ref(db, `users/${user.uid}/friends/${user.uid}`), {
-                vynstaId: newVynstaID + " (You)", addedAt: serverTimestamp()
-            });
-        }
-        // Auth state listener handles transition UI
-    } catch(error) {
-        showCustomDialog('Google Sign-In Failed', error.message);
-    }
-};
-
-window.handleGuestMode = () => {
-    window.isGuest = true;
-    window.currentUser = window.guestUser;
-    window.currentVynstaId = "Guest_" + Math.floor(Math.random() * 10000);
-    window.currentUserAvatar = 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png';
-
-    document.getElementById('display-vynsta-id').textContent = window.currentVynstaId;
-    document.getElementById('display-email').textContent = window.currentUser.email;
-    document.getElementById('profile-letter').textContent = "G";
-    document.getElementById('profile-avatar-img').style.display = 'none';
-    document.getElementById('profile-letter').style.display = 'flex';
-
-    document.getElementById('splash-screen').style.display = 'none';
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('main-app').style.display = 'flex';
-
-    document.getElementById('private-chats-list').innerHTML = '<div style="padding: 20px; text-align: center; color: var(--wa-text-muted);">Sign in to add friends and view private chats.</div>';
-
-    listenToChatPreview('global', true);
-    loadFeed();
-};
-
-window.handleLogout = async () => {
-    try {
-        if (window.isGuest) {
-            window.isGuest = false;
-            window.currentUser = null;
-            window.currentVynstaId = null;
-            document.getElementById('main-app').style.display = 'none';
-            document.getElementById('splash-screen').style.display = 'none';
-            document.getElementById('auth-screen').style.display = 'flex';
-            friendsLoaded = false;
-            feedLoaded = false;
-            window.unreadCounts = {};
-            updateTotalUnread();
-            document.getElementById('private-chats-list').innerHTML = '';
-            if(currentChatRef) off(currentChatRef);
-            if(feedNotifRef) off(feedNotifRef);
-            off(ref(db, 'feed_posts'));
-            document.getElementById('gb-menu').classList.remove('active');
+        if (!email || !password) {
+            this.showAlert('loginAlert', 'Please enter email and password', 'danger');
             return;
         }
-        await signOut(auth);
-        document.getElementById('main-app').style.display = 'none';
-        document.getElementById('splash-screen').style.display = 'none';
-        document.getElementById('auth-screen').style.display = 'flex';
-        document.getElementById('gb-menu').classList.remove('active');
-        friendsLoaded = false;
-        feedLoaded = false;
-        window.unreadCounts = {};
-        updateTotalUnread();
-        document.getElementById('private-chats-list').innerHTML = '';
-        if(currentChatRef) off(currentChatRef);
-        if(feedNotifRef) off(feedNotifRef);
-        off(ref(db, 'feed_posts')); // Stop listening to feed
-    } catch(e) { showCustomDialog('Error', 'Could not log out.'); }
-};
 
-// UPDATED AUTH STATE LISTENER
-onAuthStateChanged(auth, async (user) => {
-    const minimumSplashTime = new Promise(resolve => setTimeout(resolve, 1200));
-    
-    if (user && !window.isGuest) {
-        window.currentUser = user;
-        requestNotificationPermission();
-        window.updateLastSeen();
-        
-        onValue(ref(db, `users/${user.uid}/blocked`), (snap) => {
-            window.blockedUsers = snap.val() || {};
-            renderBlockedUsers();
-        });
-        
-        const snapshot = await get(ref(db, `users/${user.uid}`));
-        if(snapshot.exists()) {
-            const data = snapshot.val();
-            window.currentVynstaId = data.vynstaId || data.vynixId || data.username;
-            document.getElementById('display-vynsta-id').textContent = window.currentVynstaId;
-            
-            if (data.photoURL) {
-                window.currentUserAvatar = data.photoURL;
-                document.getElementById('profile-avatar-img').src = data.photoURL;
-                document.getElementById('profile-avatar-img').style.display = 'block';
-                document.getElementById('profile-letter').style.display = 'none';
+        try {
+            await auth.signInWithEmailAndPassword(email, password);
+        } catch (error) {
+            // If user doesn't exist, create demo account
+            if (error.code === 'auth/user-not-found' && email === 'demo@lender.co.za') {
+                try {
+                    await auth.createUserWithEmailAndPassword(email, password);
+                } catch (createError) {
+                    this.showAlert('loginAlert', createError.message, 'danger');
+                }
             } else {
-                document.getElementById('profile-letter').textContent = window.currentVynstaId.charAt(0).toUpperCase();
+                this.showAlert('loginAlert', error.message, 'danger');
             }
-            
-            document.getElementById('feed-composer-avatar').src = window.currentUserAvatar;
-            
-            if (!data.friends || !data.friends[user.uid]) {
-                await set(ref(db, `users/${user.uid}/friends/${user.uid}`), {
-                    vynstaId: window.currentVynstaId + " (You)", addedAt: serverTimestamp()
+        }
+    },
+
+    logout() {
+        auth.signOut();
+    },
+
+    onAuthStateChanged(user) {
+        if (user) {
+            this.currentUser = user;
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('userEmail').textContent = user.email;
+            this.loadData();
+        } else {
+            this.currentUser = null;
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+        }
+    },
+
+    // ============================================
+    // NAVIGATION
+    // ============================================
+    switchTab(tabName) {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+
+        event.target.classList.add('active');
+        document.getElementById('tab-' + tabName).classList.add('active');
+
+        if (tabName === 'dashboard') this.updateDashboard();
+        if (tabName === 'portfolio') this.loadPortfolio();
+    },
+
+    // ============================================
+    // DATA LOADING
+    // ============================================
+    async loadData() {
+        const userId = this.currentUser.uid;
+
+        // Load settings
+        const settingsSnap = await db.ref('users/' + userId + '/settings').once('value');
+        if (settingsSnap.exists()) {
+            this.settings = settingsSnap.val();
+            document.getElementById('threshApprove').value = this.settings.approveThreshold;
+            document.getElementById('threshReject').value = this.settings.rejectThreshold;
+            document.getElementById('reviewLow').textContent = this.settings.approveThreshold;
+            document.getElementById('reviewHigh').textContent = this.settings.rejectThreshold;
+        }
+
+        // Load assessments
+        const assessmentsSnap = await db.ref('users/' + userId + '/assessments').once('value');
+        if (assessmentsSnap.exists()) {
+            const data = assessmentsSnap.val();
+            this.assessments = Object.values(data).sort((a, b) => b.timestamp - a.timestamp);
+        }
+
+        // Load current model
+        const modelSnap = await db.ref('users/' + userId + '/currentModel').once('value');
+        if (modelSnap.exists()) {
+            const modelData = modelSnap.val();
+            this.currentModel = new brain.NeuralNetwork();
+            this.currentModel.fromJSON(modelData);
+            this.updateModelStatus(true, modelData.name || 'Unnamed Model');
+        } else {
+            this.updateModelStatus(false);
+        }
+
+        this.updateDashboard();
+    },
+
+    updateModelStatus(ready, name) {
+        const el = document.getElementById('modelStatus');
+        if (ready) {
+            el.innerHTML = `<div class="alert alert-success">✅ Model loaded: <strong>${name}</strong>. Ready for assessments.</div>`;
+            document.getElementById('assessBtn').disabled = false;
+        } else {
+            el.innerHTML = `<div class="alert alert-warning">⚠️ No trained model found. Please train a model first.</div>`;
+            document.getElementById('assessBtn').disabled = true;
+        }
+    },
+
+    // ============================================
+    // DASHBOARD
+    // ============================================
+    updateDashboard() {
+        const total = this.assessments.length;
+        const approved = this.assessments.filter(a => a.recommendation === 'APPROVE').length;
+        const avgRisk = total > 0 ? (this.assessments.reduce((s, a) => s + a.riskScore, 0) / total) : 0;
+
+        document.getElementById('dashTotalAssessments').textContent = total;
+        document.getElementById('dashApprovalRate').textContent = total > 0 ? Math.round((approved / total) * 100) + '%' : '0%';
+        document.getElementById('dashAvgRisk').textContent = Math.round(avgRisk * 100) + '%';
+
+        const low = this.assessments.filter(a => a.riskScore <= 0.35).length;
+        const medium = this.assessments.filter(a => a.riskScore > 0.35 && a.riskScore < 0.60).length;
+        const high = this.assessments.filter(a => a.riskScore >= 0.60).length;
+
+        document.getElementById('countLow').textContent = low;
+        document.getElementById('countMedium').textContent = medium;
+        document.getElementById('countHigh').textContent = high;
+
+        const maxCount = Math.max(low, medium, high, 1);
+        document.getElementById('barLow').style.width = (low / maxCount * 100) + '%';
+        document.getElementById('barMedium').style.width = (medium / maxCount * 100) + '%';
+        document.getElementById('barHigh').style.width = (high / maxCount * 100) + '%';
+
+        const recent = this.assessments.slice(0, 5);
+        const activityHtml = recent.length > 0 ? recent.map(a => `
+            <div style="padding:8px 0; border-bottom:1px solid var(--border); font-size:0.85rem;">
+                <strong>${a.applicantName}</strong> — ${a.businessName}<br>
+                <span style="color:var(--text-muted);">Risk: ${Math.round(a.riskScore * 100)}% | ${a.recommendation}</span>
+            </div>
+        `).join('') : '<p style="color:var(--text-muted); font-size:0.9rem;">No recent assessments</p>';
+        document.getElementById('recentActivity').innerHTML = activityHtml;
+    },
+
+    // ============================================
+    // PDF PARSING & FEATURE EXTRACTION
+    // ============================================
+    async handlePdfUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        document.getElementById('pdfName').textContent = `Selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        document.getElementById('assessBtn').disabled = false;
+
+        // Store file reference for processing
+        this.currentPdfFile = file;
+    },
+
+    async parsePdf(file) {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+        let fullText = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(item => item.str).join(' ');
+            fullText += pageText + ' ';
+        }
+
+        return this.extractTransactionsFromText(fullText);
+    },
+
+    extractTransactionsFromText(text) {
+        // This is a heuristic parser for South African bank statements
+        // Real implementation would need format-specific parsers for FNB, ABSA, Standard Bank, etc.
+
+        const lines = text.split(/
+|
+/).filter(l => l.trim());
+        const transactions = [];
+        const balances = [];
+
+        // Common patterns in SA bank statements
+        const amountPattern = /(?:R\s?)?([0-9,]+\.\d{2})/g;
+        const datePattern = /(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/;
+
+        for (const line of lines) {
+            const amounts = [...line.matchAll(/-?R?\s?([0-9,]+\.\d{2})/g)].map(m => parseFloat(m[1].replace(',', '')));
+            const dateMatch = line.match(datePattern);
+
+            if (amounts.length > 0 && dateMatch) {
+                const isDebit = line.includes('DEBIT') || line.includes('-R') || line.includes('DR');
+                const isCredit = line.includes('CREDIT') || line.includes('CR') || (!isDebit && amounts.length > 0);
+
+                const amount = amounts[amounts.length - 1]; // Last amount is usually balance or transaction amount
+
+                transactions.push({
+                    date: dateMatch[1],
+                    description: line.substring(0, 50).trim(),
+                    amount: amount,
+                    type: isDebit ? 'debit' : 'credit',
+                    raw: line
                 });
             }
-        } else {
-            window.currentVynstaId = "User_" + user.uid.substring(0,4);
-            document.getElementById('display-vynsta-id').textContent = window.currentVynstaId;
-        }
-        document.getElementById('display-email').textContent = user.email;
-        
-        listenToChatPreview('global', true);
-        listenToFeedNotifications(); 
-        loadFriends();
-        loadFeed(); 
-        
-        await minimumSplashTime;
-        document.getElementById('splash-screen').style.display = 'none';
-        document.getElementById('auth-screen').style.display = 'none';
-        document.getElementById('main-app').style.display = 'flex';
-        
-    } else if (!window.isGuest) {
-        window.currentUser = null;
-        await minimumSplashTime;
-        document.getElementById('splash-screen').style.display = 'none';
-        document.getElementById('main-app').style.display = 'none';
-        document.getElementById('auth-screen').style.display = 'flex';
-    }
-});
 
-// --- FEED (X-STYLE) LOGIC ---
-window.updateFeedPostBtn = () => {
-    const text = document.getElementById('feed-caption-input').value.trim();
-    const btn = document.getElementById('feed-post-btn');
-    if (text || pendingFeedImage) {
-        btn.classList.add('active');
-        btn.disabled = false;
-    } else {
-        btn.classList.remove('active');
+            // Extract balance figures
+            const balanceMatches = line.match(/Balance[\s:]+R?\s?([0-9,]+\.\d{2})/i);
+            if (balanceMatches) {
+                balances.push(parseFloat(balanceMatches[1].replace(',', '')));
+            }
+        }
+
+        return { transactions, balances, rawText: text };
+    },
+
+    calculateFeatures(transactionData) {
+        const { transactions, balances } = transactionData;
+
+        if (transactions.length === 0) {
+            throw new Error('No transactions found in PDF. The statement format may not be supported yet.');
+        }
+
+        // 1. Cash Flow Volatility (std dev of daily net cash flow normalized)
+        const dailyFlows = {};
+        transactions.forEach(t => {
+            const day = t.date;
+            if (!dailyFlows[day]) dailyFlows[day] = 0;
+            dailyFlows[day] += (t.type === 'credit' ? t.amount : -t.amount);
+        });
+        const flows = Object.values(dailyFlows);
+        const mean = flows.reduce((a, b) => a + b, 0) / flows.length;
+        const variance = flows.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / flows.length;
+        const volatility = Math.min(Math.sqrt(variance) / (Math.abs(mean) + 1), 1);
+
+        // 2. End-of-day balance trend (slope normalized)
+        const balanceTrend = balances.length > 1 
+            ? Math.min(Math.max((balances[balances.length - 1] - balances[0]) / (balances[0] + 1), -1), 1)
+            : 0.5;
+        const normalizedTrend = (balanceTrend + 1) / 2; // Convert -1..1 to 0..1
+
+        // 3. Debit to Credit ratio
+        const totalDebits = transactions.filter(t => t.type === 'debit').reduce((s, t) => s + t.amount, 0);
+        const totalCredits = transactions.filter(t => t.type === 'credit').reduce((s, t) => s + t.amount, 0);
+        const debitCreditRatio = totalCredits > 0 ? Math.min(totalDebits / totalCredits, 2) / 2 : 1;
+
+        // 4. Weekend/Evening transactions (heuristic - assume 20% if can't determine)
+        const weekendEveningRatio = 0.2; // Would need timestamp data
+
+        // 5. Reversal/NSF frequency
+        const reversalKeywords = ['reversal', 'returned', 'insufficient', 'nsf', 'dishonoured', 'bounce'];
+        const reversalCount = transactions.filter(t => 
+            reversalKeywords.some(kw => t.description.toLowerCase().includes(kw))
+        ).length;
+        const reversalRatio = Math.min(reversalCount / transactions.length * 5, 1); // Scale up
+
+        // 6. Salary vs Revenue mix (regular monthly deposits = salary-like)
+        const monthlyDeposits = this.detectRegularDeposits(transactions);
+        const salaryMix = Math.min(monthlyDeposits / (totalCredits + 1), 1);
+
+        // 7. Largest single deposit percentage
+        const maxDeposit = Math.max(...transactions.filter(t => t.type === 'credit').map(t => t.amount), 0);
+        const largestDepositRatio = totalCredits > 0 ? Math.min(maxDeposit / totalCredits, 1) : 0;
+
+        // 8. Days with zero balance (estimated from transaction gaps)
+        const zeroBalanceDays = balances.filter(b => b <= 0).length / Math.max(balances.length, 1);
+
+        return {
+            features: [
+                Math.min(Math.max(volatility, 0), 1),
+                Math.min(Math.max(normalizedTrend, 0), 1),
+                Math.min(Math.max(debitCreditRatio, 0), 1),
+                Math.min(Math.max(weekendEveningRatio, 0), 1),
+                Math.min(Math.max(reversalRatio, 0), 1),
+                Math.min(Math.max(salaryMix, 0), 1),
+                Math.min(Math.max(largestDepositRatio, 0), 1),
+                Math.min(Math.max(zeroBalanceDays, 0), 1)
+            ],
+            raw: {
+                totalTransactions: transactions.length,
+                totalDebits,
+                totalCredits,
+                avgBalance: balances.length > 0 ? balances.reduce((a,b) => a+b, 0) / balances.length : 0
+            }
+        };
+    },
+
+    detectRegularDeposits(transactions) {
+        // Simple heuristic: deposits within 5% of each other, monthly
+        const credits = transactions.filter(t => t.type === 'credit').map(t => t.amount).sort((a, b) => a - b);
+        if (credits.length < 3) return 0;
+
+        // Find clusters of similar amounts
+        const clusters = [];
+        let current = [credits[0]];
+        for (let i = 1; i < credits.length; i++) {
+            if (Math.abs(credits[i] - current[0]) / current[0] < 0.15) {
+                current.push(credits[i]);
+            } else {
+                clusters.push(current);
+                current = [credits[i]];
+            }
+        }
+        clusters.push(current);
+
+        const regularCluster = clusters.reduce((max, c) => c.length > max.length ? c : max, clusters[0]);
+        return regularCluster ? regularCluster.reduce((a, b) => a + b, 0) : 0;
+    },
+
+    // ============================================
+    // RISK ASSESSMENT
+    // ============================================
+    async runAssessment() {
+        if (!this.currentModel) {
+            alert('Please train a model first!');
+            return;
+        }
+
+        const name = document.getElementById('appName').value;
+        const business = document.getElementById('appBusiness').value;
+        const amount = document.getElementById('appAmount').value;
+
+        if (!name || !business || !amount || !this.currentPdfFile) {
+            alert('Please fill in all fields and upload a bank statement.');
+            return;
+        }
+
+        const btn = document.getElementById('assessBtn');
         btn.disabled = true;
-    }
-};
+        btn.innerHTML = '<span class="spinner"></span> Processing...';
 
-window.previewFeedImage = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    pendingFeedImage = file;
-    const preview = document.getElementById('feed-media-preview');
-    preview.src = URL.createObjectURL(file);
-    preview.style.display = 'block';
-    window.updateFeedPostBtn();
-};
+        try {
+            // Parse PDF
+            const txData = await this.parsePdf(this.currentPdfFile);
+            const featureData = this.calculateFeatures(txData);
 
-window.submitFeedPost = async () => {
-    const input = document.getElementById('feed-caption-input');
-    const text = input.value.trim();
-    const btn = document.getElementById('feed-post-btn');
-    
-    if (!text && !pendingFeedImage) return;
-    
-    btn.disabled = true;
-    btn.textContent = '...';
-    
-    try {
-        let mediaUrl = null;
-        if (pendingFeedImage) {
-            mediaUrl = await uploadToCloudinary(pendingFeedImage, false);
-        }
-        
-        await push(ref(db, 'feed_posts'), {
-            uid: window.currentUser.uid,
-            username: window.currentVynstaId,
-            userPhoto: window.currentUserAvatar,
-            text: text,
-            mediaUrl: mediaUrl,
-            timestamp: serverTimestamp(),
-            likes: {},
-            comments: {}
-        });
-        
-        input.value = '';
-        pendingFeedImage = null;
-        document.getElementById('feed-media-preview').style.display = 'none';
-        document.getElementById('feed-img-upload').value = '';
-        window.updateFeedPostBtn();
-        
-    } catch (err) {
-        showCustomDialog('Error', 'Failed to post. Check your connection.');
-    } finally {
-        btn.textContent = 'Post';
-    }
-};
+            // Run model
+            const result = this.currentModel.run(featureData.features);
+            const riskScore = result[0];
 
-function sortFeed(postsArray) {
-    const now = Date.now();
-    return postsArray.sort((a, b) => {
-        const ageA = (now - (a.timestamp || now)) / 3600000; 
-        const ageB = (now - (b.timestamp || now)) / 3600000;
-        
-        const likesA = a.likes ? Object.keys(a.likes).length : 0;
-        const commentsA = a.comments ? Object.keys(a.comments).length : 0;
-        
-        const likesB = b.likes ? Object.keys(b.likes).length : 0;
-        const commentsB = b.comments ? Object.keys(b.comments).length : 0;
-        
-        const scoreA = ((likesA * 2) + (commentsA * 3)) / (ageA + 1) + (Math.random() * 2);
-        const scoreB = ((likesB * 2) + (commentsB * 3)) / (ageB + 1) + (Math.random() * 2);
-        
-        return scoreB - scoreA; 
-    });
-}
+            // Determine recommendation
+            let recommendation, statusClass, statusText;
+            if (riskScore <= this.settings.approveThreshold) {
+                recommendation = 'APPROVE';
+                statusClass = 'status-approve';
+                statusText = '✅ APPROVE';
+            } else if (riskScore >= this.settings.rejectThreshold) {
+                recommendation = 'REJECT';
+                statusClass = 'status-reject';
+                statusText = '❌ REJECT';
+            } else {
+                recommendation = 'REVIEW';
+                statusClass = 'status-review';
+                statusText = '⚠️ MANUAL REVIEW';
+            }
 
-function loadFeed() {
-    if (feedLoaded) return;
-    feedLoaded = true;
-    
-    const list = document.getElementById('feed-posts-list');
-    
-    onValue(query(ref(db, 'feed_posts'), limitToLast(100)), (snapshot) => {
-        if (!snapshot.exists()) {
-            list.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--wa-text-muted); font-size: 14px;">No posts yet. Be the first!</div>';
-            return;
-        }
-        
-        const posts = [];
-        snapshot.forEach(child => { posts.push({ id: child.key, ...child.val() }); });
-        
-        const sortedPosts = sortFeed(posts);
-        
-        list.innerHTML = '';
-        sortedPosts.forEach(post => {
-            const isLiked = post.likes && post.likes[window.currentUser?.uid];
-            const likeCount = post.likes ? Object.keys(post.likes).length : 0;
-            const commentCount = post.comments ? Object.keys(post.comments).length : 0;
-            
-            const isOwnPost = window.currentUser && post.uid === window.currentUser.uid && !window.isGuest;
-            const deleteBtnHtml = isOwnPost ? `<i data-feather="trash-2" style="color:#ef4444; cursor:pointer; margin-left:16px; width:18px; height:18px;" onclick="deleteFeedPost('${post.id}')"></i>` : '';
-            
-            const card = document.createElement('div');
-            card.className = 'feed-card';
-            
-            // X-Style layout with 3 dot menu & text formatting
-            card.innerHTML = `
-                <img src="${post.userPhoto || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png'}" class="feed-composer-avatar" onclick="showCustomDialog('Profile', '@${escapeHtml(post.username)}')">
-                <div class="feed-card-main">
-                    <div class="feed-card-header">
-                        <div>
-                            <span class="feed-card-name">${escapeHtml(post.username)}</span>
-                            <span class="feed-card-time" style="margin-left: 8px;">${formatTime(post.timestamp)}</span>
-                        </div>
-                        <div style="display:flex; align-items:center;">
-                            <i data-feather="more-horizontal" style="color:var(--wa-text-muted); cursor:pointer; width:18px; height:18px;" onclick="openPostContext('${post.id}', '${post.uid}', '${escapeHtml(post.username)}', '${post.userPhoto}')"></i>
-                            ${deleteBtnHtml}
-                        </div>
+            // Display result
+            const resultHtml = `
+                <div style="text-align:center; padding:20px;">
+                    <div class="risk-score" style="color: ${riskScore < 0.35 ? 'var(--success)' : riskScore < 0.6 ? 'var(--warning)' : 'var(--danger)'};">
+                        ${Math.round(riskScore * 100)}%
                     </div>
-                    ${post.text ? `<div class="feed-card-text">${formatPostText(post.text)}</div>` : ''}
-                    ${post.mediaUrl ? `<img src="${post.mediaUrl}" class="feed-card-img" onclick="openImageViewer('${post.mediaUrl}')">` : ''}
-                    
-                    <div class="feed-actions">
-                        <div class="feed-action" onclick="openFeedComments('${post.id}')">
-                            <i data-feather="message-circle"></i>
-                            <span>${commentCount > 0 ? commentCount : ''}</span>
-                        </div>
-                        <div class="feed-action" onclick="showCustomDialog('Repost', 'Retweets/Reposts coming soon!')">
-                            <i data-feather="repeat"></i>
-                        </div>
-                        <div class="feed-action ${isLiked ? 'liked' : ''}" onclick="toggleFeedLike('${post.id}', ${isLiked})">
-                            <svg viewBox="0 0 24 24" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                            <span>${likeCount > 0 ? likeCount : ''}</span>
-                        </div>
-                        <div class="feed-action" onclick="showCustomDialog('Share', 'Share functionality coming soon!')">
-                            <i data-feather="share"></i>
-                        </div>
+                    <div class="risk-label ${statusClass}">${statusText}</div>
+                    <div style="margin-top:16px; font-size:0.9rem; color:var(--text-muted);">
+                        Default Probability for R${parseInt(amount).toLocaleString()} loan
+                    </div>
+                </div>
+                <div style="margin-top:20px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.85rem;">
+                        <span>Risk Level</span>
+                        <span>${riskScore < 0.35 ? 'Low' : riskScore < 0.6 ? 'Medium' : 'High'}</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width:${riskScore * 100}%; background: ${riskScore < 0.35 ? 'var(--success)' : riskScore < 0.6 ? 'var(--warning)' : 'var(--danger)'};"></div>
                     </div>
                 </div>
             `;
-            list.appendChild(card);
-        });
-        feather.replace();
-    });
-}
+            document.getElementById('assessResult').innerHTML = resultHtml;
 
-window.toggleFeedLike = async (postId, currentlyLiked) => {
-    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to like posts.');
-    if (!window.currentUser) return;
-    const likeRef = ref(db, `feed_posts/${postId}/likes/${window.currentUser.uid}`);
-    
-    if (!currentlyLiked && navigator.vibrate) navigator.vibrate(30);
-    
-    if (currentlyLiked) await set(likeRef, null);
-    else await set(likeRef, true);
-};
+            // Show features
+            document.getElementById('extractedFeaturesCard').style.display = 'block';
+            const featureNames = [
+                'Cash Flow Volatility',
+                'Balance Trend',
+                'Debit/Credit Ratio',
+                'Weekend/Evening %',
+                'Reversal/NSF Freq',
+                'Salary/Revenue Mix',
+                'Largest Deposit %',
+                'Zero Balance Days'
+            ];
+            document.getElementById('featureList').innerHTML = featureData.features.map((f, i) => `
+                <div class="feature-item">
+                    <span class="feature-name">${featureNames[i]}</span>
+                    <span class="feature-value">${(f * 100).toFixed(1)}%</span>
+                </div>
+            `).join('');
 
-// --- FEED COMMENTS BOTTOM SHEET ---
-window.openFeedComments = (postId) => {
-    currentFeedCommentPostId = postId;
-    document.getElementById('feed-comments-overlay').classList.add('active');
-    loadFeedComments(postId);
+            // Save to Firebase
+            const assessment = {
+                id: Date.now().toString(),
+                timestamp: Date.now(),
+                applicantName: name,
+                businessName: business,
+                loanAmount: parseFloat(amount),
+                riskScore: riskScore,
+                recommendation: recommendation,
+                features: featureData.features,
+                rawStats: featureData.raw,
+                status: 'PENDING'
+            };
 
-    // Disable comment input for guests
-    const commentInput = document.getElementById('feed-comment-input');
-    const commentBtn = commentInput.nextElementSibling || document.querySelector('#feed-comments-sheet .sheet-btn');
-    if (window.isGuest) {
-        commentInput.placeholder = 'Sign in to comment...';
-        commentInput.disabled = true;
-    } else {
-        commentInput.placeholder = 'Add a comment...';
-        commentInput.disabled = false;
-    }
-};
+            await db.ref('users/' + this.currentUser.uid + '/assessments/' + assessment.id).set(assessment);
+            this.assessments.unshift(assessment);
+            this.updateDashboard();
 
-window.closeFeedComments = () => {
-    document.getElementById('feed-comments-overlay').classList.remove('active');
-    currentFeedCommentPostId = null;
-    off(ref(db, `feed_posts/${currentFeedCommentPostId}/comments`)); 
-};
+            // Clear file
+            this.currentPdfFile = null;
+            document.getElementById('pdfName').textContent = '';
+            document.getElementById('pdfFile').value = '';
 
-function loadFeedComments(postId) {
-    const list = document.getElementById('feed-comments-list');
-    list.innerHTML = '<div style="text-align:center; padding: 20px; font-size:13px; color:var(--wa-text-muted);">Loading comments...</div>';
-    
-    onValue(ref(db, `feed_posts/${postId}/comments`), (snapshot) => {
-        list.innerHTML = '';
-        if (!snapshot.exists()) {
-            list.innerHTML = '<div style="text-align:center; padding: 20px; font-size:13px; color:var(--wa-text-muted);">No comments yet.</div>';
-            return;
-        }
-        
-        snapshot.forEach(child => {
-            const c = child.val();
-            const item = document.createElement('div');
-            item.className = 'feed-comment-item';
-            item.innerHTML = `
-                <img src="${c.userPhoto || 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png'}" class="feed-comment-avatar">
-                <div class="feed-comment-body">
-                    <div class="feed-comment-name">${escapeHtml(c.username)} <span style="font-size:11px; color:var(--wa-text-muted); font-weight:normal; margin-left:6px;">${formatTime(c.timestamp)}</span></div>
-                    <div class="feed-comment-text">${formatPostText(c.text)}</div>
+        } catch (error) {
+            console.error(error);
+            document.getElementById('assessResult').innerHTML = `
+                <div class="alert alert-danger">
+                    ❌ Error: ${error.message}<br>
+                    <small>The PDF parser may not support this bank statement format yet. Try a different statement or use manual feature entry.</small>
                 </div>
             `;
-            list.appendChild(item);
-        });
-        
-        list.scrollTop = list.scrollHeight;
-    });
-}
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Calculate Risk Score';
+        }
+    },
 
-window.submitFeedComment = async () => {
-    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to comment.');
-    if (!currentFeedCommentPostId || !window.currentUser) return;
-    const input = document.getElementById('feed-comment-input');
-    const text = input.value.trim();
-    if (!text) return;
-    
-    input.value = '';
-    
-    try {
-        await push(ref(db, `feed_posts/${currentFeedCommentPostId}/comments`), {
-            uid: window.currentUser.uid,
-            username: window.currentVynstaId,
-            userPhoto: window.currentUserAvatar,
-            text: text,
-            timestamp: serverTimestamp()
-        });
-    } catch (e) {
-        showCustomDialog('Error', 'Failed to post comment.');
-    }
-};
+    // ============================================
+    // MODEL TRAINING
+    // ============================================
+    handleCsvUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
 
-// --- PROFILE PICTURE UPLOAD ---
-window.handleProfilePicUpload = async (e) => {
-    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to update your profile.');
-    const file = e.target.files[0];
-    if (!file) return;
-    showCustomDialog('Uploading', 'Updating your profile picture...');
-    try {
-        const photoURL = await uploadToCloudinary(file, true);
-        await update(ref(db, `users/${window.currentUser.uid}`), { photoURL: photoURL });
-        document.getElementById('profile-avatar-img').src = photoURL;
-        document.getElementById('profile-avatar-img').style.display = 'block';
-        document.getElementById('profile-letter').style.display = 'none';
-        window.currentUserAvatar = photoURL;
-        document.getElementById('feed-composer-avatar').src = photoURL;
-        closeCustomDialog();
-    } catch (err) { showCustomDialog('Error', 'Failed to upload image.'); }
-};
+        document.getElementById('csvName').textContent = `Selected: ${file.name}`;
 
-window.handleChatImageUpload = async (e) => {
-    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to send images.');
-    const file = e.target.files[0];
-    if (!file) return;
-    showCustomDialog('Uploading', 'Sending image...');
-    try {
-        const photoURL = await uploadToCloudinary(file, false);
-        await push(ref(db, window.currentChatPath), {
-            uid: window.currentUser.uid, text: "", mediaUrl: photoURL,
-            timestamp: serverTimestamp(), user: { username: window.currentVynstaId || 'User' }
-        });
-        window.updateLastSeen();
-        closeCustomDialog();
-    } catch (err) { showCustomDialog('Error', 'Failed to send image.'); }
-};
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const text = e.target.result;
+            this.trainingData = this.parseCsv(text);
+            document.getElementById('trainBtn').disabled = false;
+            alert(`Loaded ${this.trainingData.length} training examples. Ready to train.`);
+        };
+        reader.readAsText(file);
+    },
 
-// --- ADD FRIEND & FAB LOGIC ---
-window.handleFabClick = () => {
-    const activeTabContainer = document.querySelector('.view-container.active').id;
-    if (window.isGuest) {
-        showCustomDialog('Guest Mode', 'Sign in to use this feature.');
-        return;
-    }
-    if(activeTabContainer === 'tab-chats') {
-        document.getElementById('friend-overlay').classList.add('active');
-        setTimeout(() => document.getElementById('friend-id-input').focus(), 100);
-    } else if (activeTabContainer === 'tab-feed') {
-        document.getElementById('feed-caption-input').focus();
-    } else if (activeTabContainer === 'tab-calls') {
-        showCustomDialog('New Call', 'Select a contact to call.');
-    }
-};
+    parseCsv(text) {
+        const lines = text.trim().split('\n');
+        const data = [];
 
-window.closeFriendSheet = () => { document.getElementById('friend-overlay').classList.remove('active'); document.getElementById('friend-id-input').value = ''; };
+        // Skip header if present
+        const startIdx = lines[0].includes('f1') || lines[0].includes('feature') ? 1 : 0;
 
-window.addFriend = async () => {
-    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to add friends.');
-    const inputId = document.getElementById('friend-id-input').value.trim();
-    if(!inputId) return;
-    
-    const usersRef = ref(db, 'users');
-    const q = query(usersRef, orderByChild('vynstaId'), equalTo(inputId));
-    
-    try {
-        const snapshot = await get(q);
-        if(snapshot.exists()) {
-            let friendUid = null; let friendData = null;
-            snapshot.forEach(child => { friendUid = child.key; friendData = child.val(); });
-            const displayId = friendUid === window.currentUser.uid ? friendData.vynstaId + " (You)" : friendData.vynstaId;
-            
-            if (window.blockedUsers && window.blockedUsers[friendUid]) {
-                return showCustomDialog('Blocked', 'This user is on your blocked list. Unblock them in settings first.');
+        for (let i = startIdx; i < lines.length; i++) {
+            const cols = lines[i].split(',').map(c => parseFloat(c.trim()));
+            if (cols.length >= 9 && cols.every(c => !isNaN(c))) {
+                data.push({
+                    input: cols.slice(0, 8),
+                    output: [cols[8]]
+                });
             }
+        }
 
-            await set(ref(db, `users/${window.currentUser.uid}/friends/${friendUid}`), { vynstaId: displayId, addedAt: serverTimestamp() });
-            if (friendUid !== window.currentUser.uid) {
-                await set(ref(db, `users/${friendUid}/friends/${window.currentUser.uid}`), { vynstaId: window.currentVynstaId, addedAt: serverTimestamp() });
-            }
-            closeFriendSheet();
-            showCustomDialog('Success', `${displayId} added to your chats!`);
-        } else { showCustomDialog('Not Found', 'No user found with that Vynsta ID.'); }
-    } catch(e) { showCustomDialog('Error', 'Failed to search for user.'); }
-};
+        return data;
+    },
 
-function loadFriends() {
-    if(friendsLoaded || !window.currentUser || window.isGuest) return;
-    friendsLoaded = true;
-    
-    const friendsRef = ref(db, `users/${window.currentUser.uid}/friends`);
-    onChildAdded(friendsRef, async (snap) => {
-        const friendUid = snap.key; const friendData = snap.val();
-        
-        if (window.blockedUsers && window.blockedUsers[friendUid]) return;
+    async trainModel() {
+        if (this.trainingData.length < 10) {
+            alert('Need at least 10 training examples. You have ' + this.trainingData.length);
+            return;
+        }
 
-        let avatarUrl = null;
-        try { const fs = await get(ref(db, `users/${friendUid}`)); if(fs.exists()) avatarUrl = fs.val().photoURL; } catch(e) {}
-        renderFriendChat(friendUid, friendData.vynstaId || friendData.vynixId, avatarUrl);
-    });
-}
+        const btn = document.getElementById('trainBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Training...';
 
-function getChatId(uid1, uid2) { return uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`; }
+        const hiddenLayers = document.getElementById('hiddenLayers').value.split(',').map(n => parseInt(n.trim()));
+        const iterations = parseInt(document.getElementById('iterations').value);
+        const modelName = document.getElementById('modelName').value;
 
-function renderFriendChat(uid, vynstaId, avatarUrl) {
-    const list = document.getElementById('private-chats-list');
-    if(document.getElementById(`chat-item-${uid}`)) return;
-    
-    const item = document.createElement('div');
-    item.className = 'chat-list-item'; item.id = `chat-item-${uid}`;
-    
-    let clickTimer = null;
-    let isLongPress = false;
-    
-    const handleOpenChat = () => {
-        if(isLongPress) return; 
-        document.getElementById('chat-room-title-text').textContent = vynstaId;
-        if (avatarUrl) document.getElementById('chat-room-avatar-img').src = avatarUrl;
-        else document.getElementById('chat-room-avatar-img').src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23A8A8A8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="background-color:%23EFEFEF"%3E%3Cpath d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/%3E%3Ccircle cx="12" cy="7" r="4"/%3E%3C/svg%3E';
-        
-        const chatId = getChatId(window.currentUser.uid, uid);
-        resetUnread(uid);
-        openChatRoom(chatId, uid);
-    };
+        const progressEl = document.getElementById('trainProgress');
+        progressEl.innerHTML = '<p>Initializing neural network...</p>';
 
-    item.addEventListener('touchstart', () => {
-        isLongPress = false;
-        clickTimer = setTimeout(() => {
-            isLongPress = true;
-            openChatContext(uid, vynstaId, avatarUrl);
-        }, 600); 
-    }, {passive: true});
-
-    item.addEventListener('touchend', () => { clearTimeout(clickTimer); });
-    item.addEventListener('touchmove', () => { clearTimeout(clickTimer); });
-    
-    item.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        openChatContext(uid, vynstaId, avatarUrl);
-    });
-
-    item.onclick = handleOpenChat;
-    
-    let avatarHtml = avatarUrl ? `<img class="avatar" src="${avatarUrl}">` : `<div class="avatar" style="background: var(--wa-text-main); color: var(--wa-light); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold;">${(vynstaId || 'U').charAt(0).toUpperCase()}</div>`;
-
-    item.innerHTML = `${avatarHtml}<div class="chat-info"><div class="chat-name-row"><span class="chat-name">${escapeHtml(vynstaId)}</span><span class="chat-time" id="time-${uid}"></span></div><div class="chat-msg-row"><span class="chat-msg-text" id="text-${uid}">Tap to open chat...</span><div class="unread-badge" id="unread-${uid}"></div></div></div>`;
-    list.appendChild(item);
-    
-    listenToChatPreview(getChatId(window.currentUser.uid, uid), false, uid);
-}
-
-// --- SWIPE TO SWITCH TABS LOGIC ---
-let touchStartX = 0; let touchStartY = 0;
-const tabsOrder = ['chats', 'feed', 'calls', 'profile'];
-
-document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY; }, {passive: true});
-document.addEventListener('touchend', e => {
-    if(!window.currentUser) return; 
-    if(document.getElementById('chat-room').classList.contains('open')) return;
-    if(document.getElementById('friend-overlay').classList.contains('active')) return;
-    if(document.getElementById('settings-overlay').classList.contains('active')) return;
-    if(document.getElementById('chat-context-overlay').classList.contains('active')) return;
-    if(document.getElementById('post-context-overlay').classList.contains('active')) return;
-    if(document.getElementById('feed-comments-overlay').classList.contains('active')) return;
-    if(document.getElementById('custom-dialog').classList.contains('active')) return;
-    if(document.getElementById('search-overlay').classList.contains('active')) return;
-    if(document.getElementById('image-viewer-overlay').classList.contains('active')) return;
-    if(document.getElementById('webview-overlay').classList.contains('active')) return;
-    
-    const dx = e.changedTouches[0].clientX - touchStartX;
-    const dy = e.changedTouches[0].clientY - touchStartY;
-    
-    if (Math.abs(dx) > 60 && Math.abs(dy) < 50) {
-        const activeTabId = document.querySelector('.view-container.active').id.replace('tab-', '');
-        const currentIndex = tabsOrder.indexOf(activeTabId);
-        
-        if (dx < 0 && currentIndex < tabsOrder.length - 1) switchTab(tabsOrder[currentIndex + 1]);
-        else if (dx > 0 && currentIndex > 0) switchTab(tabsOrder[currentIndex - 1]);
-    }
-}, {passive: true});
-
-// --- CUSTOM DIALOG LOGIC ---
-window.showCustomDialog = (title, message) => { document.getElementById('cd-title').textContent = title; document.getElementById('cd-msg').innerHTML = message; document.getElementById('custom-dialog').classList.add('active'); };
-window.closeCustomDialog = () => { document.getElementById('custom-dialog').classList.remove('active'); };
-
-// --- DARK MODE LOGIC ---
-window.toggleTheme = () => {
-    const doc = document.documentElement;
-    if (doc.getAttribute('data-theme') === 'dark') { doc.removeAttribute('data-theme'); localStorage.setItem('vynsta_theme', 'light'); } 
-    else { doc.setAttribute('data-theme', 'dark'); localStorage.setItem('vynsta_theme', 'dark'); }
-};
-if(localStorage.getItem('vynsta_theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-
-// --- SEARCH LOGIC ---
-window.openSearch = () => { document.getElementById('search-overlay').classList.add('active'); setTimeout(() => document.getElementById('global-search-input').focus(), 100); };
-window.closeSearch = () => { document.getElementById('search-overlay').classList.remove('active'); document.getElementById('global-search-input').value = ''; };
-window.handleGlobalSearch = () => { const query = document.getElementById('global-search-input').value.trim(); if (query) { showCustomDialog('Global Search', 'Searching network for: ' + query); closeSearch(); } };
-
-// --- GLOBAL CLICK LISTENER ---
-document.addEventListener('click', (e) => {
-    const menu = document.getElementById('gb-menu');
-    if(!e.target.closest('.wa-icons') && !e.target.closest('.gb-menu')) menu.classList.remove('active');
-    
-    const searchOverlay = document.getElementById('search-overlay');
-    if (searchOverlay.classList.contains('active')) { if (!e.target.closest('#search-overlay') && !e.target.closest('#search-trigger')) closeSearch(); }
-    
-    const friendOverlay = document.getElementById('friend-overlay');
-    if (friendOverlay.classList.contains('active') && !e.target.closest('#friend-sheet') && !e.target.closest('#main-fab')) closeFriendSheet();
-
-    const settingsOverlay = document.getElementById('settings-overlay');
-    if (settingsOverlay.classList.contains('active') && !e.target.closest('#settings-sheet') && !e.target.closest('.chat-list-item')) closeSettings();
-    
-    const chatContextOverlay = document.getElementById('chat-context-overlay');
-    if (chatContextOverlay.classList.contains('active') && !e.target.closest('#chat-context-sheet')) closeChatContext();
-
-    const postContextOverlay = document.getElementById('post-context-overlay');
-    if (postContextOverlay.classList.contains('active') && !e.target.closest('#post-context-sheet')) closePostContext();
-    
-    const feedCommentsOverlay = document.getElementById('feed-comments-overlay');
-    if (feedCommentsOverlay.classList.contains('active') && !e.target.closest('#feed-comments-sheet') && !e.target.closest('.feed-action')) closeFeedComments();
-});
-
-// --- PROFILE ACTIONS ---
-window.copyVynstaID = () => { 
-    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to get your Vynsta ID.');
-    if(window.currentVynstaId) { navigator.clipboard.writeText(window.currentVynstaId).then(() => { showCustomDialog('Copied', `Your Vynsta ID (${window.currentVynstaId}) was copied to your clipboard.`); }); } 
-};
-
-// --- UTILS ---
-function formatTime(timestamp) { 
-    if (!timestamp) return ''; const d = new Date(timestamp); const now = new Date();
-    if (d.toDateString() === now.toDateString()) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); 
-    const yest = new Date(); yest.setDate(yest.getDate() - 1);
-    if (d.toDateString() === yest.toDateString()) return 'Yesterday';
-    return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
-}
-function stringToColor(str) { let hash = 0; for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash); const c = (hash & 0x00FFFFFF).toString(16).toUpperCase(); return '#' + "00000".substring(0, 6 - c.length) + c; }
-function escapeHtml(text) { return (text || '').toString().replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]); }
-
-// --- UI TOGGLES ---
-window.switchTab = (tabId) => {
-    document.querySelectorAll('.wa-tab').forEach(t => t.classList.remove('active'));
-    const targetTab = document.querySelector(`.wa-tab[onclick="switchTab('${tabId}')"]`);
-    if(targetTab) targetTab.classList.add('active');
-    
-    document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
-    document.getElementById('tab-' + tabId).classList.add('active');
-
-    const fab = document.getElementById('main-fab');
-    if(tabId === 'chats') { fab.style.display = 'flex'; fab.innerHTML = '<i data-feather="message-square"></i>'; }
-    else if(tabId === 'feed') { fab.style.display = 'flex'; fab.innerHTML = '<i data-feather="edit-2"></i>'; }
-    else if(tabId === 'calls') { fab.style.display = 'flex'; fab.innerHTML = '<i data-feather="phone-call"></i>'; }
-    else if(tabId === 'profile') { fab.style.display = 'none'; } 
-    feather.replace();
-}
-
-// --- DYNAMIC CHAT LOADING & HISTORY API ---
-window.openGlobalChat = () => {
-    document.getElementById('chat-room-title-text').textContent = 'Vynsta Mainnet';
-    document.getElementById('chat-room-avatar-img').src = 'https://i.postimg.cc/T3Nv0Szn/Gemini-Generated-Image-g7omg8g7omg8g7om-removebg-preview.png';
-    if (!window.isGuest) resetUnread('global');
-    openChatRoom('global');
-};
-
-window.openChatRoom = (chatId, friendUid = null) => {
-    document.getElementById('chat-room').classList.add('open');
-    if (location.hash !== '#chat') history.pushState(null, '', '#chat');
-
-    // Guest mode: disable input
-    const msgInput = document.getElementById('msg-input');
-    const sendBtn = document.getElementById('send-btn');
-    if (window.isGuest) {
-        msgInput.placeholder = 'Sign in to send messages...';
-        msgInput.disabled = true;
-        sendBtn.style.opacity = '0.4';
-    } else {
-        msgInput.placeholder = 'Message';
-        msgInput.disabled = false;
-        sendBtn.style.opacity = '1';
-    }
-    
-    if (chatId === 'global') document.getElementById('chat-room-subtitle').textContent = 'Global encrypted channel';
-    else if (friendUid === window.currentUser.uid) document.getElementById('chat-room-subtitle').textContent = 'Message yourself';
-    else if (friendUid) {
-        document.getElementById('chat-room-subtitle').textContent = 'loading...';
-        get(ref(db, `users/${friendUid}/lastSeen`)).then(snap => {
-            if(snap.exists()) {
-                const ls = snap.val();
-                if(Date.now() - ls < 60000) document.getElementById('chat-room-subtitle').textContent = 'online';
-                else document.getElementById('chat-room-subtitle').textContent = `last seen ${formatTime(ls)}`;
-            } else document.getElementById('chat-room-subtitle').textContent = 'Private encrypted chat';
+        // Create and train
+        const net = new brain.NeuralNetwork({
+            hiddenLayers: hiddenLayers,
+            activation: 'sigmoid'
         });
+
+        // Split for validation
+        const splitIdx = Math.floor(this.trainingData.length * 0.8);
+        const trainSet = this.trainingData.slice(0, splitIdx);
+        const testSet = this.trainingData.slice(splitIdx);
+
+        progressEl.innerHTML = `<p>Training on ${trainSet.length} examples...</p><div class="progress-bar"><div class="progress-fill" id="trainBar" style="width:0%; background:var(--primary);"></div></div>`;
+
+        // Train with progress logging
+        const result = net.train(trainSet, {
+            iterations: iterations,
+            errorThresh: 0.005,
+            log: true,
+            logPeriod: Math.max(Math.floor(iterations / 20), 100),
+            callback: (stats) => {
+                const pct = Math.round((stats.iterations / iterations) * 100);
+                document.getElementById('trainBar').style.width = pct + '%';
+                progressEl.innerHTML = `
+                    <p>Iteration ${stats.iterations}/${iterations} — Error: ${stats.error.toFixed(5)}</p>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%; background:var(--primary);"></div></div>
+                `;
+            }
+        });
+
+        // Validate
+        let correct = 0;
+        testSet.forEach(ex => {
+            const pred = net.run(ex.input)[0];
+            const actual = ex.output[0];
+            const predClass = pred > 0.5 ? 1 : 0;
+            if (predClass === actual) correct++;
+        });
+        const accuracy = testSet.length > 0 ? (correct / testSet.length * 100).toFixed(1) : 'N/A';
+
+        // Save model
+        this.currentModel = net;
+        const modelJson = net.toJSON();
+
+        await db.ref('users/' + this.currentUser.uid + '/currentModel').set({
+            ...modelJson,
+            name: modelName,
+            trainedAt: Date.now(),
+            trainingSize: this.trainingData.length,
+            accuracy: accuracy,
+            iterations: result.iterations,
+            error: result.error
+        });
+
+        progressEl.innerHTML = `
+            <div class="alert alert-success">
+                ✅ Model trained successfully!<br>
+                <strong>Name:</strong> ${modelName}<br>
+                <strong>Training examples:</strong> ${this.trainingData.length}<br>
+                <strong>Iterations:</strong> ${result.iterations}<br>
+                <strong>Final error:</strong> ${result.error.toFixed(5)}<br>
+                <strong>Test accuracy:</strong> ${accuracy}%
+            </div>
+        `;
+
+        this.updateModelStatus(true, modelName);
+        btn.disabled = false;
+        btn.innerHTML = '🧠 Train Neural Network';
+    },
+
+    // Manual training
+    addManualTraining() {
+        const features = [
+            parseFloat(document.getElementById('mtF1').value),
+            parseFloat(document.getElementById('mtF2').value),
+            parseFloat(document.getElementById('mtF3').value),
+            parseFloat(document.getElementById('mtF4').value),
+            parseFloat(document.getElementById('mtF5').value),
+            parseFloat(document.getElementById('mtF6').value),
+            parseFloat(document.getElementById('mtF7').value),
+            parseFloat(document.getElementById('mtF8').value)
+        ];
+        const outcome = parseInt(document.getElementById('mtOutcome').value);
+
+        this.manualTrainingData.push({ input: features, output: [outcome] });
+
+        document.getElementById('manualExamples').innerHTML = `
+            <p style="font-size:0.85rem; color:var(--text-muted);">${this.manualTrainingData.length} examples added</p>
+            <pre style="font-size:0.75rem; margin-top:8px;">${JSON.stringify(this.manualTrainingData.slice(-3), null, 2)}</pre>
+        `;
+    },
+
+    async trainManualModel() {
+        if (this.manualTrainingData.length < 5) {
+            alert('Add at least 5 examples first');
+            return;
+        }
+
+        this.trainingData = this.manualTrainingData;
+        document.getElementById('trainBtn').disabled = false;
+        this.trainModel();
+    },
+
+    // ============================================
+    // PORTFOLIO
+    // ============================================
+    loadPortfolio() {
+        const tbody = document.getElementById('portfolioTable');
+
+        if (this.assessments.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No assessments yet</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = this.assessments.map(a => {
+            const date = new Date(a.timestamp).toLocaleDateString('en-ZA');
+            const statusClass = a.recommendation === 'APPROVE' ? 'status-approve' : 
+                               a.recommendation === 'REJECT' ? 'status-reject' : 'status-review';
+            return `
+                <tr>
+                    <td>${date}</td>
+                    <td>${a.applicantName}</td>
+                    <td>${a.businessName}</td>
+                    <td>R${a.loanAmount.toLocaleString()}</td>
+                    <td>${Math.round(a.riskScore * 100)}%</td>
+                    <td><span class="status-badge ${statusClass}">${a.recommendation}</span></td>
+                    <td>${a.status}</td>
+                </tr>
+            `;
+        }).join('');
+    },
+
+    // ============================================
+    // SETTINGS
+    // ============================================
+    async saveSettings() {
+        this.settings.approveThreshold = parseFloat(document.getElementById('threshApprove').value);
+        this.settings.rejectThreshold = parseFloat(document.getElementById('threshReject').value);
+
+        document.getElementById('reviewLow').textContent = this.settings.approveThreshold;
+        document.getElementById('reviewHigh').textContent = this.settings.rejectThreshold;
+
+        await db.ref('users/' + this.currentUser.uid + '/settings').set(this.settings);
+        alert('Settings saved!');
+    },
+
+    exportData() {
+        if (this.assessments.length === 0) {
+            alert('No data to export');
+            return;
+        }
+
+        const headers = ['Date', 'Applicant', 'Business', 'Amount', 'RiskScore', 'Recommendation', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8'];
+        const rows = this.assessments.map(a => [
+            new Date(a.timestamp).toISOString(),
+            a.applicantName,
+            a.businessName,
+            a.loanAmount,
+            a.riskScore,
+            a.recommendation,
+            ...a.features
+        ]);
+
+        const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `sme-assessments-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    },
+
+    async clearAssessments() {
+        if (!confirm('Delete all assessment data? This cannot be undone.')) return;
+        await db.ref('users/' + this.currentUser.uid + '/assessments').remove();
+        this.assessments = [];
+        this.updateDashboard();
+        this.loadPortfolio();
+        alert('All assessments cleared');
+    },
+
+    async clearModels() {
+        if (!confirm('Delete all trained models?')) return;
+        await db.ref('users/' + this.currentUser.uid + '/currentModel').remove();
+        this.currentModel = null;
+        this.updateModelStatus(false);
+        alert('Models deleted');
+    },
+
+    // ============================================
+    // UTILITIES
+    // ============================================
+    showAlert(id, message, type) {
+        const el = document.getElementById(id);
+        el.className = `alert alert-${type}`;
+        el.textContent = message;
+        setTimeout(() => el.textContent = '', 5000);
     }
-    loadChat(chatId);
-}
+};
 
-window.uiCloseChatRoom = () => { 
-    if(location.hash === '#chat') history.back(); 
-    else window.doCloseChatRoom(); 
-    // Reset input state
-    const msgInput = document.getElementById('msg-input');
-    msgInput.placeholder = 'Message';
-    msgInput.disabled = false;
-    document.getElementById('send-btn').style.opacity = '1';
-}
-window.doCloseChatRoom = () => { 
-    document.getElementById('chat-room').classList.remove('open'); 
-    window.currentChatPath = null; 
-    if(currentChatRef) off(currentChatRef); 
-}
+// Initialize auth listener
+auth.onAuthStateChanged((user) => app.onAuthStateChanged(user));
 
-// UPDATED POPSTATE ROUTING
-window.addEventListener('popstate', (e) => {
-    const hash = location.hash;
-    
-    document.getElementById('image-viewer-overlay').classList.remove('active');
-    document.getElementById('chat-context-overlay').classList.remove('active');
-    document.getElementById('post-context-overlay').classList.remove('active');
-    closeSearch(); 
-    closeFriendSheet(); 
-    closeSettings();
-    closeCustomDialog(); 
-    closeFeedComments();
-
-    if (hash === '#webview') {
-        document.getElementById('webview-overlay').classList.add('active');
-    } else {
-        document.getElementById('webview-overlay').classList.remove('active');
-        document.getElementById('webview-frame').src = '';
-    }
-
-    if (hash === '#chat') {
-        document.getElementById('chat-room').classList.add('open');
-    } else if (hash === '') {
-        window.doCloseChatRoom();
+// Drag and drop for PDF
+document.addEventListener('DOMContentLoaded', () => {
+    const uploadArea = document.getElementById('pdfUpload');
+    if (uploadArea) {
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('pdfFile').files = files;
+                app.handlePdfUpload({ target: { files } });
+            }
+        });
     }
 });
-
-window.toggleMicSendIcon = () => {
-    const input = document.getElementById('msg-input').value.trim();
-    const icon = document.getElementById('action-icon');
-    if(input.length > 0) icon.setAttribute('data-feather', 'send'); else icon.setAttribute('data-feather', 'mic');
-    feather.replace();
-}
-
-function loadChat(chatId) {
-    const container = document.getElementById('messages-container');
-    container.innerHTML = `<div style="text-align:center; padding: 20px; font-size: 12px; color: var(--wa-text-muted); background: var(--wa-light); border-radius: 8px; margin: 10px auto; width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1);"><i data-feather="lock" style="width:10px;height:10px;"></i> Messages are end-to-end encrypted. No one outside of this chat can read or listen to them.</div>`;
-    feather.replace();
-    
-    if (currentChatRef) off(currentChatRef);
-    window.currentChatPath = chatId === 'global' ? 'posts' : `chats/${chatId}/messages`;
-    currentChatRef = query(ref(db, window.currentChatPath), limitToLast(50));
-    
-    onChildAdded(currentChatRef, (snapshot) => {
-        const post = snapshot.val();
-        const isSelf = window.currentUser && post.uid === window.currentUser.uid;
-        const username = post.user?.username || 'User';
-        const time = formatTime(post.timestamp);
-        const nameColor = stringToColor(username);
-        
-        let contentHtml = escapeHtml(post.text);
-        
-        // Full-screen image viewer inside chat
-        if(post.mediaUrl) contentHtml = `<img src="${post.mediaUrl}" style="max-width:100%; border-radius:8px; margin-bottom:4px; cursor:pointer;" onclick="openImageViewer('${post.mediaUrl}')"><div style="margin-top: 4px;">${contentHtml}</div>`;
-
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `message-wrapper ${isSelf ? 'sent' : 'recv'}`;
-        const nameHtml = (!isSelf && chatId === 'global') ? `<div class="sender-name" style="color: ${nameColor}">${escapeHtml(username)}</div>` : '';
-        const ticksHtml = isSelf ? `<i data-feather="check-all" style="width:14px; height:14px; color: var(--wa-blue-tick);"></i>` : '';
-
-        msgDiv.innerHTML = `<div class="bubble">${nameHtml}${contentHtml}<div class="msg-time-ticks">${time} ${ticksHtml}</div></div>`;
-        container.appendChild(msgDiv);
-        container.scrollTop = container.scrollHeight;
-        feather.replace();
-    });
-}
-
-// --- SEND MESSAGE ---
-window.sendMessage = async () => {
-    if (window.isGuest) return showCustomDialog('Guest Mode', 'Sign in to send messages.');
-    const input = document.getElementById('msg-input');
-    const text = input.value.trim();
-    if(!text) return showCustomDialog('Action Blocked', 'Voice messages are disabled in GB Ghost Mode.');
-    if (!window.currentUser) return;
-    
-    input.value = ''; window.toggleMicSendIcon(); input.focus();
-
-    try {
-        await push(ref(db, window.currentChatPath), {
-            uid: window.currentUser.uid, text: text, timestamp: serverTimestamp(),
-            user: { username: window.currentVynstaId || 'User' } 
-        });
-        window.updateLastSeen();
-        if(navigator.vibrate) navigator.vibrate(20);
-    } catch (e) { showCustomDialog('Error', 'Send failed. Please check your connection.'); }
-}
-
-feather.replace();
 </script>
+
 </body>
 </html>
