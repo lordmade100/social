@@ -13,6 +13,8 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -369,24 +371,19 @@
 
         <div class="form-group">
             <label>Email</label>
-            <input type="email" id="loginEmail" placeholder="lender@example.co.za" value="">
+            <input type="email" id="loginEmail" placeholder="lender@example.com" value="">
         </div>
         <div class="form-group">
             <label>Password</label>
             <input type="password" id="loginPassword" placeholder="••••••••" value="">
         </div>
 
-        <div style="display: flex; gap: 12px; margin-top: 8px;">
-            <button class="btn btn-primary" style="flex: 1; justify-content: center;" onclick="app.login()">
-                <span>Sign In</span>
-            </button>
-            <button class="btn btn-secondary" style="flex: 1; justify-content: center;" onclick="app.register()">
-                <span>Sign Up</span>
-            </button>
-        </div>
+        <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="app.login()">
+            <span id="loginBtnText">Sign In</span>
+        </button>
 
         <p style="text-align:center; margin-top:16px; font-size:0.85rem; color:var(--text-muted);">
-            Enter details to Sign In, or click Sign Up to register a new account.
+            Demo: <code>demo@lender.co.za / password123</code>
         </p>
     </div>
 </div>
@@ -534,16 +531,16 @@
                 <div class="card">
                     <h2>📚 Upload Training Data</h2>
                     <div class="alert alert-info">
-                        Upload a CSV with historical loans. Format: 8 feature columns + 1 outcome column (0=repaid, 1=defaulted).
+                        Upload historical loan dataset documents. Format requirement: 8 feature columns + 1 outcome column (0=repaid, 1=defaulted).
                     </div>
 
-                    <div class="upload-area" id="csvUpload" onclick="document.getElementById('csvFile').click()">
+                    <div class="upload-area" id="trainingUpload" onclick="document.getElementById('trainingFile').click()">
                         <p style="font-size:2rem; margin-bottom:8px;">📊</p>
-                        <p style="font-weight:600;">Upload Training CSV</p>
-                        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">Columns: f1,f2,f3,f4,f5,f6,f7,f8,outcome</p>
+                        <p style="font-weight:600;">Upload Dataset File</p>
+                        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">Accepted extensions: .csv, .json, .xlsx, .xls</p>
                     </div>
-                    <input type="file" id="csvFile" accept=".csv" style="display:none;" onchange="app.handleCsvUpload(event)">
-                    <p id="csvName" style="margin-top:8px; font-size:0.85rem; color:var(--text-muted);"></p>
+                    <input type="file" id="trainingFile" accept=".csv, .json, .xlsx, .xls" style="display:none;" onchange="app.handleTrainingUpload(event)">
+                    <p id="trainingFileName" style="margin-top:8px; font-size:0.85rem; color:var(--text-muted);"></p>
 
                     <div class="form-group" style="margin-top:16px;">
                         <label>Model Name</label>
@@ -578,7 +575,7 @@
             <div class="card">
                 <h2>💡 Manual Training (Alternative)</h2>
                 <p style="margin-bottom:12px; color:var(--text-muted);">
-                    If you don't have a CSV, manually add training examples below. Each example needs 8 features and an outcome.
+                    If you don't have a file, manually add training examples below. Each example needs 8 features and an outcome.
                 </p>
 
                 <div class="grid-2">
@@ -768,24 +765,16 @@ const app = {
         try {
             await auth.signInWithEmailAndPassword(email, password);
         } catch (error) {
-            this.showAlert('loginAlert', error.message, 'danger');
-        }
-    },
-
-    async register() {
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-
-        if (!email || !password) {
-            this.showAlert('loginAlert', 'Please enter email and password to register', 'danger');
-            return;
-        }
-
-        try {
-            await auth.createUserWithEmailAndPassword(email, password);
-            this.showAlert('loginAlert', 'Account successfully registered! Logging in...', 'success');
-        } catch (error) {
-            this.showAlert('loginAlert', error.message, 'danger');
+            // If user doesn't exist, create demo account
+            if (error.code === 'auth/user-not-found' && email === 'demo@lender.co.za') {
+                try {
+                    await auth.createUserWithEmailAndPassword(email, password);
+                } catch (createError) {
+                    this.showAlert('loginAlert', createError.message, 'danger');
+                }
+            } else {
+                this.showAlert('loginAlert', error.message, 'danger');
+            }
         }
     },
 
@@ -934,7 +923,7 @@ const app = {
     },
 
     extractTransactionsFromText(text) {
-        const lines = text.split(/[\r\n]+/).filter(l => l.trim());
+        const lines = text.split(/\r?\n/).filter(l => l.trim());
         const transactions = [];
         const balances = [];
 
@@ -1172,38 +1161,118 @@ const app = {
     },
 
     // ============================================
-    // MODEL TRAINING
+    // MULTI-FORMAT MODEL TRAINING
     // ============================================
-    handleCsvUpload(event) {
+    handleTrainingUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
 
-        document.getElementById('csvName').textContent = `Selected: ${file.name}`;
-
+        document.getElementById('trainingFileName').textContent = `Selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        const ext = file.name.split('.').pop().toLowerCase();
         const reader = new FileReader();
-        reader.onload = (e) => {
-            const text = e.target.result;
-            this.trainingData = this.parseCsv(text);
-            document.getElementById('trainBtn').disabled = false;
-            alert(`Loaded ${this.trainingData.length} training examples. Ready to train.`);
-        };
-        reader.readAsText(file);
+
+        if (ext === 'json') {
+            reader.onload = (e) => {
+                try {
+                    this.trainingData = this.parseJson(e.target.result);
+                    document.getElementById('trainBtn').disabled = false;
+                    alert(`Loaded ${this.trainingData.length} examples from JSON successfully.`);
+                } catch (err) {
+                    alert(`JSON Error: ${err.message}`);
+                }
+            };
+            reader.readAsText(file);
+        } 
+        else if (ext === 'xlsx' || ext === 'xls') {
+            reader.onload = (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[sheetName];
+                    // Turn sheet rows into an array of arrays
+                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                    this.trainingData = this.parseArrayRows(rows);
+                    document.getElementById('trainBtn').disabled = false;
+                    alert(`Loaded ${this.trainingData.length} examples from Excel sheet successfully.`);
+                } catch (err) {
+                    alert(`Excel Error: ${err.message}`);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        } 
+        else {
+            // Default treatment as CSV text fallback
+            reader.onload = (e) => {
+                try {
+                    this.trainingData = this.parseCsv(e.target.result);
+                    document.getElementById('trainBtn').disabled = false;
+                    alert(`Loaded ${this.trainingData.length} examples from CSV successfully.`);
+                } catch (err) {
+                    alert(`CSV Error: ${err.message}`);
+                }
+            };
+            reader.readAsText(file);
+        }
     },
 
     parseCsv(text) {
         const lines = text.trim().split('\n');
-        const data = [];
-        const startIdx = lines[0].includes('f1') || lines[0].includes('feature') ? 1 : 0;
+        const rows = lines.map(line => line.split(',').map(c => c.trim()));
+        return this.parseArrayRows(rows);
+    },
 
-        for (let i = startIdx; i < lines.length; i++) {
-            const cols = lines[i].split(',').map(c => parseFloat(c.trim()));
-            if (cols.length >= 9 && cols.every(c => !isNaN(c))) {
-                data.push({
-                    input: cols.slice(0, 8),
-                    output: [cols[8]]
-                });
+    parseJson(text) {
+        const parsed = JSON.parse(text);
+        const data = [];
+
+        if (Array.isArray(parsed)) {
+            parsed.forEach(item => {
+                // Supports explicit structural scheme: { input: [8 features], output: [1 value] }
+                if (item && item.input && Array.isArray(item.input) && item.output && Array.isArray(item.output)) {
+                    if (item.input.length === 8 && item.output.length === 1) {
+                        data.push({
+                            input: item.input.map(Number),
+                            output: item.output.map(Number)
+                        });
+                    }
+                } 
+                // Supports flat arrays format row: [f1, f2, f3, f4, f5, f6, f7, f8, outcome]
+                else if (Array.isArray(item) && item.length >= 9) {
+                    const cleanRow = item.slice(0, 9).map(Number);
+                    if (cleanRow.every(val => !isNaN(val))) {
+                        data.push({
+                            input: cleanRow.slice(0, 8),
+                            output: [cleanRow[8]]
+                        });
+                    }
+                }
+            });
+        }
+        if (data.length === 0) throw new Error("No structured features found match. Expecting arrays or schema elements.");
+        return data;
+    },
+
+    parseArrayRows(rows) {
+        const data = [];
+        if (!rows || rows.length === 0) return data;
+
+        // Skip standard label headers row text automatically if detected
+        const startIdx = (rows[0] && rows[0].some(cell => typeof cell === 'string' && isNaN(parseFloat(cell)))) ? 1 : 0;
+
+        for (let i = startIdx; i < rows.length; i++) {
+            const row = rows[i];
+            if (row && row.length >= 9) {
+                const values = row.slice(0, 9).map(c => parseFloat(c));
+                if (values.every(v => !isNaN(v))) {
+                    data.push({
+                        input: values.slice(0, 8),
+                        output: [values[8]]
+                    });
+                }
             }
         }
+        if (data.length === 0) throw new Error("Could not parse numeric vectors. Check structural layout requirements.");
         return data;
     },
 
@@ -1242,7 +1311,8 @@ const app = {
             logPeriod: Math.max(Math.floor(iterations / 20), 100),
             callback: (stats) => {
                 const pct = Math.round((stats.iterations / iterations) * 100);
-                document.getElementById('trainBar').style.width = pct + '%';
+                const trainBarEl = document.getElementById('trainBar');
+                if(trainBarEl) trainBarEl.style.width = pct + '%';
                 progressEl.innerHTML = `
                     <p>Iteration ${stats.iterations}/${iterations} — Error: ${stats.error.toFixed(5)}</p>
                     <div class="progress-bar"><div class="progress-fill" style="width:${pct}%; background:var(--primary);"></div></div>
@@ -1407,9 +1477,6 @@ const app = {
         alert('Models deleted');
     },
 
-    // ============================================
-    // UTILITIES
-    // ============================================
     showAlert(id, message, type) {
         const el = document.getElementById(id);
         el.className = `alert alert-${type}`;
