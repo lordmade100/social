@@ -8,10 +8,11 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-
-    <script src="https://unpkg.com/brain.js@2.0.0-beta.23/dist/browser.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -20,270 +21,26 @@
             --primary: #1a5f7a;
             --primary-dark: #134b61;
             --secondary: #c84b31;
-            --success: #2d6a4f;
-            --warning: #e9c46a;
+            --success: #1e8e3e;
+            --warning: #f9ab00;
             --danger: #e63946;
-            --bg: #f8f9fa;
+            --bg: #f4f6f9;
             --card: #ffffff;
-            --text: #212529;
-            --text-muted: #6c757d;
-            --border: #dee2e6;
-            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --text: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --shadow: 0 2px 12px rgba(0,0,0,0.07);
+            --radius: 14px;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'DM Sans', -apple-system, sans-serif;
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
         }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-
-        header {
-            background: var(--primary);
-            color: white;
-            padding: 20px 0;
-            box-shadow: var(--shadow);
-        }
-
-        header h1 { font-size: 1.5rem; font-weight: 700; }
-        header p { opacity: 0.9; font-size: 0.9rem; margin-top: 4px; }
-
-        .nav-tabs {
-            display: flex;
-            gap: 8px;
-            margin: 24px 0;
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 0;
-        }
-
-        .nav-tab {
-            padding: 12px 24px;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            font-weight: 600;
-            color: var(--text-muted);
-            transition: all 0.2s;
-        }
-
-        .nav-tab:hover { color: var(--primary); }
-        .nav-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
-
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-
-        .card {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-        }
-
-        .card h2 {
-            font-size: 1.1rem;
-            margin-bottom: 16px;
-            color: var(--primary-dark);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .form-group { margin-bottom: 16px; }
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            font-size: 0.85rem;
-            margin-bottom: 6px;
-            color: var(--text);
-        }
-
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        input[type="number"],
-        input[type="file"] {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.95rem;
-            transition: border 0.2s;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(26,95,122,0.1);
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-        .btn-primary:hover { background: var(--primary-dark); }
-
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-        .btn-success:hover { background: #1b4d3a; }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-        .btn-danger:hover { background: #c1121f; }
-
-        .btn-secondary {
-            background: var(--border);
-            color: var(--text);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .alert {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            font-size: 0.9rem;
-        }
-        .alert-info { background: #e7f3ff; color: #004085; border-left: 4px solid var(--primary); }
-        .alert-success { background: #d4edda; color: #155724; border-left: 4px solid var(--success); }
-        .alert-warning { background: #fff3cd; color: #856404; border-left: 4px solid var(--warning); }
-        .alert-danger { background: #f8d7da; color: #721c24; border-left: 4px solid var(--danger); }
-
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-
-        @media (max-width: 768px) {
-            .grid-2, .grid-3 { grid-template-columns: 1fr; }
-            .nav-tabs { overflow-x: auto; }
-        }
-
-        .metric-card {
-            text-align: center;
-            padding: 20px;
-        }
-
-        .metric-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .metric-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .status-approve { background: #d4edda; color: var(--success); }
-        .status-review { background: #fff3cd; color: #856404; }
-        .status-reject { background: #f8d7da; color: var(--danger); }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        th {
-            font-weight: 700;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        tr:hover { background: #f8f9fa; }
-
-        .progress-bar {
-            height: 8px;
-            background: var(--border);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.5s;
-        }
-
-        .feature-list {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .feature-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 12px;
-            background: #f8f9fa;
-            border-radius: 6px;
-            font-size: 0.85rem;
-        }
-
-        .feature-name { color: var(--text-muted); }
-        .feature-value { font-weight: 700; color: var(--primary); }
-
-        .risk-gauge {
-            width: 200px;
-            height: 100px;
-            margin: 20px auto;
-            position: relative;
-        }
-
-        .risk-score {
-            text-align: center;
-            font-size: 3rem;
-            font-weight: 800;
-        }
-
-        .risk-label {
-            text-align: center;
-            font-size: 1rem;
-            font-weight: 700;
-            margin-top: 8px;
-        }
-
+        /* ── LOGIN ── */
         .login-screen {
             min-height: 100vh;
             display: flex;
@@ -291,132 +48,333 @@
             justify-content: center;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
         }
-
         .login-box {
             background: white;
             padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
             width: 100%;
             max-width: 400px;
         }
+        .login-box h2 { text-align: center; margin-bottom: 6px; color: var(--primary-dark); font-size: 1.4rem; }
+        .login-box p { text-align: center; color: var(--text-muted); margin-bottom: 28px; font-size: 0.9rem; }
 
-        .login-box h2 {
-            text-align: center;
+        /* ── HEADER ── */
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.15);
+        }
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header-brand { display: flex; align-items: center; gap: 10px; }
+        .header-brand h1 { font-size: 1.15rem; font-weight: 700; }
+        .header-brand p { font-size: 0.78rem; opacity: 0.8; }
+        .header-right { display: flex; align-items: center; gap: 10px; }
+        .user-pill { background: rgba(255,255,255,0.15); border-radius: 50px; padding: 6px 14px; font-size: 0.82rem; }
+
+        /* ── LAYOUT ── */
+        .container { max-width: 1280px; margin: 0 auto; padding: 24px; }
+
+        /* ── TABS ── */
+        .nav-tabs {
+            display: flex;
+            gap: 4px;
             margin-bottom: 24px;
+            background: white;
+            border-radius: var(--radius);
+            padding: 6px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .nav-tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            font-size: 0.88rem;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .nav-tab:hover { color: var(--primary); background: var(--bg); }
+        .nav-tab.active { color: var(--primary); background: var(--bg); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ── CARDS ── */
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 18px;
             color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .hidden { display: none !important; }
-
-        .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.8s linear infinite;
+        /* ── FORMS ── */
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-weight: 600; font-size: 0.82rem; margin-bottom: 6px; color: var(--text); text-transform: uppercase; letter-spacing: 0.03em; }
+        input[type="text"], input[type="email"], input[type="password"], input[type="number"] {
+            width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
+            border-radius: 10px; font-size: 0.95rem; font-family: inherit;
+            transition: border 0.2s; background: white; color: var(--text);
         }
+        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,95,122,0.1); }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        /* ── BUTTONS ── */
+        .btn {
+            padding: 11px 22px; border: none; border-radius: 50px;
+            font-weight: 600; cursor: pointer; transition: all 0.2s;
+            font-size: 0.9rem; display: inline-flex; align-items: center; gap: 7px;
+            font-family: inherit;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-secondary { background: var(--border); color: var(--text); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+        .btn-full { width: 100%; justify-content: center; }
 
+        /* ── ALERTS ── */
+        .alert { padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 0.88rem; }
+        .alert-info { background: #eff6ff; color: #1e40af; border-left: 3px solid #3b82f6; }
+        .alert-success { background: #f0fdf4; color: #166534; border-left: 3px solid var(--success); }
+        .alert-warning { background: #fffbeb; color: #92400e; border-left: 3px solid var(--warning); }
+        .alert-danger { background: #fef2f2; color: #991b1b; border-left: 3px solid var(--danger); }
+
+        /* ── GRIDS ── */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+        @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+        /* ── METRIC ── */
+        .metric-card { text-align: center; padding: 24px; }
+        .metric-value { font-size: 2.2rem; font-weight: 800; color: var(--primary); }
+        .metric-label { font-size: 0.82rem; color: var(--text-muted); margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+
+        /* ── STATUS BADGES ── */
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 50px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+        .badge-approve { background: #dcfce7; color: var(--success); }
+        .badge-review { background: #fef9c3; color: #854d0e; }
+        .badge-reject { background: #fee2e2; color: var(--danger); }
+
+        /* ── PROGRESS ── */
+        .progress-bar { height: 8px; background: var(--border); border-radius: 50px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 50px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+
+        /* ── TABLE ── */
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { font-weight: 700; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        tr:hover td { background: #f9fafb; }
+
+        /* ── UPLOAD AREA ── */
         .upload-area {
             border: 2px dashed var(--border);
-            border-radius: 12px;
-            padding: 40px;
+            border-radius: var(--radius);
+            padding: 36px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
         }
+        .upload-area:hover { border-color: var(--primary); background: #f0f7fa; }
+        .upload-area.dragover { border-color: var(--primary); background: rgba(26,95,122,0.06); }
+        .upload-icon { font-size: 2.5rem; margin-bottom: 10px; }
 
-        .upload-area:hover {
-            border-color: var(--primary);
-            background: #f8f9fa;
+        /* ── RISK RESULT ── */
+        .risk-score-display {
+            text-align: center;
+            padding: 32px 20px 24px;
         }
-
-        .upload-area.dragover {
-            border-color: var(--primary);
-            background: rgba(26,95,122,0.05);
+        .risk-number {
+            font-size: 5rem;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 8px;
         }
-
-        .section-title {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            margin: 24px 0 12px;
+        .risk-verdict {
+            font-size: 1.1rem;
             font-weight: 700;
+            padding: 8px 24px;
+            border-radius: 50px;
+            display: inline-block;
+            margin-bottom: 16px;
         }
 
-        pre {
-            background: #f4f4f4;
-            padding: 12px;
-            border-radius: 6px;
-            overflow-x: auto;
-            font-size: 0.8rem;
+        /* ── AI ANALYSIS ── */
+        .ai-analysis {
+            background: linear-gradient(135deg, #f0f7fa 0%, #e8f4f8 100%);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-top: 16px;
+            border: 1px solid #c9dde5;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: var(--text);
         }
+        .ai-analysis h3, .ai-analysis h4 { color: var(--primary-dark); margin-top: 12px; margin-bottom: 6px; font-size: 0.95rem; }
+        .ai-analysis h3:first-child, .ai-analysis h4:first-child { margin-top: 0; }
+        .ai-analysis ul { margin-left: 20px; }
+        .ai-analysis li { margin-bottom: 4px; }
+        .ai-analysis strong { color: var(--primary-dark); }
+        .ai-analysis p { margin-bottom: 8px; }
+        .ai-analysis p:last-child { margin-bottom: 0; }
+        .ai-label { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--primary); margin-bottom: 12px; }
+        .ai-label::before { content: ''; width: 24px; height: 2px; background: var(--primary); border-radius: 2px; }
+        .ai-label::after { content: ''; width: 24px; height: 2px; background: var(--primary); border-radius: 2px; }
+
+        /* ── FEATURE GRID ── */
+        .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .feature-item { background: var(--bg); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border); }
+        .feature-name { font-size: 0.82rem; color: var(--text-muted); font-weight: 500; }
+        .feature-value { font-size: 0.9rem; font-weight: 700; color: var(--primary); }
+        .feature-bar { width: 48px; height: 4px; background: var(--border); border-radius: 2px; margin-top: 4px; overflow: hidden; }
+        .feature-bar-fill { height: 100%; border-radius: 2px; background: var(--primary); }
+
+        /* ── SPINNER ── */
+        .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── THINKING DOTS ── */
+        .thinking-dots { display: inline-flex; gap: 5px; margin-left: 8px; vertical-align: middle; }
+        .thinking-dots span { width: 7px; height: 7px; background: var(--primary); border-radius: 50%; animation: tdot 1.4s infinite; }
+        .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes tdot { 0%,100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } }
+
+        /* ── AI STATUS INDICATOR ── */
+        .ai-status-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: linear-gradient(90deg, rgba(26,95,122,0.1) 0%, rgba(26,95,122,0.05) 100%);
+            border: 1px solid rgba(26,95,122,0.2);
+            border-radius: 50px; padding: 4px 12px; font-size: 0.78rem;
+            font-weight: 600; color: var(--primary); margin-bottom: 16px;
+        }
+        .ai-status-dot { width: 7px; height: 7px; background: var(--success); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100% { box-shadow: 0 0 0 2px rgba(30,142,62,0.2); } 50% { box-shadow: 0 0 0 5px rgba(30,142,62,0); } }
+
+        /* ── SECTION TITLE ── */
+        .section-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); font-weight: 700; margin: 20px 0 10px; }
+
+        /* ── CONTEXT EDITOR ── */
+        .context-textarea {
+            width: 100%; padding: 14px; border: 1.5px solid var(--border);
+            border-radius: 10px; font-size: 0.88rem; font-family: 'DM Sans', monospace;
+            resize: vertical; min-height: 140px; line-height: 1.6; color: var(--text);
+        }
+        .context-textarea:focus { outline: none; border-color: var(--primary); }
+
+        .hidden { display: none !important; }
+
+        /* ── NAV MOBILE ── */
+        @media (max-width: 768px) {
+            .nav-tabs { overflow-x: auto; padding: 4px; }
+            .nav-tab { padding: 9px 14px; font-size: 0.82rem; }
+            .container { padding: 16px; }
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
 <body>
 
+<!-- ══ LOGIN ══ -->
 <div id="loginScreen" class="login-screen">
     <div class="login-box">
-        <h2>🔐 SME Risk Engine</h2>
-        <p style="text-align:center; color: var(--text-muted); margin-bottom: 24px;">South African Microlender AI</p>
-
+        <h2>🏦 SME Risk Engine</h2>
+        <p>AI-powered credit risk scoring for South African SMEs</p>
         <div id="loginAlert"></div>
-
         <div class="form-group">
             <label>Email</label>
-            <input type="email" id="loginEmail" placeholder="lender@example.com" value="">
+            <input type="email" id="loginEmail" placeholder="lender@example.com">
         </div>
         <div class="form-group">
             <label>Password</label>
-            <input type="password" id="loginPassword" placeholder="••••••••" value="">
+            <input type="password" id="loginPassword" placeholder="••••••••">
         </div>
-
-        <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="app.login()">
+        <button class="btn btn-primary btn-full" onclick="app.login()">
             <span id="loginBtnText">Sign In</span>
         </button>
-
-        <p style="text-align:center; margin-top:16px; font-size:0.85rem; color:var(--text-muted);">
+        <p style="text-align:center;margin-top:14px;font-size:0.82rem;color:var(--text-muted);">
             Demo: <code>demo@lender.co.za / password123</code>
         </p>
     </div>
 </div>
 
+<!-- ══ MAIN APP ══ -->
 <div id="mainApp" class="hidden">
     <header>
-        <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
-            <div>
-                <h1>🏦 SME Risk Engine</h1>
-                <p>AI-powered credit risk scoring for South African SMEs</p>
+        <div class="header-inner">
+            <div class="header-brand">
+                <div>
+                    <h1>🏦 SME Risk Engine</h1>
+                    <p>Powered by Grok AI · South African Microlender</p>
+                </div>
             </div>
-            <div style="display:flex; gap:12px; align-items:center;">
-                <span id="userEmail" style="font-size:0.85rem; opacity:0.9;"></span>
-                <button class="btn btn-secondary" onclick="app.logout()" style="font-size:0.8rem;">Logout</button>
+            <div class="header-right">
+                <span class="user-pill" id="userEmail"></span>
+                <button class="btn btn-secondary" style="padding:8px 16px;font-size:0.82rem;" onclick="app.logout()">Logout</button>
             </div>
         </div>
     </header>
 
     <div class="container">
+        <!-- TABS -->
         <div class="nav-tabs">
-            <button class="nav-tab active" onclick="app.switchTab('dashboard')">📊 Dashboard</button>
-            <button class="nav-tab" onclick="app.switchTab('assess')">📝 New Assessment</button>
-            <button class="nav-tab" onclick="app.switchTab('train')">🧠 Train Model</button>
-            <button class="nav-tab" onclick="app.switchTab('portfolio')">📁 Portfolio</button>
-            <button class="nav-tab" onclick="app.switchTab('settings')">⚙️ Settings</button>
+            <button class="nav-tab active" onclick="app.switchTab('dashboard', this)">
+                <i data-feather="bar-chart-2" style="width:16px;height:16px;"></i> Dashboard
+            </button>
+            <button class="nav-tab" onclick="app.switchTab('assess', this)">
+                <i data-feather="file-text" style="width:16px;height:16px;"></i> New Assessment
+            </button>
+            <button class="nav-tab" onclick="app.switchTab('context', this)">
+                <i data-feather="sliders" style="width:16px;height:16px;"></i> AI Context
+            </button>
+            <button class="nav-tab" onclick="app.switchTab('portfolio', this)">
+                <i data-feather="briefcase" style="width:16px;height:16px;"></i> Portfolio
+            </button>
+            <button class="nav-tab" onclick="app.switchTab('settings', this)">
+                <i data-feather="settings" style="width:16px;height:16px;"></i> Settings
+            </button>
         </div>
 
+        <!-- ══ DASHBOARD ══ -->
         <div id="tab-dashboard" class="tab-content active">
             <div class="grid-3">
                 <div class="card metric-card">
-                    <div class="metric-value" id="dashTotalAssessments">0</div>
+                    <div class="metric-value" id="dashTotal">0</div>
                     <div class="metric-label">Total Assessments</div>
                 </div>
                 <div class="card metric-card">
-                    <div class="metric-value" id="dashApprovalRate">0%</div>
+                    <div class="metric-value" id="dashApproval">0%</div>
                     <div class="metric-label">Approval Rate</div>
                 </div>
                 <div class="card metric-card">
@@ -425,226 +383,195 @@
                 </div>
             </div>
 
-            <div class="card">
-                <h2>⚡ Quick Stats</h2>
-                <div class="grid-2">
-                    <div>
-                        <p class="section-title">Risk Distribution</p>
-                        <div id="riskDistribution">
-                            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                                <span>Low Risk (0-35%)</span>
-                                <span id="countLow">0</span>
-                            </div>
-                            <div class="progress-bar"><div class="progress-fill" id="barLow" style="width:0%; background:var(--success);"></div></div>
-
-                            <div style="display:flex; justify-content:space-between; margin:12px 0 8px;">
-                                <span>Medium Risk (35-60%)</span>
-                                <span id="countMedium">0</span>
-                            </div>
-                            <div class="progress-bar"><div class="progress-fill" id="barMedium" style="width:0%; background:var(--warning);"></div></div>
-
-                            <div style="display:flex; justify-content:space-between; margin:12px 0 8px;">
-                                <span>High Risk (60%+)</span>
-                                <span id="countHigh">0</span>
-                            </div>
-                            <div class="progress-bar"><div class="progress-fill" id="barHigh" style="width:0%; background:var(--danger);"></div></div>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title"><i data-feather="activity" style="width:16px;height:16px;"></i> Risk Distribution</div>
+                    <div style="margin-bottom:14px;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.85rem;">
+                            <span>Low Risk (0–35%)</span><span id="countLow" style="font-weight:700;">0</span>
                         </div>
+                        <div class="progress-bar"><div class="progress-fill" id="barLow" style="width:0%;background:var(--success);"></div></div>
+                    </div>
+                    <div style="margin-bottom:14px;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.85rem;">
+                            <span>Medium Risk (35–60%)</span><span id="countMedium" style="font-weight:700;">0</span>
+                        </div>
+                        <div class="progress-bar"><div class="progress-fill" id="barMedium" style="width:0%;background:var(--warning);"></div></div>
                     </div>
                     <div>
-                        <p class="section-title">Recent Activity</p>
-                        <div id="recentActivity" style="max-height:200px; overflow-y:auto;">
-                            <p style="color:var(--text-muted); font-size:0.9rem;">No recent assessments</p>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.85rem;">
+                            <span>High Risk (60%+)</span><span id="countHigh" style="font-weight:700;">0</span>
                         </div>
+                        <div class="progress-bar"><div class="progress-fill" id="barHigh" style="width:0%;background:var(--danger);"></div></div>
                     </div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i data-feather="clock" style="width:16px;height:16px;"></i> Recent Activity</div>
+                    <div id="recentActivity"><p style="color:var(--text-muted);font-size:0.88rem;">No recent assessments</p></div>
                 </div>
             </div>
 
             <div class="card">
-                <h2>📋 Model Status</h2>
-                <div id="modelStatus">
-                    <div class="alert alert-warning">
-                        ⚠️ No trained model found. Please train a model first using historical data.
-                    </div>
+                <div class="card-title"><i data-feather="cpu" style="width:16px;height:16px;"></i> AI Engine Status</div>
+                <div class="ai-status-badge">
+                    <div class="ai-status-dot"></div>
+                    Grok AI · Ready for assessments
                 </div>
+                <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.6;">
+                    This engine uses the <strong>xAI Grok API</strong> to analyse bank statement features and produce detailed credit risk assessments. 
+                    No model training required — Grok reasons directly over extracted financial signals to estimate default probability, explain risk factors, and recommend a lending decision.
+                </p>
             </div>
         </div>
 
+        <!-- ══ ASSESS ══ -->
         <div id="tab-assess" class="tab-content">
             <div class="grid-2">
-                <div class="card">
-                    <h2>📄 Upload Bank Statement</h2>
-                    <div class="alert alert-info">
-                        Upload a 3-month bank statement PDF. We'll extract risk features and calculate default probability.
+                <div>
+                    <div class="card">
+                        <div class="card-title"><i data-feather="upload" style="width:16px;height:16px;"></i> Applicant Details</div>
+                        <div class="form-group">
+                            <label>Applicant Name</label>
+                            <input type="text" id="appName" placeholder="e.g. Thabo Mokoena">
+                        </div>
+                        <div class="form-group">
+                            <label>Business Name</label>
+                            <input type="text" id="appBusiness" placeholder="e.g. Mokoena Logistics">
+                        </div>
+                        <div class="form-group">
+                            <label>Loan Amount (R)</label>
+                            <input type="number" id="appAmount" placeholder="e.g. 50000">
+                        </div>
+                        <div class="form-group">
+                            <label>Business Sector</label>
+                            <select id="appSector" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:0.95rem;color:var(--text);">
+                                <option value="">Select sector...</option>
+                                <option>Retail</option>
+                                <option>Logistics & Transport</option>
+                                <option>Food & Hospitality</option>
+                                <option>Construction</option>
+                                <option>Professional Services</option>
+                                <option>Agriculture</option>
+                                <option>Manufacturing</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label>Applicant Name</label>
-                        <input type="text" id="appName" placeholder="e.g. Thabo Mokoena">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Business Name</label>
-                        <input type="text" id="appBusiness" placeholder="e.g. Mokoena Logistics">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Loan Amount (R)</label>
-                        <input type="number" id="appAmount" placeholder="e.g. 50000">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Bank Statement PDF</label>
+                    <div class="card">
+                        <div class="card-title"><i data-feather="file" style="width:16px;height:16px;"></i> Bank Statement PDF</div>
+                        <div class="alert alert-info">Upload a 3-month bank statement. We'll extract financial signals and send them to Grok AI for risk analysis.</div>
                         <div class="upload-area" id="pdfUpload" onclick="document.getElementById('pdfFile').click()">
-                            <p style="font-size:2rem; margin-bottom:8px;">📤</p>
-                            <p style="font-weight:600;">Click to upload PDF</p>
-                            <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">or drag and drop</p>
+                            <div class="upload-icon">📤</div>
+                            <p style="font-weight:600;margin-bottom:4px;">Click to upload PDF</p>
+                            <p style="font-size:0.82rem;color:var(--text-muted);">or drag and drop · PDF only</p>
                         </div>
                         <input type="file" id="pdfFile" accept=".pdf" style="display:none;" onchange="app.handlePdfUpload(event)">
-                        <p id="pdfName" style="margin-top:8px; font-size:0.85rem; color:var(--text-muted);"></p>
-                    </div>
+                        <p id="pdfName" style="margin-top:10px;font-size:0.82rem;color:var(--text-muted);"></p>
 
-                    <button class="btn btn-primary" id="assessBtn" onclick="app.runAssessment()" disabled>
-                        Calculate Risk Score
-                    </button>
-                </div>
-
-                <div class="card">
-                    <h2>🎯 Risk Assessment Result</h2>
-                    <div id="assessResult">
-                        <p style="text-align:center; color:var(--text-muted); padding:40px 0;">
-                            Upload a bank statement and click "Calculate Risk Score" to see results.
-                        </p>
+                        <div style="margin-top:16px;display:flex;gap:10px;">
+                            <button class="btn btn-primary" id="assessBtn" onclick="app.runAssessment()" disabled>
+                                <i data-feather="zap" style="width:15px;height:15px;"></i>
+                                Run AI Assessment
+                            </button>
+                            <button class="btn btn-secondary" onclick="app.runDemoAssessment()">
+                                <i data-feather="play" style="width:15px;height:15px;"></i>
+                                Try Demo
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="card" id="extractedFeaturesCard" style="display:none;">
-                <h2>🔍 Extracted Features</h2>
-                <div class="feature-list" id="featureList"></div>
+                <div>
+                    <div class="card" style="min-height:340px;">
+                        <div class="card-title"><i data-feather="target" style="width:16px;height:16px;"></i> Risk Assessment Result</div>
+                        <div id="assessResult">
+                            <div style="text-align:center;padding:50px 20px;color:var(--text-muted);">
+                                <i data-feather="shield" style="width:48px;height:48px;opacity:0.2;margin-bottom:12px;"></i>
+                                <p style="font-size:0.9rem;">Upload a bank statement and click<br><strong>Run AI Assessment</strong> to see results.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" id="featuresCard" style="display:none;">
+                        <div class="card-title"><i data-feather="list" style="width:16px;height:16px;"></i> Extracted Financial Signals</div>
+                        <div class="feature-grid" id="featureList"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div id="tab-train" class="tab-content">
+        <!-- ══ AI CONTEXT ══ -->
+        <div id="tab-context" class="tab-content">
             <div class="grid-2">
                 <div class="card">
-                    <h2>📚 Import Training Data</h2>
+                    <div class="card-title"><i data-feather="edit-3" style="width:16px;height:16px;"></i> AI System Context</div>
                     <div class="alert alert-info">
-                        Upload a CSV with historical loans or paste raw data below. Format: 8 feature columns + 1 outcome column (0=repaid, 1=defaulted).
+                        Customise the instructions given to Grok AI when it analyses applications. Add your lending policy, risk appetite, sector-specific notes, or blacklist criteria.
                     </div>
-
-                    <div class="upload-area" id="csvUpload" onclick="document.getElementById('csvFile').click()">
-                        <p style="font-size:2rem; margin-bottom:8px;">📊</p>
-                        <p style="font-weight:600;">Upload Training CSV</p>
-                        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">Columns: f1,f2,f3,f4,f5,f6,f7,f8,outcome</p>
-                    </div>
-                    <input type="file" id="csvFile" accept=".csv" style="display:none;" onchange="app.handleCsvUpload(event)">
-                    <p id="csvName" style="margin-top:8px; font-size:0.85rem; color:var(--text-muted);"></p>
-
-                    <div class="form-group" style="margin-top: 20px;">
-                        <label>... Or Paste Raw CSV Text Data Below</label>
-                        <textarea id="csvPasteArea" rows="6" placeholder="f1,f2,f3,f4,f5,f6,f7,f8,outcome&#10;0.15,0.85,0.35,0.12,0.02,0.75,0.20,0.00,0&#10;0.75,0.22,0.88,0.45,0.65,0.10,0.70,0.45,1" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-family: monospace; font-size: 0.85rem; resize: vertical;"></textarea>
-                        <button class="btn btn-secondary" onclick="app.handleCsvPaste()" style="margin-top: 8px; width: 100%; justify-content: center;">
-                            📋 Parse Pasted Text Data
-                        </button>
-                    </div>
-
-                    <div class="form-group" style="margin-top:16px;">
-                        <label>Model Name</label>
-                        <input type="text" id="modelName" placeholder="e.g. Q1-2024-SME-Model" value="SME-Default-Predictor">
-                    </div>
-
                     <div class="form-group">
-                        <label>Hidden Layers (comma-separated)</label>
-                        <input type="text" id="hiddenLayers" placeholder="16,8" value="16,8">
-                    </div>
+                        <label>System Prompt / Lending Policy</label>
+                        <textarea class="context-textarea" id="systemContext" rows="10">You are a senior credit risk analyst at a South African microlending institution. Your role is to evaluate SME loan applications based on extracted bank statement features.
 
-                    <div class="form-group">
-                        <label>Training Iterations</label>
-                        <input type="number" id="iterations" value="10000" min="1000" max="50000">
-                    </div>
+Lending Policy:
+- Max loan amount: R500,000
+- Minimum 3 months business banking history required
+- High reversals/NSF are red flags for cash flow problems
+- Stable or growing balance trends preferred
+- Diversified revenue streams reduce concentration risk
 
-                    <button class="btn btn-success" id="trainBtn" onclick="app.trainModel()" disabled>
-                        🧠 Train Neural Network
+South African Context:
+- Consider load-shedding impact on business cash flows
+- Weekend/evening transactions may indicate informal sector business (normal for SA SMEs)
+- Salary inflows alongside business revenue are common for owner-managed businesses</textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="app.saveContext()">
+                        <i data-feather="save" style="width:15px;height:15px;"></i>
+                        Save Context
                     </button>
                 </div>
 
                 <div class="card">
-                    <h2>📈 Training Progress</h2>
-                    <div id="trainProgress">
-                        <p style="text-align:center; color:var(--text-muted); padding:20px;">
-                            Upload or paste training data to begin.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>💡 Manual Training (Alternative)</h2>
-                <p style="margin-bottom:12px; color:var(--text-muted);">
-                    If you don't have a CSV, manually add training examples below. Each example needs 8 features and an outcome.
-                </p>
-
-                <div class="grid-2">
-                    <div>
-                        <div class="form-group">
-                            <label>Feature 1: Cash Flow Volatility (0-1)</label>
-                            <input type="number" id="mtF1" step="0.01" min="0" max="1" value="0.5">
+                    <div class="card-title"><i data-feather="info" style="width:16px;height:16px;"></i> How It Works</div>
+                    <div style="font-size:0.88rem;color:var(--text);line-height:1.9;">
+                        <div style="display:flex;gap:12px;margin-bottom:16px;">
+                            <div style="width:28px;height:28px;background:var(--primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">1</div>
+                            <div><strong>PDF Parsing</strong> — Bank statement is parsed with PDF.js. Transactions, balances, and keywords are extracted.</div>
                         </div>
-                        <div class="form-group">
-                            <label>Feature 2: Balance Trend (0-1)</label>
-                            <input type="number" id="mtF2" step="0.01" min="0" max="1" value="0.5">
+                        <div style="display:flex;gap:12px;margin-bottom:16px;">
+                            <div style="width:28px;height:28px;background:var(--primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">2</div>
+                            <div><strong>Feature Calculation</strong> — 8 normalised risk features are computed: volatility, balance trend, debit/credit ratio, reversal frequency, etc.</div>
                         </div>
-                        <div class="form-group">
-                            <label>Feature 3: Debit/Credit Ratio (0-1)</label>
-                            <input type="number" id="mtF3" step="0.01" min="0" max="1" value="0.5">
+                        <div style="display:flex;gap:12px;margin-bottom:16px;">
+                            <div style="width:28px;height:28px;background:var(--primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">3</div>
+                            <div><strong>Grok AI Analysis</strong> — Features + applicant context are sent to the Grok API, which reasons over the data, estimates default probability, and provides a detailed explanation.</div>
                         </div>
-                        <div class="form-group">
-                            <label>Feature 4: Weekend/Evening % (0-1)</label>
-                            <input type="number" id="mtF4" step="0.01" min="0" max="1" value="0.3">
+                        <div style="display:flex;gap:12px;">
+                            <div style="width:28px;height:28px;background:var(--primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">4</div>
+                            <div><strong>Decision + Storage</strong> — Result (APPROVE / REVIEW / REJECT) and AI reasoning are saved to Firebase for your portfolio.</div>
                         </div>
                     </div>
-                    <div>
+
+                    <div style="margin-top:20px;">
+                        <div class="card-title" style="margin-bottom:12px;"><i data-feather="key" style="width:16px;height:16px;"></i> API Key</div>
                         <div class="form-group">
-                            <label>Feature 5: Reversal/NSF Frequency (0-1)</label>
-                            <input type="number" id="mtF5" step="0.01" min="0" max="1" value="0.1">
+                            <label>xAI Grok API Key</label>
+                            <input type="password" id="apiKeyInput" placeholder="xai-...">
+                            <p style="font-size:0.78rem;color:var(--text-muted);margin-top:5px;">Stored locally in your browser. Never sent to our servers.</p>
                         </div>
-                        <div class="form-group">
-                            <label>Feature 6: Salary vs Revenue Mix (0-1)</label>
-                            <input type="number" id="mtF6" step="0.01" min="0" max="1" value="0.5">
-                        </div>
-                        <div class="form-group">
-                            <label>Feature 7: Largest Deposit % (0-1)</label>
-                            <input type="number" id="mtF7" step="0.01" min="0" max="1" value="0.3">
-                        </div>
-                        <div class="form-group">
-                            <label>Feature 8: Zero Balance Days (0-1)</label>
-                            <input type="number" id="mtF8" step="0.01" min="0" max="1" value="0.2">
-                        </div>
+                        <button class="btn btn-primary" onclick="app.saveApiKey()">
+                            <i data-feather="save" style="width:15px;height:15px;"></i>
+                            Save API Key
+                        </button>
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Outcome</label>
-                    <select id="mtOutcome" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border);">
-                        <option value="0">✅ Repaid Successfully (0)</option>
-                        <option value="1">❌ Defaulted (1)</option>
-                    </select>
-                </div>
-
-                <div style="display:flex; gap:12px;">
-                    <button class="btn btn-primary" onclick="app.addManualTraining()">Add Example</button>
-                    <button class="btn btn-success" onclick="app.trainManualModel()">Train on Manual Data</button>
-                </div>
-
-                <div id="manualExamples" style="margin-top:16px;">
-                    <p style="color:var(--text-muted); font-size:0.85rem;">No manual examples added yet.</p>
                 </div>
             </div>
         </div>
 
+        <!-- ══ PORTFOLIO ══ -->
         <div id="tab-portfolio" class="tab-content">
             <div class="card">
-                <h2>📁 All Assessments</h2>
+                <div class="card-title"><i data-feather="briefcase" style="width:16px;height:16px;"></i> All Assessments</div>
                 <div style="overflow-x:auto;">
                     <table>
                         <thead>
@@ -652,67 +579,59 @@
                                 <th>Date</th>
                                 <th>Applicant</th>
                                 <th>Business</th>
+                                <th>Sector</th>
                                 <th>Amount</th>
                                 <th>Risk Score</th>
-                                <th>Recommendation</th>
-                                <th>Status</th>
+                                <th>Decision</th>
                             </tr>
                         </thead>
                         <tbody id="portfolioTable">
-                            <tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No assessments yet</td></tr>
+                            <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:28px;">No assessments yet</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
+        <!-- ══ SETTINGS ══ -->
         <div id="tab-settings" class="tab-content">
             <div class="grid-2">
                 <div class="card">
-                    <h2>⚙️ Risk Thresholds</h2>
+                    <div class="card-title"><i data-feather="sliders" style="width:16px;height:16px;"></i> Risk Thresholds</div>
                     <div class="form-group">
-                        <label>Auto-Approve Threshold (0-1)</label>
-                        <input type="number" id="threshApprove" step="0.01" min="0" max="1" value="0.35">
-                        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Applications below this risk score are automatically approved.</p>
+                        <label>Auto-Approve Below (%)</label>
+                        <input type="number" id="threshApprove" value="35" min="0" max="100">
+                        <p style="font-size:0.78rem;color:var(--text-muted);margin-top:5px;">AI scores below this go straight to APPROVE.</p>
                     </div>
                     <div class="form-group">
-                        <label>Auto-Reject Threshold (0-1)</label>
-                        <input type="number" id="threshReject" step="0.01" min="0" max="1" value="0.60">
-                        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Applications above this risk score are automatically rejected.</p>
+                        <label>Auto-Reject Above (%)</label>
+                        <input type="number" id="threshReject" value="60" min="0" max="100">
+                        <p style="font-size:0.78rem;color:var(--text-muted);margin-top:5px;">AI scores above this go straight to REJECT.</p>
                     </div>
-                    <div class="form-group">
-                        <label>Review Range</label>
-                        <p style="padding:10px; background:#f8f9fa; border-radius:6px; font-size:0.9rem;">
-                            Between <span id="reviewLow">0.35</span> and <span id="reviewHigh">0.60</span> = Manual Review
-                        </p>
+                    <div class="alert alert-info" style="margin-bottom:16px;">
+                        Between <strong id="reviewLow">35%</strong> and <strong id="reviewHigh">60%</strong> = Manual Review
                     </div>
                     <button class="btn btn-primary" onclick="app.saveSettings()">Save Thresholds</button>
                 </div>
 
                 <div class="card">
-                    <h2>🔒 POPIA Compliance</h2>
-                    <div class="alert alert-info">
-                        This system processes personal financial data. Ensure compliance with POPIA.
-                    </div>
-                    <ul style="font-size:0.9rem; color:var(--text); line-height:2;">
-                        <li>✅ Raw PDFs are parsed and immediately discarded</li>
-                        <li>✅ Only extracted features and scores are stored</li>
-                        <li>✅ Data is encrypted in transit and at rest (Firebase)</li>
+                    <div class="card-title"><i data-feather="shield" style="width:16px;height:16px;"></i> POPIA Compliance</div>
+                    <div class="alert alert-info" style="margin-bottom:16px;">This system processes personal financial data. Ensure compliance with POPIA.</div>
+                    <ul style="font-size:0.88rem;line-height:2.2;list-style:none;">
+                        <li>✅ Raw PDFs are parsed in-browser and immediately discarded</li>
+                        <li>✅ Only extracted features and scores are stored in Firebase</li>
+                        <li>✅ Data is encrypted in transit and at rest</li>
                         <li>✅ Access is authenticated and logged</li>
                         <li>⚠️ Register an Information Officer with the SA Information Regulator</li>
                     </ul>
-                    <button class="btn btn-secondary" onclick="app.exportData()">📥 Export Assessment Data (CSV)</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>🗑️ Data Management</h2>
-                <div class="alert alert-danger">
-                    ⚠️ Deleting data is irreversible. Ensure you have backups if required for regulatory compliance.
-                </div>
-                <div style="display:flex; gap:12px;">
-                    <button class="btn btn-danger" onclick="app.clearAssessments()">Clear All Assessments</button>
-                    <button class="btn btn-danger" onclick="app.clearModels()">Delete All Models</button>
+                    <div style="display:flex;gap:10px;margin-top:16px;">
+                        <button class="btn btn-secondary" onclick="app.exportData()">
+                            <i data-feather="download" style="width:15px;height:15px;"></i> Export CSV
+                        </button>
+                        <button class="btn btn-danger" onclick="app.clearAssessments()">
+                            <i data-feather="trash-2" style="width:15px;height:15px;"></i> Clear All
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -720,9 +639,9 @@
 </div>
 
 <script>
-// ============================================
-// FIREBASE CONFIG (HARDCODED FOR TESTING)
-// ============================================
+// ══════════════════════════════════════════
+// FIREBASE CONFIG
+// ══════════════════════════════════════════
 const firebaseConfig = {
     apiKey: "AIzaSyCh7Ute6LeSAxcNDEQwZg5m0cA4ujnLCfg",
     authDomain: "test-17881.firebaseapp.com",
@@ -730,63 +649,46 @@ const firebaseConfig = {
     projectId: "test-17881",
     storageBucket: "test-17881.firebasestorage.app",
     messagingSenderId: "1057428047643",
-    appId: "1:1057428047643:web:f3801c0d933225a5cd35be",
-    measurementId: "G-65PFSJ1MDS"
+    appId: "1:1057428047643:web:f3801c0d933225a5cd35be"
 };
 
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const auth = firebase.auth();
 
-// PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-// ============================================
-// APPLICATION STATE
-// ============================================
+// xAI Grok API
+const XAI_BASE = "https://api.x.ai/v1";
+
+// ══════════════════════════════════════════
+// APP STATE
+// ══════════════════════════════════════════
 const app = {
     currentUser: null,
-    currentModel: null,
-    trainingData: [],
-    manualTrainingData: [],
     assessments: [],
-    settings: {
-        approveThreshold: 0.35,
-        rejectThreshold: 0.60
-    },
+    settings: { approveThreshold: 35, rejectThreshold: 60 },
+    currentPdfFile: null,
+    systemContext: '',
 
-    // ============================================
-    // AUTHENTICATION
-    // ============================================
+    // ── AUTH ──
     async login() {
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
-
-        if (!email || !password) {
-            this.showAlert('loginAlert', 'Please enter email and password', 'danger');
-            return;
-        }
-
+        if (!email || !password) { app.showAlert('loginAlert', 'Please enter email and password.', 'danger'); return; }
         try {
             await auth.signInWithEmailAndPassword(email, password);
-        } catch (error) {
-            // If user doesn't exist, create demo account
-            if (error.code === 'auth/user-not-found' && email === 'demo@lender.co.za') {
-                try {
-                    await auth.createUserWithEmailAndPassword(email, password);
-                } catch (createError) {
-                    this.showAlert('loginAlert', createError.message, 'danger');
-                }
+        } catch (err) {
+            if (err.code === 'auth/user-not-found' && email === 'demo@lender.co.za') {
+                try { await auth.createUserWithEmailAndPassword(email, password); }
+                catch (e) { app.showAlert('loginAlert', e.message, 'danger'); }
             } else {
-                this.showAlert('loginAlert', error.message, 'danger');
+                app.showAlert('loginAlert', err.message, 'danger');
             }
         }
     },
 
-    logout() {
-        auth.signOut();
-    },
+    logout() { auth.signOut(); },
 
     onAuthStateChanged(user) {
         if (user) {
@@ -795,6 +697,7 @@ const app = {
             document.getElementById('mainApp').classList.remove('hidden');
             document.getElementById('userEmail').textContent = user.email;
             this.loadData();
+            feather.replace();
         } else {
             this.currentUser = null;
             document.getElementById('loginScreen').classList.remove('hidden');
@@ -802,278 +705,312 @@ const app = {
         }
     },
 
-    // ============================================
-    // NAVIGATION
-    // ============================================
-    switchTab(tabName) {
+    // ── NAV ──
+    switchTab(tabName, btn) {
         document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-
-        event.target.classList.add('active');
+        btn.classList.add('active');
         document.getElementById('tab-' + tabName).classList.add('active');
-
         if (tabName === 'dashboard') this.updateDashboard();
         if (tabName === 'portfolio') this.loadPortfolio();
+        feather.replace();
     },
 
-    // ============================================
-    // DATA LOADING
-    // ============================================
+    // ── DATA ──
     async loadData() {
-        const userId = this.currentUser.uid;
+        const uid = this.currentUser.uid;
 
-        // Load settings
-        const settingsSnap = await db.ref('users/' + userId + '/settings').once('value');
-        if (settingsSnap.exists()) {
-            this.settings = settingsSnap.val();
+        // Settings
+        const sSnap = await db.ref(`users/${uid}/settings`).once('value');
+        if (sSnap.exists()) {
+            this.settings = sSnap.val();
             document.getElementById('threshApprove').value = this.settings.approveThreshold;
             document.getElementById('threshReject').value = this.settings.rejectThreshold;
-            document.getElementById('reviewLow').textContent = this.settings.approveThreshold;
-            document.getElementById('reviewHigh').textContent = this.settings.rejectThreshold;
+            this.updateThresholdDisplay();
         }
 
-        // Load assessments
-        const assessmentsSnap = await db.ref('users/' + userId + '/assessments').once('value');
-        if (assessmentsSnap.exists()) {
-            const data = assessmentsSnap.val();
-            this.assessments = Object.values(data).sort((a, b) => b.timestamp - a.timestamp);
-        }
-
-        // Load current model
-        const modelSnap = await db.ref('users/' + userId + '/currentModel').once('value');
-        if (modelSnap.exists()) {
-            const modelData = modelSnap.val();
-            this.currentModel = new brain.NeuralNetwork();
-            this.currentModel.fromJSON(modelData);
-            this.updateModelStatus(true, modelData.name || 'Unnamed Model');
+        // System context
+        const cSnap = await db.ref(`users/${uid}/systemContext`).once('value');
+        if (cSnap.exists()) {
+            this.systemContext = cSnap.val();
+            document.getElementById('systemContext').value = this.systemContext;
         } else {
-            this.updateModelStatus(false);
+            this.systemContext = document.getElementById('systemContext').value;
+        }
+
+        // API key
+        const savedKey = localStorage.getItem('xai_api_key');
+        if (savedKey) document.getElementById('apiKeyInput').value = savedKey;
+
+        // Assessments
+        const aSnap = await db.ref(`users/${uid}/assessments`).once('value');
+        if (aSnap.exists()) {
+            this.assessments = Object.values(aSnap.val()).sort((a, b) => b.timestamp - a.timestamp);
         }
 
         this.updateDashboard();
     },
 
-    updateModelStatus(ready, name) {
-        const el = document.getElementById('modelStatus');
-        if (ready) {
-            el.innerHTML = `<div class="alert alert-success">✅ Model loaded: <strong>${name}</strong>. Ready for assessments.</div>`;
-            document.getElementById('assessBtn').disabled = false;
-        } else {
-            el.innerHTML = `<div class="alert alert-warning">⚠️ No trained model found. Please train a model first.</div>`;
-            document.getElementById('assessBtn').disabled = true;
-        }
-    },
-
-    // ============================================
-    // DASHBOARD
-    // ============================================
+    // ── DASHBOARD ──
     updateDashboard() {
         const total = this.assessments.length;
         const approved = this.assessments.filter(a => a.recommendation === 'APPROVE').length;
-        const avgRisk = total > 0 ? (this.assessments.reduce((s, a) => s + a.riskScore, 0) / total) : 0;
+        const avgRisk = total > 0 ? this.assessments.reduce((s, a) => s + a.riskScore, 0) / total : 0;
 
-        document.getElementById('dashTotalAssessments').textContent = total;
-        document.getElementById('dashApprovalRate').textContent = total > 0 ? Math.round((approved / total) * 100) + '%' : '0%';
-        document.getElementById('dashAvgRisk').textContent = Math.round(avgRisk * 100) + '%';
+        document.getElementById('dashTotal').textContent = total;
+        document.getElementById('dashApproval').textContent = total > 0 ? Math.round(approved / total * 100) + '%' : '0%';
+        document.getElementById('dashAvgRisk').textContent = Math.round(avgRisk) + '%';
 
-        const low = this.assessments.filter(a => a.riskScore <= 0.35).length;
-        const medium = this.assessments.filter(a => a.riskScore > 0.35 && a.riskScore < 0.60).length;
-        const high = this.assessments.filter(a => a.riskScore >= 0.60).length;
-
+        const low = this.assessments.filter(a => a.riskScore <= 35).length;
+        const med = this.assessments.filter(a => a.riskScore > 35 && a.riskScore < 60).length;
+        const high = this.assessments.filter(a => a.riskScore >= 60).length;
         document.getElementById('countLow').textContent = low;
-        document.getElementById('countMedium').textContent = medium;
+        document.getElementById('countMedium').textContent = med;
         document.getElementById('countHigh').textContent = high;
-
-        const maxCount = Math.max(low, medium, high, 1);
-        document.getElementById('barLow').style.width = (low / maxCount * 100) + '%';
-        document.getElementById('barMedium').style.width = (medium / maxCount * 100) + '%';
-        document.getElementById('barHigh').style.width = (high / maxCount * 100) + '%';
+        const maxC = Math.max(low, med, high, 1);
+        document.getElementById('barLow').style.width = (low / maxC * 100) + '%';
+        document.getElementById('barMedium').style.width = (med / maxC * 100) + '%';
+        document.getElementById('barHigh').style.width = (high / maxC * 100) + '%';
 
         const recent = this.assessments.slice(0, 5);
-        const activityHtml = recent.length > 0 ? recent.map(a => `
-            <div style="padding:8px 0; border-bottom:1px solid var(--border); font-size:0.85rem;">
-                <strong>${a.applicantName}</strong> — ${a.businessName}<br>
-                <span style="color:var(--text-muted);">Risk: ${Math.round(a.riskScore * 100)}% | ${a.recommendation}</span>
-            </div>
-        `).join('') : '<p style="color:var(--text-muted); font-size:0.9rem;">No recent assessments</p>';
-        document.getElementById('recentActivity').innerHTML = activityHtml;
+        document.getElementById('recentActivity').innerHTML = recent.length > 0
+            ? recent.map(a => `
+                <div style="padding:10px 0;border-bottom:1px solid var(--border);font-size:0.85rem;">
+                    <strong>${a.applicantName}</strong> — ${a.businessName}<br>
+                    <span style="color:var(--text-muted);">Risk: ${a.riskScore}% · 
+                    <span class="badge badge-${a.recommendation.toLowerCase()}">${a.recommendation}</span></span>
+                </div>`).join('')
+            : '<p style="color:var(--text-muted);font-size:0.88rem;">No assessments yet</p>';
+        feather.replace();
     },
 
-    // ============================================
-    // PDF PARSING & FEATURE EXTRACTION
-    // ============================================
+    // ── PDF HANDLING ──
     async handlePdfUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
-
-        document.getElementById('pdfName').textContent = `Selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-        document.getElementById('assessBtn').disabled = false;
-
-        // Store file reference for processing
         this.currentPdfFile = file;
+        document.getElementById('pdfName').textContent = `✅ ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        document.getElementById('assessBtn').disabled = false;
     },
 
     async parsePdf(file) {
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-
         let fullText = '';
         for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
-            const textContent = await page.getTextContent();
-            const pageText = textContent.items.map(item => item.str).join(' ');
-            fullText += pageText + ' ';
+            const tc = await page.getTextContent();
+            fullText += tc.items.map(item => item.str).join(' ') + ' ';
         }
-
-        return this.extractTransactionsFromText(fullText);
+        return this.extractTransactions(fullText);
     },
 
-    extractTransactionsFromText(text) {
-        // This is a heuristic parser for South African bank statements
-        // Real implementation would need format-specific parsers for FNB, ABSA, Standard Bank, etc.
-
+    extractTransactions(text) {
         const lines = text.split(/\r?\n/).filter(l => l.trim());
         const transactions = [];
         const balances = [];
-
-        // Common patterns in SA bank statements
-        const amountPattern = /(?:R\s?)?([0-9,]+\.\d{2})/g;
         const datePattern = /(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/;
 
         for (const line of lines) {
-            const amounts = [...line.matchAll(/-?R?\s?([0-9,]+\.\d{2})/g)].map(m => parseFloat(m[1].replace(',', '')));
+            const amounts = [...line.matchAll(/-?R?\s?([0-9,]+\.\d{2})/g)].map(m => parseFloat(m[1].replace(/,/g, '')));
             const dateMatch = line.match(datePattern);
-
             if (amounts.length > 0 && dateMatch) {
-                const isDebit = line.includes('DEBIT') || line.includes('-R') || line.includes('DR');
-                const isCredit = line.includes('CREDIT') || line.includes('CR') || (!isDebit && amounts.length > 0);
-
-                const amount = amounts[amounts.length - 1]; // Last amount is usually balance or transaction amount
-
+                const isDebit = /debit|dr\b|-R/i.test(line);
                 transactions.push({
                     date: dateMatch[1],
-                    description: line.substring(0, 50).trim(),
-                    amount: amount,
-                    type: isDebit ? 'debit' : 'credit',
-                    raw: line
+                    description: line.substring(0, 60).trim(),
+                    amount: amounts[amounts.length - 1],
+                    type: isDebit ? 'debit' : 'credit'
                 });
             }
-
-            // Extract balance figures
-            const balanceMatches = line.match(/Balance[\s:]+R?\s?([0-9,]+\.\d{2})/i);
-            if (balanceMatches) {
-                balances.push(parseFloat(balanceMatches[1].replace(',', '')));
-            }
+            const bMatch = line.match(/balance[\s:]+R?\s?([0-9,]+\.\d{2})/i);
+            if (bMatch) balances.push(parseFloat(bMatch[1].replace(/,/g, '')));
         }
-
-        return { transactions, balances, rawText: text };
+        return { transactions, balances };
     },
 
-    calculateFeatures(transactionData) {
-        const { transactions, balances } = transactionData;
+    calculateFeatures({ transactions, balances }) {
+        if (transactions.length === 0) throw new Error('No transactions found in PDF. The format may not be supported.');
 
-        if (transactions.length === 0) {
-            throw new Error('No transactions found in PDF. The statement format may not be supported yet.');
-        }
-
-        // 1. Cash Flow Volatility (std dev of daily net cash flow normalized)
         const dailyFlows = {};
         transactions.forEach(t => {
-            const day = t.date;
-            if (!dailyFlows[day]) dailyFlows[day] = 0;
-            dailyFlows[day] += (t.type === 'credit' ? t.amount : -t.amount);
+            dailyFlows[t.date] = (dailyFlows[t.date] || 0) + (t.type === 'credit' ? t.amount : -t.amount);
         });
         const flows = Object.values(dailyFlows);
         const mean = flows.reduce((a, b) => a + b, 0) / flows.length;
         const variance = flows.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / flows.length;
         const volatility = Math.min(Math.sqrt(variance) / (Math.abs(mean) + 1), 1);
 
-        // 2. End-of-day balance trend (slope normalized)
-        const balanceTrend = balances.length > 1 
-            ? Math.min(Math.max((balances[balances.length - 1] - balances[0]) / (balances[0] + 1), -1), 1)
-            : 0.5;
-        const normalizedTrend = (balanceTrend + 1) / 2; // Convert -1..1 to 0..1
-
-        // 3. Debit to Credit ratio
         const totalDebits = transactions.filter(t => t.type === 'debit').reduce((s, t) => s + t.amount, 0);
         const totalCredits = transactions.filter(t => t.type === 'credit').reduce((s, t) => s + t.amount, 0);
         const debitCreditRatio = totalCredits > 0 ? Math.min(totalDebits / totalCredits, 2) / 2 : 1;
 
-        // 4. Weekend/Evening transactions (heuristic - assume 20% if can't determine)
-        const weekendEveningRatio = 0.2; // Would need timestamp data
+        const balanceTrend = balances.length > 1
+            ? Math.min(Math.max((balances[balances.length - 1] - balances[0]) / (Math.abs(balances[0]) + 1), -1), 1)
+            : 0;
+        const normalizedTrend = (balanceTrend + 1) / 2;
 
-        // 5. Reversal/NSF frequency
-        const reversalKeywords = ['reversal', 'returned', 'insufficient', 'nsf', 'dishonoured', 'bounce'];
-        const reversalCount = transactions.filter(t => 
-            reversalKeywords.some(kw => t.description.toLowerCase().includes(kw))
-        ).length;
-        const reversalRatio = Math.min(reversalCount / transactions.length * 5, 1); // Scale up
+        const reversalKw = ['reversal','returned','insufficient','nsf','dishonour','bounce','unpaid'];
+        const reversalCount = transactions.filter(t => reversalKw.some(k => t.description.toLowerCase().includes(k))).length;
+        const reversalRatio = Math.min(reversalCount / transactions.length * 5, 1);
 
-        // 6. Salary vs Revenue mix (regular monthly deposits = salary-like)
-        const monthlyDeposits = this.detectRegularDeposits(transactions);
-        const salaryMix = Math.min(monthlyDeposits / (totalCredits + 1), 1);
+        const weekendRatio = 0.2; // placeholder without full timestamps
 
-        // 7. Largest single deposit percentage
-        const maxDeposit = Math.max(...transactions.filter(t => t.type === 'credit').map(t => t.amount), 0);
+        const credits = transactions.filter(t => t.type === 'credit').map(t => t.amount).sort((a, b) => a - b);
+        let regularDeposits = 0;
+        if (credits.length >= 3) {
+            const clusters = [];
+            let curr = [credits[0]];
+            for (let i = 1; i < credits.length; i++) {
+                if (Math.abs(credits[i] - curr[0]) / (curr[0] + 1) < 0.15) curr.push(credits[i]);
+                else { clusters.push(curr); curr = [credits[i]]; }
+            }
+            clusters.push(curr);
+            const largest = clusters.reduce((m, c) => c.length > m.length ? c : m, clusters[0]);
+            regularDeposits = largest.reduce((a, b) => a + b, 0);
+        }
+        const salaryMix = Math.min(regularDeposits / (totalCredits + 1), 1);
+
+        const maxDeposit = Math.max(...credits, 0);
         const largestDepositRatio = totalCredits > 0 ? Math.min(maxDeposit / totalCredits, 1) : 0;
 
-        // 8. Days with zero balance (estimated from transaction gaps)
         const zeroBalanceDays = balances.filter(b => b <= 0).length / Math.max(balances.length, 1);
 
         return {
-            features: [
-                Math.min(Math.max(volatility, 0), 1),
-                Math.min(Math.max(normalizedTrend, 0), 1),
-                Math.min(Math.max(debitCreditRatio, 0), 1),
-                Math.min(Math.max(weekendEveningRatio, 0), 1),
-                Math.min(Math.max(reversalRatio, 0), 1),
-                Math.min(Math.max(salaryMix, 0), 1),
-                Math.min(Math.max(largestDepositRatio, 0), 1),
-                Math.min(Math.max(zeroBalanceDays, 0), 1)
-            ],
+            features: {
+                cashFlowVolatility: +volatility.toFixed(3),
+                balanceTrend: +normalizedTrend.toFixed(3),
+                debitCreditRatio: +debitCreditRatio.toFixed(3),
+                weekendEveningPct: +weekendRatio.toFixed(3),
+                reversalFrequency: +reversalRatio.toFixed(3),
+                salaryRevenueMix: +salaryMix.toFixed(3),
+                largestDepositPct: +largestDepositRatio.toFixed(3),
+                zeroBalanceDays: +zeroBalanceDays.toFixed(3)
+            },
             raw: {
                 totalTransactions: transactions.length,
-                totalDebits,
-                totalCredits,
-                avgBalance: balances.length > 0 ? balances.reduce((a,b) => a+b, 0) / balances.length : 0
+                totalDebits: +totalDebits.toFixed(2),
+                totalCredits: +totalCredits.toFixed(2),
+                avgBalance: balances.length > 0 ? +(balances.reduce((a, b) => a + b, 0) / balances.length).toFixed(2) : 0,
+                reversalCount
             }
         };
     },
 
-    detectRegularDeposits(transactions) {
-        // Simple heuristic: deposits within 5% of each other, monthly
-        const credits = transactions.filter(t => t.type === 'credit').map(t => t.amount).sort((a, b) => a - b);
-        if (credits.length < 3) return 0;
+    // ── GROK AI ASSESSMENT ──
+    async callGrokAPI(features, raw, applicantName, businessName, loanAmount, sector) {
+        const apiKey = localStorage.getItem('xai_api_key');
+        if (!apiKey) throw new Error('No xAI API key found. Please add your key in the AI Context tab.');
 
-        // Find clusters of similar amounts
-        const clusters = [];
-        let current = [credits[0]];
-        for (let i = 1; i < credits.length; i++) {
-            if (Math.abs(credits[i] - current[0]) / current[0] < 0.15) {
-                current.push(credits[i]);
-            } else {
-                clusters.push(current);
-                current = [credits[i]];
-            }
+        const systemPrompt = this.systemContext || document.getElementById('systemContext').value;
+
+        const userMessage = `
+Please analyse this SME loan application and provide a detailed credit risk assessment.
+
+## Applicant
+- **Name:** ${applicantName}
+- **Business:** ${businessName}
+- **Sector:** ${sector || 'Not specified'}
+- **Loan Amount Requested:** R${parseInt(loanAmount).toLocaleString()}
+
+## Extracted Bank Statement Features (normalised 0–1)
+- Cash Flow Volatility: ${(features.cashFlowVolatility * 100).toFixed(1)}% (higher = more volatile/risky)
+- Balance Trend: ${(features.balanceTrend * 100).toFixed(1)}% (higher = improving balance)
+- Debit/Credit Ratio: ${(features.debitCreditRatio * 100).toFixed(1)}% (higher = spending more than earning)
+- Weekend/Evening Transactions: ${(features.weekendEveningPct * 100).toFixed(1)}%
+- Reversal/NSF Frequency: ${(features.reversalFrequency * 100).toFixed(1)}% (higher = more bounced payments)
+- Salary vs Revenue Mix: ${(features.salaryRevenueMix * 100).toFixed(1)}% (higher = more salary-like regular income)
+- Largest Single Deposit %: ${(features.largestDepositPct * 100).toFixed(1)}% (higher = more revenue concentration)
+- Zero/Near-Zero Balance Days: ${(features.zeroBalanceDays * 100).toFixed(1)}%
+
+## Raw Stats
+- Total transactions analysed: ${raw.totalTransactions}
+- Total debits: R${raw.totalDebits.toLocaleString()}
+- Total credits: R${raw.totalCredits.toLocaleString()}
+- Average balance: R${raw.avgBalance.toLocaleString()}
+- Reversal/NSF events: ${raw.reversalCount}
+
+## Your Task
+1. Estimate the **default probability as a percentage (0–100%)** based on these signals.
+2. Identify the **top 3 risk factors** present in this application.
+3. Identify any **positive signals** that reduce risk.
+4. Give a **lending recommendation**: APPROVE, MANUAL REVIEW, or REJECT.
+5. Suggest an appropriate **maximum loan amount** if not the full amount requested.
+6. Provide a brief **explanation** suitable for a credit file.
+
+Respond in clear, structured markdown with headers. Be direct and specific.`;
+
+        const response = await fetch(`${XAI_BASE}/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: 'grok-3-fast',
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: userMessage }
+                ],
+                max_tokens: 1200
+            })
+        });
+
+        if (!response.ok) {
+            const err = await response.text();
+            throw new Error(`Grok API error: ${err}`);
         }
-        clusters.push(current);
 
-        const regularCluster = clusters.reduce((max, c) => c.length > max.length ? c : max, clusters[0]);
-        return regularCluster ? regularCluster.reduce((a, b) => a + b, 0) : 0;
+        const data = await response.json();
+        return data.choices[0].message.content;
     },
 
-    // ============================================
-    // RISK ASSESSMENT
-    // ============================================
-    async runAssessment() {
-        if (!this.currentModel) {
-            alert('Please train a model first!');
-            return;
+    parseRiskScore(aiResponse) {
+        // Extract percentage from AI response
+        const patterns = [
+            /default probability[:\s]+(\d+(?:\.\d+)?)\s*%/i,
+            /(\d+(?:\.\d+)?)\s*%\s*(?:default|probability|risk|chance)/i,
+            /probability[:\s]+(\d+(?:\.\d+)?)\s*%/i,
+            /(\d+(?:\.\d+)?)\s*%/
+        ];
+        for (const p of patterns) {
+            const m = aiResponse.match(p);
+            if (m) return Math.min(100, Math.max(0, parseFloat(m[1])));
         }
+        return 50; // fallback
+    },
 
-        const name = document.getElementById('appName').value;
-        const business = document.getElementById('appBusiness').value;
+    parseMarkdown(text) {
+        if (!text) return '';
+        let html = text
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/^### (.*$)/gim, '<h4>$1</h4>')
+            .replace(/^## (.*$)/gim, '<h3>$1</h3>')
+            .replace(/^# (.*$)/gim, '<h3>$1</h3>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+        const lines = html.split('\n');
+        let result = [], inList = false;
+        for (const line of lines) {
+            const lm = line.match(/^\s*[-*] (.*$)/);
+            if (lm) { if (!inList) { result.push('<ul>'); inList = true; } result.push('<li>' + lm[1] + '</li>'); }
+            else { if (inList) { result.push('</ul>'); inList = false; } result.push(line); }
+        }
+        if (inList) result.push('</ul>');
+        return result.join('\n').split('\n\n').map(p => {
+            p = p.trim();
+            if (!p) return '';
+            if (p.startsWith('<h') || p.startsWith('<ul') || p.startsWith('</ul') || p.startsWith('<li')) return p;
+            return '<p>' + p + '</p>';
+        }).join('\n');
+    },
+
+    // ── RUN ASSESSMENT ──
+    async runAssessment() {
+        const name = document.getElementById('appName').value.trim();
+        const business = document.getElementById('appBusiness').value.trim();
         const amount = document.getElementById('appAmount').value;
+        const sector = document.getElementById('appSector').value;
 
         if (!name || !business || !amount || !this.currentPdfFile) {
             alert('Please fill in all fields and upload a bank statement.');
@@ -1082,74 +1019,79 @@ const app = {
 
         const btn = document.getElementById('assessBtn');
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner"></span> Processing...';
+        btn.innerHTML = '<span class="spinner"></span> Parsing PDF...';
+
+        document.getElementById('assessResult').innerHTML = `
+            <div style="text-align:center;padding:40px 20px;">
+                <p style="font-weight:600;color:var(--primary);font-size:1rem;">
+                    Analysing bank statement
+                    <span class="thinking-dots"><span></span><span></span><span></span></span>
+                </p>
+                <p style="color:var(--text-muted);font-size:0.85rem;margin-top:8px;">Grok AI is reviewing the financial signals...</p>
+            </div>`;
 
         try {
-            // Parse PDF
             const txData = await this.parsePdf(this.currentPdfFile);
             const featureData = this.calculateFeatures(txData);
 
-            // Run model
-            const result = this.currentModel.run(featureData.features);
-            const riskScore = result[0];
+            btn.innerHTML = '<span class="spinner"></span> Asking Grok AI...';
 
-            // Determine recommendation
-            let recommendation, statusClass, statusText;
-            if (riskScore <= this.settings.approveThreshold) {
-                recommendation = 'APPROVE';
-                statusClass = 'status-approve';
-                statusText = '✅ APPROVE';
-            } else if (riskScore >= this.settings.rejectThreshold) {
-                recommendation = 'REJECT';
-                statusClass = 'status-reject';
-                statusText = '❌ REJECT';
-            } else {
-                recommendation = 'REVIEW';
-                statusClass = 'status-review';
-                statusText = '⚠️ MANUAL REVIEW';
-            }
+            const aiResponse = await this.callGrokAPI(
+                featureData.features, featureData.raw,
+                name, business, amount, sector
+            );
 
-            // Display result
-            const resultHtml = `
-                <div style="text-align:center; padding:20px;">
-                    <div class="risk-score" style="color: ${riskScore < 0.35 ? 'var(--success)' : riskScore < 0.6 ? 'var(--warning)' : 'var(--danger)'};">
-                        ${Math.round(riskScore * 100)}%
+            const riskScore = this.parseRiskScore(aiResponse);
+            const thresh = this.settings;
+            let recommendation, badgeClass;
+            if (riskScore <= thresh.approveThreshold) { recommendation = 'APPROVE'; badgeClass = 'approve'; }
+            else if (riskScore >= thresh.rejectThreshold) { recommendation = 'REJECT'; badgeClass = 'reject'; }
+            else { recommendation = 'REVIEW'; badgeClass = 'review'; }
+
+            const scoreColor = riskScore <= 35 ? 'var(--success)' : riskScore < 60 ? 'var(--warning)' : 'var(--danger)';
+
+            document.getElementById('assessResult').innerHTML = `
+                <div class="risk-score-display">
+                    <div class="risk-number" style="color:${scoreColor};">${Math.round(riskScore)}%</div>
+                    <div style="margin-bottom:12px;font-size:0.82rem;color:var(--text-muted);">Estimated Default Probability</div>
+                    <span class="badge badge-${badgeClass}" style="font-size:0.88rem;padding:8px 20px;">${recommendation}</span>
+                </div>
+                <div style="padding:0 4px 4px;">
+                    <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:6px;">
+                        <span style="color:var(--text-muted);">Risk Level</span>
+                        <span style="font-weight:700;">${riskScore <= 35 ? 'Low' : riskScore < 60 ? 'Medium' : 'High'}</span>
                     </div>
-                    <div class="risk-label ${statusClass}">${statusText}</div>
-                    <div style="margin-top:16px; font-size:0.9rem; color:var(--text-muted);">
-                        Default Probability for R${parseInt(amount).toLocaleString()} loan
+                    <div class="progress-bar" style="height:10px;">
+                        <div class="progress-fill" style="width:${riskScore}%;background:${scoreColor};"></div>
                     </div>
                 </div>
-                <div style="margin-top:20px;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.85rem;">
-                        <span>Risk Level</span>
-                        <span>${riskScore < 0.35 ? 'Low' : riskScore < 0.6 ? 'Medium' : 'High'}</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width:${riskScore * 100}%; background: ${riskScore < 0.35 ? 'var(--success)' : riskScore < 0.6 ? 'var(--warning)' : 'var(--danger)'};"></div>
-                    </div>
-                </div>
-            `;
-            document.getElementById('assessResult').innerHTML = resultHtml;
+                <div class="ai-analysis">
+                    <div class="ai-label">Grok AI Analysis</div>
+                    ${this.parseMarkdown(aiResponse)}
+                </div>`;
 
             // Show features
-            document.getElementById('extractedFeaturesCard').style.display = 'block';
-            const featureNames = [
-                'Cash Flow Volatility',
-                'Balance Trend',
-                'Debit/Credit Ratio',
-                'Weekend/Evening %',
-                'Reversal/NSF Freq',
-                'Salary/Revenue Mix',
-                'Largest Deposit %',
-                'Zero Balance Days'
+            document.getElementById('featuresCard').style.display = 'block';
+            const fNames = [
+                ['Cash Flow Volatility', 'cashFlowVolatility'],
+                ['Balance Trend', 'balanceTrend'],
+                ['Debit/Credit Ratio', 'debitCreditRatio'],
+                ['Weekend/Evening %', 'weekendEveningPct'],
+                ['Reversal/NSF Freq', 'reversalFrequency'],
+                ['Salary/Revenue Mix', 'salaryRevenueMix'],
+                ['Largest Deposit %', 'largestDepositPct'],
+                ['Zero Balance Days', 'zeroBalanceDays']
             ];
-            document.getElementById('featureList').innerHTML = featureData.features.map((f, i) => `
-                <div class="feature-item">
-                    <span class="feature-name">${featureNames[i]}</span>
-                    <span class="feature-value">${(f * 100).toFixed(1)}%</span>
-                </div>
-            `).join('');
+            document.getElementById('featureList').innerHTML = fNames.map(([label, key]) => {
+                const val = featureData.features[key];
+                return `<div class="feature-item">
+                    <div>
+                        <div class="feature-name">${label}</div>
+                        <div class="feature-bar"><div class="feature-bar-fill" style="width:${val * 100}%;"></div></div>
+                    </div>
+                    <div class="feature-value">${(val * 100).toFixed(1)}%</div>
+                </div>`;
+            }).join('');
 
             // Save to Firebase
             const assessment = {
@@ -1157,326 +1099,231 @@ const app = {
                 timestamp: Date.now(),
                 applicantName: name,
                 businessName: business,
+                sector: sector || 'N/A',
                 loanAmount: parseFloat(amount),
-                riskScore: riskScore,
-                recommendation: recommendation,
+                riskScore: Math.round(riskScore),
+                recommendation,
+                aiAnalysis: aiResponse,
                 features: featureData.features,
                 rawStats: featureData.raw,
                 status: 'PENDING'
             };
-
-            await db.ref('users/' + this.currentUser.uid + '/assessments/' + assessment.id).set(assessment);
+            await db.ref(`users/${this.currentUser.uid}/assessments/${assessment.id}`).set(assessment);
             this.assessments.unshift(assessment);
             this.updateDashboard();
 
-            // Clear file
             this.currentPdfFile = null;
             document.getElementById('pdfName').textContent = '';
             document.getElementById('pdfFile').value = '';
+            document.getElementById('assessBtn').disabled = true;
 
-        } catch (error) {
-            console.error(error);
+        } catch (err) {
+            console.error(err);
             document.getElementById('assessResult').innerHTML = `
                 <div class="alert alert-danger">
-                    ❌ Error: ${error.message}<br>
-                    <small>The PDF parser may not support this bank statement format yet. Try a different statement or use manual feature entry.</small>
-                </div>
-            `;
+                    <strong>❌ Error:</strong> ${err.message}<br>
+                    <small style="margin-top:6px;display:block;">
+                        ${err.message.includes('API key') ? 'Go to the <strong>AI Context</strong> tab and add your xAI Grok API key.' : 'The PDF parser may not support this bank statement format. Try another statement.'}
+                    </small>
+                </div>`;
         } finally {
             btn.disabled = false;
-            btn.textContent = 'Calculate Risk Score';
+            btn.innerHTML = '<i data-feather="zap" style="width:15px;height:15px;"></i> Run AI Assessment';
+            feather.replace();
         }
     },
 
-    // ============================================
-    // MODEL TRAINING
-    // ============================================
-    handleCsvUpload(event) {
-        const file = event.target.files[0];
-        if (!file) return;
+    // ── DEMO ASSESSMENT ──
+    async runDemoAssessment() {
+        document.getElementById('appName').value = document.getElementById('appName').value || 'Thabo Mokoena';
+        document.getElementById('appBusiness').value = document.getElementById('appBusiness').value || 'Mokoena Logistics Pty Ltd';
+        document.getElementById('appAmount').value = document.getElementById('appAmount').value || '75000';
+        document.getElementById('appSector').value = 'Logistics & Transport';
 
-        document.getElementById('csvName').textContent = `Selected: ${file.name}`;
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const text = e.target.result;
-            this.trainingData = this.parseCsv(text);
-            document.getElementById('trainBtn').disabled = false;
-            alert(`Loaded ${this.trainingData.length} training examples. Ready to train.`);
-        };
-        reader.readAsText(file);
-    },
-
-    handleCsvPaste() {
-        const pastedText = document.getElementById('csvPasteArea').value.trim();
-        if (!pastedText) {
-            alert('Please paste some text data first.');
+        const apiKey = localStorage.getItem('xai_api_key');
+        if (!apiKey) {
+            alert('Please add your xAI Grok API key in the AI Context tab first.');
             return;
         }
 
-        this.trainingData = this.parseCsv(pastedText);
-
-        if (this.trainingData.length > 0) {
-            document.getElementById('trainBtn').disabled = false;
-            document.getElementById('csvName').textContent = "Using pasted text data";
-            alert(`Successfully loaded ${this.trainingData.length} examples from pasted text. Ready to train.`);
-        } else {
-            alert('Failed to parse text. Please ensure it follows a valid comma-separated format with 8 inputs and 1 output.');
-        }
-    },
-
-    parseCsv(text) {
-        const lines = text.trim().split('\n');
-        const data = [];
-
-        // Skip header if present
-        const startIdx = lines[0].includes('f1') || lines[0].includes('feature') ? 1 : 0;
-
-        for (let i = startIdx; i < lines.length; i++) {
-            const cols = lines[i].split(',').map(c => parseFloat(c.trim()));
-            if (cols.length >= 9 && cols.every(c => !isNaN(c))) {
-                data.push({
-                    input: cols.slice(0, 8),
-                    output: [cols[8]]
-                });
-            }
-        }
-
-        return data;
-    },
-
-    async trainModel() {
-        if (this.trainingData.length < 10) {
-            alert('Need at least 10 training examples. You have ' + this.trainingData.length);
-            return;
-        }
-
-        const btn = document.getElementById('trainBtn');
+        const btn = document.getElementById('assessBtn');
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner"></span> Training...';
 
-        const hiddenLayers = document.getElementById('hiddenLayers').value.split(',').map(n => parseInt(n.trim()));
-        const iterations = parseInt(document.getElementById('iterations').value);
-        const modelName = document.getElementById('modelName').value;
+        document.getElementById('assessResult').innerHTML = `
+            <div style="text-align:center;padding:40px 20px;">
+                <p style="font-weight:600;color:var(--primary);font-size:1rem;">
+                    Running demo assessment
+                    <span class="thinking-dots"><span></span><span></span><span></span></span>
+                </p>
+                <p style="color:var(--text-muted);font-size:0.85rem;margin-top:8px;">Grok AI is analysing simulated financial signals...</p>
+            </div>`;
 
-        const progressEl = document.getElementById('trainProgress');
-        progressEl.innerHTML = '<p>Initializing neural network...</p>';
+        try {
+            const demoFeatures = {
+                cashFlowVolatility: 0.38,
+                balanceTrend: 0.62,
+                debitCreditRatio: 0.44,
+                weekendEveningPct: 0.30,
+                reversalFrequency: 0.08,
+                salaryRevenueMix: 0.25,
+                largestDepositPct: 0.22,
+                zeroBalanceDays: 0.05
+            };
+            const demoRaw = { totalTransactions: 87, totalDebits: 148350, totalCredits: 162800, avgBalance: 24600, reversalCount: 2 };
 
-        // Create and train
-        const net = new brain.NeuralNetwork({
-            hiddenLayers: hiddenLayers,
-            activation: 'sigmoid'
-        });
+            const aiResponse = await this.callGrokAPI(
+                demoFeatures, demoRaw,
+                document.getElementById('appName').value,
+                document.getElementById('appBusiness').value,
+                document.getElementById('appAmount').value,
+                'Logistics & Transport'
+            );
 
-        // Split for validation
-        const splitIdx = Math.floor(this.trainingData.length * 0.8);
-        const trainSet = this.trainingData.slice(0, splitIdx);
-        const testSet = this.trainingData.slice(splitIdx);
+            const riskScore = this.parseRiskScore(aiResponse);
+            const thresh = this.settings;
+            let recommendation, badgeClass;
+            if (riskScore <= thresh.approveThreshold) { recommendation = 'APPROVE'; badgeClass = 'approve'; }
+            else if (riskScore >= thresh.rejectThreshold) { recommendation = 'REJECT'; badgeClass = 'reject'; }
+            else { recommendation = 'REVIEW'; badgeClass = 'review'; }
+            const scoreColor = riskScore <= 35 ? 'var(--success)' : riskScore < 60 ? 'var(--warning)' : 'var(--danger)';
 
-        progressEl.innerHTML = `<p>Training on ${trainSet.length} examples...</p><div class="progress-bar"><div class="progress-fill" id="trainBar" style="width:0%; background:var(--primary);"></div></div>`;
+            document.getElementById('assessResult').innerHTML = `
+                <div class="alert alert-info" style="margin-bottom:12px;font-size:0.82rem;">ℹ️ Demo — simulated bank statement data</div>
+                <div class="risk-score-display">
+                    <div class="risk-number" style="color:${scoreColor};">${Math.round(riskScore)}%</div>
+                    <div style="margin-bottom:12px;font-size:0.82rem;color:var(--text-muted);">Estimated Default Probability</div>
+                    <span class="badge badge-${badgeClass}" style="font-size:0.88rem;padding:8px 20px;">${recommendation}</span>
+                </div>
+                <div style="padding:0 4px 4px;">
+                    <div class="progress-bar" style="height:10px;">
+                        <div class="progress-fill" style="width:${riskScore}%;background:${scoreColor};"></div>
+                    </div>
+                </div>
+                <div class="ai-analysis">
+                    <div class="ai-label">Grok AI Analysis</div>
+                    ${this.parseMarkdown(aiResponse)}
+                </div>`;
 
-        // Train with progress logging
-        const result = net.train(trainSet, {
-            iterations: iterations,
-            errorThresh: 0.005,
-            log: true,
-            logPeriod: Math.max(Math.floor(iterations / 20), 100),
-            callback: (stats) => {
-                const pct = Math.round((stats.iterations / iterations) * 100);
-                document.getElementById('trainBar').style.width = pct + '%';
-                progressEl.innerHTML = `
-                    <p>Iteration ${stats.iterations}/${iterations} — Error: ${stats.error.toFixed(5)}</p>
-                    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%; background:var(--primary);"></div></div>
-                `;
-            }
-        });
+            document.getElementById('featuresCard').style.display = 'block';
+            const fNames = [
+                ['Cash Flow Volatility', 'cashFlowVolatility'], ['Balance Trend', 'balanceTrend'],
+                ['Debit/Credit Ratio', 'debitCreditRatio'], ['Weekend/Evening %', 'weekendEveningPct'],
+                ['Reversal/NSF Freq', 'reversalFrequency'], ['Salary/Revenue Mix', 'salaryRevenueMix'],
+                ['Largest Deposit %', 'largestDepositPct'], ['Zero Balance Days', 'zeroBalanceDays']
+            ];
+            document.getElementById('featureList').innerHTML = fNames.map(([label, key]) => {
+                const val = demoFeatures[key];
+                return `<div class="feature-item">
+                    <div><div class="feature-name">${label}</div>
+                    <div class="feature-bar"><div class="feature-bar-fill" style="width:${val * 100}%;"></div></div></div>
+                    <div class="feature-value">${(val * 100).toFixed(1)}%</div>
+                </div>`;
+            }).join('');
 
-        // Validate
-        let correct = 0;
-        testSet.forEach(ex => {
-            const pred = net.run(ex.input)[0];
-            const actual = ex.output[0];
-            const predClass = pred > 0.5 ? 1 : 0;
-            if (predClass === actual) correct++;
-        });
-        const accuracy = testSet.length > 0 ? (correct / testSet.length * 100).toFixed(1) : 'N/A';
-
-        // Save model
-        this.currentModel = net;
-        const modelJson = net.toJSON();
-
-        await db.ref('users/' + this.currentUser.uid + '/currentModel').set({
-            ...modelJson,
-            name: modelName,
-            trainedAt: Date.now(),
-            trainingSize: this.trainingData.length,
-            accuracy: accuracy,
-            iterations: result.iterations,
-            error: result.error
-        });
-
-        progressEl.innerHTML = `
-            <div class="alert alert-success">
-                ✅ Model trained successfully!<br>
-                <strong>Name:</strong> ${modelName}<br>
-                <strong>Training examples:</strong> ${this.trainingData.length}<br>
-                <strong>Iterations:</strong> ${result.iterations}<br>
-                <strong>Final error:</strong> ${result.error.toFixed(5)}<br>
-                <strong>Test accuracy:</strong> ${accuracy}%
-            </div>
-        `;
-
-        this.updateModelStatus(true, modelName);
-        btn.disabled = false;
-        btn.innerHTML = '🧠 Train Neural Network';
-    },
-
-    // Manual training
-    addManualTraining() {
-        const features = [
-            parseFloat(document.getElementById('mtF1').value),
-            parseFloat(document.getElementById('mtF2').value),
-            parseFloat(document.getElementById('mtF3').value),
-            parseFloat(document.getElementById('mtF4').value),
-            parseFloat(document.getElementById('mtF5').value),
-            parseFloat(document.getElementById('mtF6').value),
-            parseFloat(document.getElementById('mtF7').value),
-            parseFloat(document.getElementById('mtF8').value)
-        ];
-        const outcome = parseInt(document.getElementById('mtOutcome').value);
-
-        this.manualTrainingData.push({ input: features, output: [outcome] });
-
-        document.getElementById('manualExamples').innerHTML = `
-            <p style="font-size:0.85rem; color:var(--text-muted);">${this.manualTrainingData.length} examples added</p>
-            <pre style="font-size:0.75rem; margin-top:8px;">${JSON.stringify(this.manualTrainingData.slice(-3), null, 2)}</pre>
-        `;
-    },
-
-    async trainManualModel() {
-        if (this.manualTrainingData.length < 5) {
-            alert('Add at least 5 examples first');
-            return;
+        } catch (err) {
+            document.getElementById('assessResult').innerHTML = `<div class="alert alert-danger"><strong>❌ Error:</strong> ${err.message}</div>`;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i data-feather="zap" style="width:15px;height:15px;"></i> Run AI Assessment';
+            feather.replace();
         }
-
-        this.trainingData = this.manualTrainingData;
-        document.getElementById('trainBtn').disabled = false;
-        this.trainModel();
     },
 
-    // ============================================
-    // PORTFOLIO
-    // ============================================
+    // ── PORTFOLIO ──
     loadPortfolio() {
         const tbody = document.getElementById('portfolioTable');
-
         if (this.assessments.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No assessments yet</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:28px;">No assessments yet</td></tr>';
             return;
         }
-
         tbody.innerHTML = this.assessments.map(a => {
             const date = new Date(a.timestamp).toLocaleDateString('en-ZA');
-            const statusClass = a.recommendation === 'APPROVE' ? 'status-approve' : 
-                               a.recommendation === 'REJECT' ? 'status-reject' : 'status-review';
-            return `
-                <tr>
-                    <td>${date}</td>
-                    <td>${a.applicantName}</td>
-                    <td>${a.businessName}</td>
-                    <td>R${a.loanAmount.toLocaleString()}</td>
-                    <td>${Math.round(a.riskScore * 100)}%</td>
-                    <td><span class="status-badge ${statusClass}">${a.recommendation}</span></td>
-                    <td>${a.status}</td>
-                </tr>
-            `;
+            const bc = a.recommendation === 'APPROVE' ? 'approve' : a.recommendation === 'REJECT' ? 'reject' : 'review';
+            return `<tr>
+                <td>${date}</td>
+                <td><strong>${a.applicantName}</strong></td>
+                <td>${a.businessName}</td>
+                <td>${a.sector || '—'}</td>
+                <td>R${a.loanAmount.toLocaleString()}</td>
+                <td><strong>${a.riskScore}%</strong></td>
+                <td><span class="badge badge-${bc}">${a.recommendation}</span></td>
+            </tr>`;
         }).join('');
     },
 
-    // ============================================
-    // SETTINGS
-    // ============================================
+    // ── SETTINGS ──
     async saveSettings() {
-        this.settings.approveThreshold = parseFloat(document.getElementById('threshApprove').value);
-        this.settings.rejectThreshold = parseFloat(document.getElementById('threshReject').value);
+        this.settings.approveThreshold = parseInt(document.getElementById('threshApprove').value);
+        this.settings.rejectThreshold = parseInt(document.getElementById('threshReject').value);
+        this.updateThresholdDisplay();
+        await db.ref(`users/${this.currentUser.uid}/settings`).set(this.settings);
+        alert('✅ Settings saved!');
+    },
 
-        document.getElementById('reviewLow').textContent = this.settings.approveThreshold;
-        document.getElementById('reviewHigh').textContent = this.settings.rejectThreshold;
+    updateThresholdDisplay() {
+        document.getElementById('reviewLow').textContent = this.settings.approveThreshold + '%';
+        document.getElementById('reviewHigh').textContent = this.settings.rejectThreshold + '%';
+    },
 
-        await db.ref('users/' + this.currentUser.uid + '/settings').set(this.settings);
-        alert('Settings saved!');
+    async saveContext() {
+        const ctx = document.getElementById('systemContext').value;
+        this.systemContext = ctx;
+        await db.ref(`users/${this.currentUser.uid}/systemContext`).set(ctx);
+        alert('✅ AI context saved!');
+    },
+
+    saveApiKey() {
+        const key = document.getElementById('apiKeyInput').value.trim();
+        if (!key) { alert('Please enter an API key.'); return; }
+        localStorage.setItem('xai_api_key', key);
+        alert('✅ API key saved locally!');
     },
 
     exportData() {
-        if (this.assessments.length === 0) {
-            alert('No data to export');
-            return;
-        }
-
-        const headers = ['Date', 'Applicant', 'Business', 'Amount', 'RiskScore', 'Recommendation', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8'];
+        if (this.assessments.length === 0) { alert('No data to export'); return; }
+        const headers = ['Date','Applicant','Business','Sector','Amount','RiskScore','Recommendation'];
         const rows = this.assessments.map(a => [
-            new Date(a.timestamp).toISOString(),
-            a.applicantName,
-            a.businessName,
-            a.loanAmount,
-            a.riskScore,
-            a.recommendation,
-            ...a.features
+            new Date(a.timestamp).toISOString(), a.applicantName, a.businessName,
+            a.sector || '', a.loanAmount, a.riskScore, a.recommendation
         ]);
-
         const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
         const blob = new Blob([csv], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `sme-assessments-${new Date().toISOString().split('T')[0]}.csv`;
-        a.click();
+        const el = document.createElement('a');
+        el.href = url;
+        el.download = `sme-assessments-${new Date().toISOString().split('T')[0]}.csv`;
+        el.click();
         URL.revokeObjectURL(url);
     },
 
     async clearAssessments() {
         if (!confirm('Delete all assessment data? This cannot be undone.')) return;
-        await db.ref('users/' + this.currentUser.uid + '/assessments').remove();
+        await db.ref(`users/${this.currentUser.uid}/assessments`).remove();
         this.assessments = [];
         this.updateDashboard();
         this.loadPortfolio();
-        alert('All assessments cleared');
+        alert('All assessments cleared.');
     },
 
-    async clearModels() {
-        if (!confirm('Delete all trained models?')) return;
-        await db.ref('users/' + this.currentUser.uid + '/currentModel').remove();
-        this.currentModel = null;
-        this.updateModelStatus(false);
-        alert('Models deleted');
-    },
-
-    // ============================================
-    // UTILITIES
-    // ============================================
-    showAlert(id, message, type) {
+    showAlert(id, msg, type) {
         const el = document.getElementById(id);
         el.className = `alert alert-${type}`;
-        el.textContent = message;
-        setTimeout(() => el.textContent = '', 5000);
+        el.textContent = msg;
+        setTimeout(() => { el.className = ''; el.textContent = ''; }, 5000);
     }
 };
 
-// Initialize auth listener
-auth.onAuthStateChanged((user) => app.onAuthStateChanged(user));
+// ── AUTH LISTENER ──
+auth.onAuthStateChanged(user => app.onAuthStateChanged(user));
 
-// Drag and drop for PDF
+// ── DRAG AND DROP ──
 document.addEventListener('DOMContentLoaded', () => {
+    feather.replace();
     const uploadArea = document.getElementById('pdfUpload');
     if (uploadArea) {
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('dragover');
-        });
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragover');
-        });
-        uploadArea.addEventListener('drop', (e) => {
+        uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        uploadArea.addEventListener('drop', e => {
             e.preventDefault();
             uploadArea.classList.remove('dragover');
             const files = e.dataTransfer.files;
@@ -1486,8 +1333,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Update threshold display on change
+    ['threshApprove', 'threshReject'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', () => app.updateThresholdDisplay());
+    });
 });
 </script>
-
 </body>
 </html>
