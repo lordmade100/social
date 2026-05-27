@@ -8,6 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-remote-config-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
 
@@ -555,15 +556,21 @@ South African Context:
 
                     <div style="margin-top:20px;">
                         <div class="card-title" style="margin-bottom:12px;"><i data-feather="key" style="width:16px;height:16px;"></i> API Key</div>
+                        <div class="alert alert-info" style="margin-bottom:12px;font-size:0.82rem;">
+                            <strong>Firebase Remote Config</strong> fetches the API key automatically from your Firebase project. No manual entry needed for users.
+                        </div>
                         <div class="form-group">
-                            <label>xAI Grok API Key</label>
+                            <label>Override API Key (optional fallback)</label>
                             <input type="password" id="apiKeyInput" placeholder="xai-...">
-                            <p style="font-size:0.78rem;color:var(--text-muted);margin-top:5px;">Stored locally in your browser. Never sent to our servers.</p>
+                            <p style="font-size:0.78rem;color:var(--text-muted);margin-top:5px;">Only used if Remote Config has no key set. Stored locally.</p>
                         </div>
                         <button class="btn btn-primary" onclick="app.saveApiKey()">
                             <i data-feather="save" style="width:15px;height:15px;"></i>
-                            Save API Key
+                            Save Fallback Key
                         </button>
+                        <div style="margin-top:14px;padding:12px;background:var(--bg);border-radius:8px;font-size:0.78rem;color:var(--text-muted);">
+                            <strong>Admin:</strong> Set the key in Firebase Console → Remote Config → Add parameter <code>xai_api_key</code>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -657,10 +664,46 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const auth = firebase.auth();
 
+// ══════════════════════════════════════════
+// FIREBASE REMOTE CONFIG — FETCH API KEY
+// ══════════════════════════════════════════
+const remoteConfig = firebase.remoteConfig();
+
+// Set in-app defaults (fallback if fetch fails)
+remoteConfig.setDefaults({
+    xai_api_key: '',
+    xai_base_url: 'https://api.x.ai/v1',
+    min_fetch_interval_sec: 3600
+});
+
+// Configure fetch settings
+remoteConfig.settings = {
+    minimumFetchIntervalMillis: 300000  // 5 minutes min between fetches
+};
+
+async function fetchRemoteConfig() {
+    try {
+        const fetched = await remoteConfig.fetchAndActivate();
+        XAI_API_KEY = remoteConfig.getString('xai_api_key');
+        const baseUrl = remoteConfig.getString('xai_base_url');
+        if (baseUrl) XAI_BASE = baseUrl;
+        console.log('Remote Config fetched:', fetched ? 'from server' : 'cached');
+        console.log('API Key present:', XAI_API_KEY ? 'Yes (' + XAI_API_KEY.substring(0, 8) + '...)' : 'No');
+    } catch (err) {
+        console.error('Remote Config fetch failed:', err);
+        // Fallback: try localStorage if user previously entered one
+        XAI_API_KEY = localStorage.getItem('xai_api_key') || '';
+    }
+}
+
+// Fetch on startup
+fetchRemoteConfig();
+
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-// xAI Grok API
-const XAI_BASE = "https://api.x.ai/v1";
+// xAI Grok API — base URL (endpoint fetched from Remote Config)
+let XAI_BASE = "https://api.x.ai/v1";
+let XAI_API_KEY = null;
 
 // ══════════════════════════════════════════
 // APP STATE
@@ -900,8 +943,12 @@ const app = {
 
     // ── GROK AI ASSESSMENT ──
     async callGrokAPI(features, raw, applicantName, businessName, loanAmount, sector) {
-        const apiKey = localStorage.getItem('xai_api_key');
-        if (!apiKey) throw new Error('No xAI API key found. Please add your key in the AI Context tab.');
+        // Ensure Remote Config is loaded; re-fetch if key not present
+        if (!XAI_API_KEY) {
+            await fetchRemoteConfig();
+        }
+        const apiKey = XAI_API_KEY || localStorage.getItem('xai_api_key');
+        if (!apiKey) throw new Error('No xAI API key found. The administrator must set it in Firebase Remote Config.');
 
         const systemPrompt = this.systemContext || document.getElementById('systemContext').value;
 
@@ -1276,8 +1323,10 @@ Respond in clear, structured markdown with headers. Be direct and specific.`;
     saveApiKey() {
         const key = document.getElementById('apiKeyInput').value.trim();
         if (!key) { alert('Please enter an API key.'); return; }
+        // Save locally as fallback only — the proper way is Firebase Remote Config in console
         localStorage.setItem('xai_api_key', key);
-        alert('✅ API key saved locally!');
+        XAI_API_KEY = key;
+        alert('✅ API key saved locally as fallback. For production, set it in Firebase Remote Config console.');
     },
 
     exportData() {
