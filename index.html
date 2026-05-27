@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SME Bureau Engine — Microlender Credit Scoring Network</title>
+    <title>SME Risk Engine - SA Microlender AI</title>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -12,468 +12,627 @@
     <script src="https://unpkg.com/feather-icons"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bureau-blue: #002d62;
-            --bureau-light: #f5f8ff;
-            --experian-purple: #4a154b;
-            --success: #1b5e20;
-            --success-light: #e8f5e9;
-            --warning: #e65100;
-            --warning-light: #fff3e0;
-            --danger: #b71c1c;
-            --danger-light: #ffebee;
+            --primary: #1a5f7a;
+            --primary-dark: #134b61;
+            --secondary: #c84b31;
+            --success: #1e8e3e;
+            --warning: #f9ab00;
+            --danger: #e63946;
+            --bg: #f4f6f9;
             --card: #ffffff;
-            --text-dark: #0f172a;
-            --text-muted: #64748b;
-            --border: #cbd5e1;
-            --radius-lg: 16px;
-            --radius-md: 10px;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 20px rgba(0, 45, 98, 0.08);
+            --text: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --shadow: 0 2px 12px rgba(0,0,0,0.07);
+            --radius: 14px;
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-            background: #f8fafc;
-            color: var(--text-dark);
-            line-height: 1.5;
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
         }
 
-        /* ── AUTHENTICATION ── */
-        .auth-screen {
+        /* ── LOGIN ── */
+        .login-screen {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(circle at top left, var(--bureau-blue), #001530);
-            padding: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
         }
-        .auth-container {
-            background: var(--card);
+        .login-box {
+            background: white;
             padding: 40px;
-            border-radius: var(--radius-lg);
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
             width: 100%;
-            max-width: 440px;
+            max-width: 400px;
         }
-        .auth-brand { text-align: center; margin-bottom: 32px; }
-        .auth-brand h2 { color: var(--bureau-blue); font-weight: 800; font-size: 1.6rem; letter-spacing: -0.02em; }
-        .auth-brand p { color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; }
+        .login-box h2 { text-align: center; margin-bottom: 6px; color: var(--primary-dark); font-size: 1.4rem; }
+        .login-box p { text-align: center; color: var(--text-muted); margin-bottom: 28px; font-size: 0.9rem; }
 
-        /* ── SYSTEM HEADER ── */
+        /* ── HEADER ── */
         header {
-            background: var(--bureau-blue);
+            background: var(--primary);
             color: white;
+            padding: 0;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 16px rgba(0,0,0,0.15);
         }
-        .header-wrap {
-            max-width: 1400px;
+        .header-inner {
+            max-width: 1280px;
             margin: 0 auto;
             padding: 0 24px;
-            height: 72px;
+            height: 64px;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
-        .brand-cluster h1 { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.01em; display: flex; align-items: center; gap: 8px; }
-        .brand-cluster p { font-size: 0.75rem; color: #93c5fd; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
-        .header-meta { display: flex; align-items: center; gap: 16px; }
-        .network-pill { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; padding: 6px 16px; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-        .network-dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; }
+        .header-brand { display: flex; align-items: center; gap: 10px; }
+        .header-brand h1 { font-size: 1.15rem; font-weight: 700; }
+        .header-brand p { font-size: 0.78rem; opacity: 0.8; }
+        .header-right { display: flex; align-items: center; gap: 10px; }
+        .user-pill { background: rgba(255,255,255,0.15); border-radius: 50px; padding: 6px 14px; font-size: 0.82rem; }
 
-        /* ── INTERFACE LAYOUT ── */
-        .wrapper { max-width: 1400px; margin: 0 auto; padding: 32px 24px; }
+        /* ── LAYOUT ── */
+        .container { max-width: 1280px; margin: 0 auto; padding: 24px; }
 
-        /* ── CONTROLS & SELECTION ── */
-        .tab-strip {
+        /* ── TABS ── */
+        .nav-tabs {
             display: flex;
-            gap: 8px;
-            margin-bottom: 32px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 12px;
+            gap: 4px;
+            margin-bottom: 24px;
+            background: white;
+            border-radius: var(--radius);
+            padding: 6px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
         }
-        .tab-trigger {
+        .nav-tab {
             padding: 10px 20px;
             background: none;
             border: none;
-            border-radius: var(--radius-md);
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
             color: var(--text-muted);
-            font-family: inherit;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
             transition: all 0.2s;
-        }
-        .tab-trigger:hover { color: var(--bureau-blue); background: var(--bureau-light); }
-        .tab-trigger.active { color: white; background: var(--bureau-blue); box-shadow: var(--shadow-sm); }
-        .tab-pane { display: none; }
-        .tab-pane.active { display: block; }
-
-        /* ── BUREAU STRUCTURES ── */
-        .panel {
-            background: var(--card);
-            border-radius: var(--radius-lg);
-            padding: 28px;
-            margin-bottom: 24px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid #e2e8f0;
-        }
-        .panel-heading {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--bureau-blue);
+            font-size: 0.88rem;
+            font-family: inherit;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 7px;
+        }
+        .nav-tab:hover { color: var(--primary); background: var(--bg); }
+        .nav-tab.active { color: var(--primary); background: var(--bg); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ── CARDS ── */
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        /* ── FORMS & INPUTS ── */
-        .field-group { margin-bottom: 20px; }
-        .field-group label { display: block; font-weight: 700; font-size: 0.8rem; margin-bottom: 6px; color: var(--text-dark); text-transform: uppercase; letter-spacing: 0.05em; }
-        input, select, textarea {
-            width: 100%; padding: 12px 16px; border: 1.5px solid #e2e8f0;
-            border-radius: var(--radius-md); font-size: 0.95rem; font-family: inherit;
-            color: var(--text-dark); background: #ffffff; transition: all 0.2s;
+        /* ── FORMS ── */
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-weight: 600; font-size: 0.82rem; margin-bottom: 6px; color: var(--text); text-transform: uppercase; letter-spacing: 0.03em; }
+        input[type="text"], input[type="email"], input[type="password"], input[type="number"] {
+            width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
+            border-radius: 10px; font-size: 0.95rem; font-family: inherit;
+            transition: border 0.2s; background: white; color: var(--text);
         }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--bureau-blue); box-shadow: 0 0 0 4px rgba(0,45,98,0.1); }
+        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,95,122,0.1); }
 
-        /* ── COMMERCIAL BUTTONS ── */
-        .action-btn {
-            padding: 12px 24px; border: none; border-radius: var(--radius-md);
+        /* ── BUTTONS ── */
+        .btn {
+            padding: 11px 22px; border: none; border-radius: 50px;
             font-weight: 600; cursor: pointer; transition: all 0.2s;
-            font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px;
-            font-family: inherit; justify-content: center;
+            font-size: 0.9rem; display: inline-flex; align-items: center; gap: 7px;
+            font-family: inherit;
         }
-        .action-btn-primary { background: var(--bureau-blue); color: white; }
-        .action-btn-primary:hover { background: #001f42; transform: translateY(-1px); }
-        .action-btn-success { background: var(--success); color: white; }
-        .action-btn-secondary { background: #e2e8f0; color: var(--text-dark); }
-        .action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
-        .full-width { width: 100%; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-secondary { background: var(--border); color: var(--text); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+        .btn-full { width: 100%; justify-content: center; }
+
+        /* ── ALERTS ── */
+        .alert { padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 0.88rem; }
+        .alert-info { background: #eff6ff; color: #1e40af; border-left: 3px solid #3b82f6; }
+        .alert-success { background: #f0fdf4; color: #166534; border-left: 3px solid var(--success); }
+        .alert-warning { background: #fffbeb; color: #92400e; border-left: 3px solid var(--warning); }
+        .alert-danger { background: #fef2f2; color: #991b1b; border-left: 3px solid var(--danger); }
 
         /* ── GRIDS ── */
-        .split-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-        .split-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
-        .split-bureau { display: grid; grid-template-columns: 420px 1fr; gap: 32px; }
-        @media (max-width: 1024px) { .split-2, .split-3, .split-bureau { grid-template-columns: 1fr; } }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+        @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
 
-        /* ── EXPERIAN CREDIT SCORE DISPLAY ── */
-        .score-dial-box {
+        /* ── METRIC ── */
+        .metric-card { text-align: center; padding: 24px; }
+        .metric-value { font-size: 2.2rem; font-weight: 800; color: var(--primary); }
+        .metric-label { font-size: 0.82rem; color: var(--text-muted); margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+
+        /* ── STATUS BADGES ── */
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 50px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+        .badge-approve { background: #dcfce7; color: var(--success); }
+        .badge-review { background: #fef9c3; color: #854d0e; }
+        .badge-reject { background: #fee2e2; color: var(--danger); }
+
+        /* ── PROGRESS ── */
+        .progress-bar { height: 8px; background: var(--border); border-radius: 50px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 50px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+
+        /* ── TABLE ── */
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { font-weight: 700; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        tr:hover td { background: #f9fafb; }
+
+        /* ── UPLOAD AREA ── */
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 36px;
             text-align: center;
-            padding: 32px 20px;
-            background: #f8fafc;
-            border-radius: var(--radius-lg);
-            border: 1px dashed var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        .score-value {
-            font-size: 4.5rem;
+        .upload-area:hover { border-color: var(--primary); background: #f0f7fa; }
+        .upload-area.dragover { border-color: var(--primary); background: rgba(26,95,122,0.06); }
+        .upload-icon { font-size: 2.5rem; margin-bottom: 10px; }
+
+        /* ── RISK RESULT ── */
+        .risk-score-display {
+            text-align: center;
+            padding: 32px 20px 24px;
+        }
+        .risk-number {
+            font-size: 5rem;
             font-weight: 800;
             line-height: 1;
-            letter-spacing: -0.04em;
+            margin-bottom: 8px;
         }
-        .score-band-badge {
-            display: inline-block;
-            padding: 6px 18px;
-            border-radius: 50px;
-            font-size: 0.85rem;
+        .risk-verdict {
+            font-size: 1.1rem;
             font-weight: 700;
-            text-transform: uppercase;
-            margin-top: 12px;
-            letter-spacing: 0.04em;
+            padding: 8px 24px;
+            border-radius: 50px;
+            display: inline-block;
+            margin-bottom: 16px;
         }
 
-        /* ── CREDIT RISK MATRIX ── */
-        .bureau-matrix { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 20px; }
-        .matrix-cell { background: #f1f5f9; border-radius: var(--radius-md); padding: 14px; border-left: 4px solid var(--border); }
-        .matrix-cell.risk-high { border-left-color: var(--danger); }
-        .matrix-cell.risk-low { border-left-color: var(--success); }
-        .matrix-title { font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
-        .matrix-data { font-size: 1.1rem; font-weight: 700; margin-top: 2px; color: var(--bureau-blue); }
-
-        /* ── EXPERIAN ENGINE OUTPUT ── */
-        .bureau-report {
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            margin-top: 20px;
+        /* ── AI ANALYSIS ── */
+        .ai-analysis {
+            background: linear-gradient(135deg, #f0f7fa 0%, #e8f4f8 100%);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-top: 16px;
+            border: 1px solid #c9dde5;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: var(--text);
         }
-        .bureau-report h3 { font-size: 1.05rem; margin-top: 18px; margin-bottom: 8px; color: var(--bureau-blue); border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; }
-        .bureau-report h3:first-of-type { margin-top: 0; }
-        .bureau-report ul { margin-left: 20px; margin-top: 6px; }
-        .bureau-report li { margin-bottom: 6px; font-size: 0.9rem; }
+        .ai-analysis h3, .ai-analysis h4 { color: var(--primary-dark); margin-top: 12px; margin-bottom: 6px; font-size: 0.95rem; }
+        .ai-analysis h3:first-child, .ai-analysis h4:first-child { margin-top: 0; }
+        .ai-analysis ul { margin-left: 20px; }
+        .ai-analysis li { margin-bottom: 4px; }
+        .ai-analysis strong { color: var(--primary-dark); }
+        .ai-analysis p { margin-bottom: 8px; }
+        .ai-analysis p:last-child { margin-bottom: 0; }
+        .ai-label { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--primary); margin-bottom: 12px; }
+        .ai-label::before { content: ''; width: 24px; height: 2px; background: var(--primary); border-radius: 2px; }
+        .ai-label::after { content: ''; width: 24px; height: 2px; background: var(--primary); border-radius: 2px; }
 
-        /* ── DATA TABLES ── */
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #e2e8f0; }
-        th { font-weight: 700; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; background: #f8fafc; }
-        tr:hover td { background: var(--bureau-light); }
+        /* ── FEATURE GRID ── */
+        .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .feature-item { background: var(--bg); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border); }
+        .feature-name { font-size: 0.82rem; color: var(--text-muted); font-weight: 500; }
+        .feature-value { font-size: 0.9rem; font-weight: 700; color: var(--primary); }
+        .feature-bar { width: 48px; height: 4px; background: var(--border); border-radius: 2px; margin-top: 4px; overflow: hidden; }
+        .feature-bar-fill { height: 100%; border-radius: 2px; background: var(--primary); }
 
-        .badge-status { padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; }
-        .status-approve { background: var(--success-light); color: var(--success); }
-        .status-review { background: var(--warning-light); color: var(--warning); }
-        .status-reject { background: var(--danger-light); color: var(--danger); }
+        /* ── SPINNER ── */
+        .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* UI UTILITIES */
+        /* ── THINKING DOTS ── */
+        .thinking-dots { display: inline-flex; gap: 5px; margin-left: 8px; vertical-align: middle; }
+        .thinking-dots span { width: 7px; height: 7px; background: var(--primary); border-radius: 50%; animation: tdot 1.4s infinite; }
+        .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes tdot { 0%,100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } }
+
+        /* ── AI STATUS INDICATOR ── */
+        .ai-status-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: linear-gradient(90deg, rgba(26,95,122,0.1) 0%, rgba(26,95,122,0.05) 100%);
+            border: 1px solid rgba(26,95,122,0.2);
+            border-radius: 50px; padding: 4px 12px; font-size: 0.78rem;
+            font-weight: 600; color: var(--primary); margin-bottom: 16px;
+        }
+        .ai-status-dot { width: 7px; height: 7px; background: var(--success); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100% { box-shadow: 0 0 0 2px rgba(30,142,62,0.2); } 50% { box-shadow: 0 0 0 5px rgba(30,142,62,0); } }
+
+        /* ── SECTION TITLE ── */
+        .section-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); font-weight: 700; margin: 20px 0 10px; }
+
+        /* ── CONTEXT EDITOR ── */
+        .context-textarea {
+            width: 100%; padding: 14px; border: 1.5px solid var(--border);
+            border-radius: 10px; font-size: 0.88rem; font-family: 'DM Sans', monospace;
+            resize: vertical; min-height: 140px; line-height: 1.6; color: var(--text);
+        }
+        .context-textarea:focus { outline: none; border-color: var(--primary); }
+
         .hidden { display: none !important; }
-        .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: rotate 0.7s linear infinite; }
-        @keyframes rotate { to { transform: rotate(360deg); } }
+
+        /* ── NAV MOBILE ── */
+        @media (max-width: 768px) {
+            .nav-tabs { overflow-x: auto; padding: 4px; }
+            .nav-tab { padding: 9px 14px; font-size: 0.82rem; }
+            .container { padding: 16px; }
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
+<base target="_blank">
 </head>
 <body>
 
-<div id="authScreen" class="auth-screen">
-    <div class="auth-container">
-        <div class="auth-brand">
-            <h2>🏦 NATIONAL CREDIT POOL</h2>
-            <p>Experian Lending Decisional Network for Micro-Financiers</p>
+<!-- ══ LOGIN ══ -->
+<div id="loginScreen" class="login-screen">
+    <div class="login-box">
+        <h2>🏦 SME Risk Engine</h2>
+        <p>AI-powered credit risk scoring for South African SMEs</p>
+        <div id="loginAlert"></div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="loginEmail" placeholder="lender@example.com">
         </div>
-        <div id="authAlert"></div>
-        <div class="field-group">
-            <label>Registered NCR Provider ID/Email</label>
-            <input type="email" id="authEmail" placeholder="lender@ncr-network.co.za">
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="••••••••">
         </div>
-        <div class="field-group">
-            <label>Bureau Access Token / Password</label>
-            <input type="password" id="authPassword" placeholder="••••••••">
-        </div>
-        <button class="action-btn action-btn-primary full-width" onclick="bureauApp.executeLogin()">
-            <span id="authBtnText">Authenticate Merchant Node</span>
+        <button class="btn btn-primary btn-full" onclick="app.login()">
+            <span id="loginBtnText">Sign In</span>
         </button>
-        <p style="text-align:center;margin-top:16px;font-size:0.8rem;color:var(--text-muted);">
-            Merchant Node Gateway: <code>demo@lender.co.za / password123</code>
+        <p style="text-align:center;margin-top:14px;font-size:0.82rem;color:var(--text-muted);">
+            Demo: <code>demo@lender.co.za / password123</code>
         </p>
     </div>
 </div>
 
-<div id="bureauInterface" class="hidden">
+<!-- ══ MAIN APP ══ -->
+<div id="mainApp" class="hidden">
     <header>
-        <div class="header-wrap">
-            <div class="brand-cluster">
-                <h1><i data-feather="activity"></i> CREDIT RISK ENGINE</h1>
-                <p>Cross-Lender Bureau Network Infrastructure</p>
+        <div class="header-inner">
+            <div class="header-brand">
+                <div>
+                    <h1>🏦 SME Risk Engine</h1>
+                    <p>Powered by Grok AI · South African Microlender</p>
+                </div>
             </div>
-            <div class="header-meta">
-                <div class="network-pill"><div class="network-dot"></div> Live Bureau Shared Pool</div>
-                <span id="merchantDisplay" style="font-size: 0.85rem; font-weight: 500; opacity: 0.9;"></span>
-                <button class="action-btn action-btn-secondary" style="padding:6px 14px; font-size:0.8rem;" onclick="bureauApp.executeLogout()">Exit Node</button>
+            <div class="header-right">
+                <span class="user-pill" id="userEmail"></span>
+                <button class="btn btn-secondary" style="padding:8px 16px;font-size:0.82rem;" onclick="app.logout()">Logout</button>
             </div>
         </div>
     </header>
 
-    <div class="wrapper">
-        <div class="tab-strip">
-            <button class="tab-trigger active" onclick="bureauApp.toggleInterface('dashboard', this)">
-                <i data-feather="grid"></i> Network Dashboard
+    <div class="container">
+        <!-- TABS -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="app.switchTab('dashboard', this)">
+                <i data-feather="bar-chart-2" style="width:16px;height:16px;"></i> Dashboard
             </button>
-            <button class="tab-trigger" onclick="bureauApp.toggleInterface('query', this)">
-                <i data-feather="search"></i> Run Bureau Query
+            <button class="nav-tab" onclick="app.switchTab('assess', this)">
+                <i data-feather="file-text" style="width:16px;height:16px;"></i> New Assessment
             </button>
-            <button class="tab-trigger" onclick="bureauApp.toggleInterface('sharedPool', this)">
-                <i data-feather="database"></i> Shared Credit Registry
+            <button class="nav-tab" onclick="app.switchTab('context', this)">
+                <i data-feather="sliders" style="width:16px;height:16px;"></i> AI Context
             </button>
-            <button class="tab-trigger" onclick="bureauApp.toggleInterface('ruleset', this)">
-                <i data-feather="sliders"></i> Underwriting Protocols
+            <button class="nav-tab" onclick="app.switchTab('portfolio', this)">
+                <i data-feather="briefcase" style="width:16px;height:16px;"></i> Portfolio
+            </button>
+            <button class="nav-tab" onclick="app.switchTab('settings', this)">
+                <i data-feather="settings" style="width:16px;height:16px;"></i> Settings
             </button>
         </div>
 
-        <div id="pane-dashboard" class="tab-pane active">
-            <div class="split-3">
-                <div class="panel" style="text-align: center;">
-                    <div style="font-size: 2.2rem; font-weight: 800; color: var(--bureau-blue);" id="statGlobalQueries">0</div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-top: 4px;">Network Inquiries Handled</div>
+        <!-- ══ DASHBOARD ══ -->
+        <div id="tab-dashboard" class="tab-content active">
+            <div class="grid-3">
+                <div class="card metric-card">
+                    <div class="metric-value" id="dashTotal">0</div>
+                    <div class="metric-label">Total Assessments</div>
                 </div>
-                <div class="panel" style="text-align: center;">
-                    <div style="font-size: 2.2rem; font-weight: 800; color: var(--success);" id="statAvgScore">0</div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-top: 4px;">Network Mean Credit Score</div>
+                <div class="card metric-card">
+                    <div class="metric-value" id="dashApproval">0%</div>
+                    <div class="metric-label">Approval Rate</div>
                 </div>
-                <div class="panel" style="text-align: center;">
-                    <div style="font-size: 2.2rem; font-weight: 800; color: var(--danger);" id="statRepudiationRate">0%</div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-top: 4px;">High-Risk Reject Velocity</div>
+                <div class="card metric-card">
+                    <div class="metric-value" id="dashAvgRisk">0%</div>
+                    <div class="metric-label">Avg Default Risk</div>
                 </div>
             </div>
 
-            <div class="panel">
-                <div class="panel-heading">🚨 Real-time Industry Credit Inquiries (Shared Pool Network Monitoring)</div>
-                <div style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Timestamp</th>
-                                <th>ID / Reg Number</th>
-                                <th>Applicant Profile</th>
-                                <th>Sector / Class</th>
-                                <th>Calculated Score</th>
-                                <th>Risk Category</th>
-                                <th>Originating Node</th>
-                            </tr>
-                        </thead>
-                        <tbody id="liveNetworkFeed">
-                            <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px;">No live queries across the registry node.</td></tr>
-                        </tbody>
-                    </table>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title"><i data-feather="activity" style="width:16px;height:16px;"></i> Risk Distribution</div>
+                    <div style="margin-bottom:14px;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.85rem;">
+                            <span>Low Risk (0–35%)</span><span id="countLow" style="font-weight:700;">0</span>
+                        </div>
+                        <div class="progress-bar"><div class="progress-fill" id="barLow" style="width:0%;background:var(--success);"></div></div>
+                    </div>
+                    <div style="margin-bottom:14px;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.85rem;">
+                            <span>Medium Risk (35–60%)</span><span id="countMedium" style="font-weight:700;">0</span>
+                        </div>
+                        <div class="progress-bar"><div class="progress-fill" id="barMedium" style="width:0%;background:var(--warning);"></div></div>
+                    </div>
+                    <div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.85rem;">
+                            <span>High Risk (60%+)</span><span id="countHigh" style="font-weight:700;">0</span>
+                        </div>
+                        <div class="progress-bar"><div class="progress-fill" id="barHigh" style="width:0%;background:var(--danger);"></div></div>
+                    </div>
                 </div>
+                <div class="card">
+                    <div class="card-title"><i data-feather="clock" style="width:16px;height:16px;"></i> Recent Activity</div>
+                    <div id="recentActivity"><p style="color:var(--text-muted);font-size:0.88rem;">No recent assessments</p></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i data-feather="cpu" style="width:16px;height:16px;"></i> AI Engine Status</div>
+                <div class="ai-status-badge">
+                    <div class="ai-status-dot"></div>
+                    Grok AI · Ready for assessments
+                </div>
+                <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.6;">
+                    This engine uses the <strong>xAI Grok API</strong> to analyse bank statement features and produce detailed credit risk assessments. 
+                    No model training required — Grok reasons directly over extracted financial signals to estimate default probability, explain risk factors, and recommend a lending decision.
+                </p>
             </div>
         </div>
 
-        <div id="pane-query" class="tab-pane">
-            <div class="split-bureau">
+        <!-- ══ ASSESS ══ -->
+        <div id="tab-assess" class="tab-content">
+            <div class="grid-2">
                 <div>
-                    <div class="panel">
-                        <div class="panel-heading">Profile Context Extraction</div>
-                        <div class="field-group">
-                            <label>South African ID / Registration Number</label>
-                            <input type="text" id="targetIdNumber" placeholder="e.g. 950302XXXX08X / 2022/XXXXXX/07">
+                    <div class="card">
+                        <div class="card-title"><i data-feather="upload" style="width:16px;height:16px;"></i> Applicant Details</div>
+                        <div class="form-group">
+                            <label>Applicant Name</label>
+                            <input type="text" id="appName" placeholder="e.g. Thabo Mokoena">
                         </div>
-                        <div class="field-group">
-                            <label>Full Legal Entity / Subject Name</label>
-                            <input type="text" id="targetSubjectName" placeholder="e.g. Katlego Frans Enterprise">
+                        <div class="form-group">
+                            <label>Business Name</label>
+                            <input type="text" id="appBusiness" placeholder="e.g. Mokoena Logistics">
                         </div>
-                        <div class="split-2">
-                            <div class="field-group">
-                                <label>Exposure Exposure Limit Required (R)</label>
-                                <input type="number" id="targetExposure" placeholder="e.g. 150000">
-                            </div>
-                            <div class="field-group">
-                                <label>Industry Sector Class</label>
-                                <select id="targetSector">
-                                    <option value="Retail">Retail Trade</option>
-                                    <option value="Logistics">Logistics & Fleet</option>
-                                    <option value="Agriculture">Agriculture / Farming</option>
-                                    <option value="Construction">Civil & Construction</option>
-                                    <option value="Services">Professional Services</option>
-                                </select>
-                            </div>
+                        <div class="form-group">
+                            <label>Loan Amount (R)</label>
+                            <input type="number" id="appAmount" placeholder="e.g. 50000">
+                        </div>
+                        <div class="form-group">
+                            <label>Business Sector</label>
+                            <select id="appSector" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:0.95rem;color:var(--text);">
+                                <option value="">Select sector...</option>
+                                <option>Retail</option>
+                                <option>Logistics & Transport</option>
+                                <option>Food & Hospitality</option>
+                                <option>Construction</option>
+                                <option>Professional Services</option>
+                                <option>Agriculture</option>
+                                <option>Manufacturing</option>
+                                <option>Other</option>
+                            </select>
                         </div>
                     </div>
 
-                    <div class="panel">
-                        <div class="panel-heading">Primary Signal Acquisition</div>
-                        <div style="padding:16px; background:var(--bureau-light); border-radius:var(--radius-md); margin-bottom:16px; font-size:0.85rem; color:var(--bureau-blue);">
-                            <strong>Experian Compliance Directive:</strong> Upload a 3-to-6 Month Bank Statement PDF. The local client layer extracts data parameters before passing them to the remote AI core.
+                    <div class="card">
+                        <div class="card-title"><i data-feather="file" style="width:16px;height:16px;"></i> Bank Statement PDF</div>
+                        <div class="alert alert-info">Upload a 3-month bank statement. We'll extract financial signals and send them to Grok AI for risk analysis.</div>
+                        <div class="upload-area" id="pdfUpload" onclick="document.getElementById('pdfFile').click()">
+                            <div class="upload-icon">📤</div>
+                            <p style="font-weight:600;margin-bottom:4px;">Click to upload PDF</p>
+                            <p style="font-size:0.82rem;color:var(--text-muted);">or drag and drop · PDF only</p>
                         </div>
-                        <div style="border: 2px dashed var(--border); border-radius: var(--radius-lg); padding: 32px; text-align: center; cursor: pointer; background: #faffff;" id="dragDropSurface" onclick="document.getElementById('bureauPdfFile').click()">
-                            <span style="font-size: 2rem;">📄</span>
-                            <p style="font-weight: 700; margin-top: 6px;">Commit Document to Bureau Parse Engine</p>
-                            <p style="font-size: 0.8rem; color: var(--text-muted);">Supports explicit structural PDF formats</p>
-                        </div>
-                        <input type="file" id="bureauPdfFile" accept=".pdf" style="display:none;" onchange="bureauApp.processFileImport(event)">
-                        <p id="targetFileNameDisplay" style="margin-top:12px; font-size:0.85rem; font-weight:700; color:var(--success);"></p>
+                        <input type="file" id="pdfFile" accept=".pdf" style="display:none;" onchange="app.handlePdfUpload(event)">
+                        <p id="pdfName" style="margin-top:10px;font-size:0.82rem;color:var(--text-muted);"></p>
 
-                        <div style="margin-top:20px; display:flex; gap:12px;">
-                            <button class="action-btn action-btn-primary" id="triggerScoringBtn" onclick="bureauApp.runBureauUnderwrite()" disabled>
-                                <i data-feather="shield"></i> Generate Score & Comprehensive Report
+                        <div style="margin-top:16px;display:flex;gap:10px;">
+                            <button class="btn btn-primary" id="assessBtn" onclick="app.runAssessment()" disabled>
+                                <i data-feather="zap" style="width:15px;height:15px;"></i>
+                                Run AI Assessment
                             </button>
-                            <button class="action-btn action-btn-secondary" onclick="bureauApp.runMockUnderwrite()">
-                                <i data-feather="cpu"></i> Inject Test Profile
+                            <button class="btn btn-secondary" onclick="app.runDemoAssessment()">
+                                <i data-feather="play" style="width:15px;height:15px;"></i>
+                                Try Demo
                             </button>
                         </div>
                     </div>
                 </div>
 
                 <div>
-                    <div class="panel" style="min-height: 400px;">
-                        <div class="panel-heading">Bureau Risk Analysis Assessment Matrix</div>
-                        <div id="scoringTargetOutput">
-                            <div style="text-align:center; padding:80px 20px; color:var(--text-muted);">
-                                <i data-feather="activity" style="width:48px; height:48px; opacity:0.15; margin-bottom:16px;"></i>
-                                <p style="font-size:0.95rem;">Pending Entity Inquiry Data Stream.</p>
+                    <div class="card" style="min-height:340px;">
+                        <div class="card-title"><i data-feather="target" style="width:16px;height:16px;"></i> Risk Assessment Result</div>
+                        <div id="assessResult">
+                            <div style="text-align:center;padding:50px 20px;color:var(--text-muted);">
+                                <i data-feather="shield" style="width:48px;height:48px;opacity:0.2;margin-bottom:12px;"></i>
+                                <p style="font-size:0.9rem;">Upload a bank statement and click<br><strong>Run AI Assessment</strong> to see results.</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="panel" id="bureauVectorCard" style="display:none;">
-                        <div class="panel-heading">Risk Vector Score Weightings</div>
-                        <div class="bureau-matrix" id="bureauVectorGrid"></div>
+                    <div class="card" id="featuresCard" style="display:none;">
+                        <div class="card-title"><i data-feather="list" style="width:16px;height:16px;"></i> Extracted Financial Signals</div>
+                        <div class="feature-grid" id="featureList"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="pane-sharedPool" class="tab-pane">
-            <div class="panel">
-                <div class="panel-heading">Global Bureau Cross-Inquiry Directory Search</div>
-                <div style="display: flex; gap: 12px; margin-bottom: 24px;">
-                    <input type="text" id="bureauSearchInput" placeholder="Search by South African ID, Company Reg Number, or Name..." style="max-width: 500px;">
-                    <button class="action-btn action-btn-primary" onclick="bureauApp.executeBureauLookup()">
-                        <i data-feather="search"></i> Lookup Bureau File
+        <!-- ══ AI CONTEXT ══ -->
+        <div id="tab-context" class="tab-content">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title"><i data-feather="edit-3" style="width:16px;height:16px;"></i> AI System Context</div>
+                    <div class="alert alert-info">
+                        Customise the instructions given to Grok AI when it analyses applications. Add your lending policy, risk appetite, sector-specific notes, or blacklist criteria.
+                    </div>
+                    <div class="form-group">
+                        <label>System Prompt / Lending Policy</label>
+                        <textarea class="context-textarea" id="systemContext" rows="10">You are a senior credit risk analyst at a South African microlending institution. Your role is to evaluate SME loan applications based on extracted bank statement features.
+
+Lending Policy:
+- Max loan amount: R500,000
+- Minimum 3 months business banking history required
+- High reversals/NSF are red flags for cash flow problems
+- Stable or growing balance trends preferred
+- Diversified revenue streams reduce concentration risk
+
+South African Context:
+- Consider load-shedding impact on business cash flows
+- Weekend/evening transactions may indicate informal sector business (normal for SA SMEs)
+- Salary inflows alongside business revenue are common for owner-managed businesses</textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="app.saveContext()">
+                        <i data-feather="save" style="width:15px;height:15px;"></i>
+                        Save Context
                     </button>
                 </div>
+
+                <div class="card">
+                    <div class="card-title"><i data-feather="info" style="width:16px;height:16px;"></i> How It Works</div>
+                    <div style="font-size:0.88rem;color:var(--text);line-height:1.9;">
+                        <div style="display:flex;gap:12px;margin-bottom:16px;">
+                            <div style="width:28px;height:28px;background:var(--primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">1</div>
+                            <div><strong>PDF Parsing</strong> — Bank statement is parsed with PDF.js. Transactions, balances, and keywords are extracted.</div>
+                        </div>
+                        <div style="display:flex;gap:12px;margin-bottom:16px;">
+                            <div style="width:28px;height:28px;background:var(--primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">2</div>
+                            <div><strong>Feature Calculation</strong> — 8 normalised risk features are computed: volatility, balance trend, debit/credit ratio, reversal frequency, etc.</div>
+                        </div>
+                        <div style="display:flex;gap:12px;margin-bottom:16px;">
+                            <div style="width:28px;height:28px;background:var(--primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">3</div>
+                            <div><strong>Grok AI Analysis</strong> — Features + applicant context are sent to the Grok API, which reasons over the data, estimates default probability, and provides a detailed explanation.</div>
+                        </div>
+                        <div style="display:flex;gap:12px;">
+                            <div style="width:28px;height:28px;background:var(--primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">4</div>
+                            <div><strong>Decision + Storage</strong> — Result (APPROVE / REVIEW / REJECT) and AI reasoning are saved to Firebase for your portfolio.</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:20px;">
+                        <div class="card-title" style="margin-bottom:12px;"><i data-feather="key" style="width:16px;height:16px;"></i> API Key</div>
+                        <div class="form-group">
+                            <label>xAI Grok API Key</label>
+                            <input type="password" id="apiKeyInput" placeholder="xai-...">
+                            <p style="font-size:0.78rem;color:var(--text-muted);margin-top:5px;">Stored locally in your browser. Never sent to our servers.</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="app.saveApiKey()">
+                            <i data-feather="save" style="width:15px;height:15px;"></i>
+                            Save API Key
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ PORTFOLIO ══ -->
+        <div id="tab-portfolio" class="tab-content">
+            <div class="card">
+                <div class="card-title"><i data-feather="briefcase" style="width:16px;height:16px;"></i> All Assessments</div>
                 <div style="overflow-x:auto;">
                     <table>
                         <thead>
                             <tr>
-                                <th>Bureau Tracking ID</th>
-                                <th>Subject Profile</th>
-                                <th>National ID/Reg</th>
-                                <th>Aggregated Score</th>
-                                <th>Underwriter Consensus</th>
-                                <th>Last Actioned Date</th>
+                                <th>Date</th>
+                                <th>Applicant</th>
+                                <th>Business</th>
+                                <th>Sector</th>
+                                <th>Amount</th>
+                                <th>Risk Score</th>
+                                <th>Decision</th>
                             </tr>
                         </thead>
-                        <tbody id="bureauRegistryBody">
-                            <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:24px;">No historical matching indices discovered in current segment.</td></tr>
+                        <tbody id="portfolioTable">
+                            <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:28px;">No assessments yet</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <div id="pane-ruleset" class="tab-pane">
-            <div class="split-2">
-                <div class="panel">
-                    <div class="panel-heading">Remote Config Integration & Underwriting Weights</div>
-                    <div style="padding:12px; background:var(--warning-light); color:var(--warning); font-size:0.85rem; border-radius:var(--radius-md); margin-bottom:16px; font-weight:600;">
-                        ⚠️ Adjusting these thresholds will immediately impact automated recommendations across your portfolio.
+        <!-- ══ SETTINGS ══ -->
+        <div id="tab-settings" class="tab-content">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title"><i data-feather="sliders" style="width:16px;height:16px;"></i> Risk Thresholds</div>
+                    <div class="form-group">
+                        <label>Auto-Approve Below (%)</label>
+                        <input type="number" id="threshApprove" value="35" min="0" max="100">
+                        <p style="font-size:0.78rem;color:var(--text-muted);margin-top:5px;">AI scores below this go straight to APPROVE.</p>
                     </div>
-                    <div class="field-group">
-                        <label>Auto-Approve Bureau Cut-Off Score (300 - 850)</label>
-                        <input type="number" id="cfgApproveFloor" value="650" min="300" max="850">
+                    <div class="form-group">
+                        <label>Auto-Reject Above (%)</label>
+                        <input type="number" id="threshReject" value="60" min="0" max="100">
+                        <p style="font-size:0.78rem;color:var(--text-muted);margin-top:5px;">AI scores above this go straight to REJECT.</p>
                     </div>
-                    <div class="field-group">
-                        <label>Auto-Reject Bureau Ceiling Score (300 - 850)</label>
-                        <input type="number" id="cfgRejectCeiling" value="480" min="300" max="850">
+                    <div class="alert alert-info" style="margin-bottom:16px;">
+                        Between <strong id="reviewLow">35%</strong> and <strong id="reviewHigh">60%</strong> = Manual Review
                     </div>
-                    <div class="field-group">
-                        <label>Bureau System Prompt / Decision Matrix Alignment Rules</label>
-                        <textarea id="cfgSystemTemplate" rows="8" style="font-family: monospace; font-size:0.85rem;">You are the underwriting intelligence core at a centralized South African credit bureau, calibrated similarly to Experian and TransUnion data rules. 
-
-Evaluate the subject against standard National Credit Act (NCA) parameters:
-- Translate metrics to a definitive credit score variant between 300 and 850.
-- High volatility and debt-to-income imbalances degrade the score.
-- Unadjusted bounce/NSF occurrences indicate immediate micro-default.
-- Ensure optimization reflects structural vulnerabilities like macroeconomic inflation and load-shedding resource overfills.</textarea>
-                    </div>
-                    <button class="action-btn action-btn-primary" onclick="bureauApp.commitSystemConfiguration()">Commit Ruleset Modifications</button>
+                    <button class="btn btn-primary" onclick="app.saveSettings()">Save Thresholds</button>
                 </div>
 
-                <div class="panel">
-                    <div class="panel-heading">Bureau Integration & Security Layer</div>
-                    <div class="field-group">
-                        <label>xAI Grok API Secret Gateway</label>
-                        <input type="password" id="bureauGrokApiKey" placeholder="xai-....................">
-                    </div>
-                    <button class="action-btn action-btn-primary" onclick="bureauApp.commitApiKeyLocal()">Bind Security Credentials</button>
-                    
-                    <hr style="margin:24px 0; border:0; border-top:1px solid var(--border);">
-                    <div class="panel-heading">National Credit Regulator Compliance Matrix</div>
-                    <ul style="font-size:0.85rem; line-height:2; color:var(--text-dark); list-style-type: square; padding-left:20px;">
-                        <li>Data access streams are strictly bound to explicit borrower consent architecture.</li>
-                        <li>Platform tracks all individual credit provider inquiries to satisfy section 70 of the National Credit Act (NCA).</li>
-                        <li>Automated rejection logic must clear access paths to manual validation review under dispute terms.</li>
+                <div class="card">
+                    <div class="card-title"><i data-feather="shield" style="width:16px;height:16px;"></i> POPIA Compliance</div>
+                    <div class="alert alert-info" style="margin-bottom:16px;">This system processes personal financial data. Ensure compliance with POPIA.</div>
+                    <ul style="font-size:0.88rem;line-height:2.2;list-style:none;">
+                        <li>✅ Raw PDFs are parsed in-browser and immediately discarded</li>
+                        <li>✅ Only extracted features and scores are stored in Firebase</li>
+                        <li>✅ Data is encrypted in transit and at rest</li>
+                        <li>✅ Access is authenticated and logged</li>
+                        <li>⚠️ Register an Information Officer with the SA Information Regulator</li>
                     </ul>
+                    <div style="display:flex;gap:10px;margin-top:16px;">
+                        <button class="btn btn-secondary" onclick="app.exportData()">
+                            <i data-feather="download" style="width:15px;height:15px;"></i> Export CSV
+                        </button>
+                        <button class="btn btn-danger" onclick="app.clearAssessments()">
+                            <i data-feather="trash-2" style="width:15px;height:15px;"></i> Clear All
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -482,7 +641,7 @@ Evaluate the subject against standard National Credit Act (NCA) parameters:
 
 <script>
 // ══════════════════════════════════════════
-// FIREBASE CORE NETWORK CONTEXT SETUP
+// FIREBASE CONFIG
 // ══════════════════════════════════════════
 const firebaseConfig = {
     apiKey: "AIzaSyCh7Ute6LeSAxcNDEQwZg5m0cA4ujnLCfg",
@@ -495,420 +654,692 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-const realTimeDatabase = firebase.database();
-const securityAuth = firebase.auth();
+const db = firebase.database();
+const auth = firebase.auth();
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-const REMOTE_AI_GATEWAY = "https://api.x.ai/v1";
+
+// xAI Grok API
+const XAI_BASE = "https://api.x.ai/v1";
 
 // ══════════════════════════════════════════
-// ENGINE APPLICATIONS & STATES
+// APP STATE
 // ══════════════════════════════════════════
-const bureauApp = {
-    activeNodeUser: null,
-    cachedNetworkBureauRegistry: [],
-    merchantRules: { approveFloor: 650, rejectCeiling: 480 },
-    committedFile: null,
-    systemContextPrompt: '',
+const app = {
+    currentUser: null,
+    assessments: [],
+    settings: { approveThreshold: 35, rejectThreshold: 60 },
+    currentPdfFile: null,
+    systemContext: '',
 
-    async executeLogin() {
-        const e = document.getElementById('authEmail').value;
-        const p = document.getElementById('authPassword').value;
-        if (!e || !p) return;
+    // ── AUTH ──
+    async login() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        if (!email || !password) { app.showAlert('loginAlert', 'Please enter email and password.', 'danger'); return; }
         try {
-            await securityAuth.signInWithEmailAndPassword(e, p);
+            await auth.signInWithEmailAndPassword(email, password);
         } catch (err) {
-            if (err.code === 'auth/user-not-found' && e === 'demo@lender.co.za') {
-                await securityAuth.createUserWithEmailAndPassword(e, p);
+            if (err.code === 'auth/user-not-found' && email === 'demo@lender.co.za') {
+                try { await auth.createUserWithEmailAndPassword(email, password); }
+                catch (e) { app.showAlert('loginAlert', e.message, 'danger'); }
             } else {
-                alert(err.message);
+                app.showAlert('loginAlert', err.message, 'danger');
             }
         }
     },
 
-    executeLogout() { securityAuth.signOut(); },
+    logout() { auth.signOut(); },
 
-    handleAuthStateShift(user) {
+    onAuthStateChanged(user) {
         if (user) {
-            this.activeNodeUser = user;
-            document.getElementById('authScreen').classList.add('hidden');
-            document.getElementById('bureauInterface').classList.remove('hidden');
-            document.getElementById('merchantDisplay').textContent = `Node: ${user.email}`;
-            this.synchronizeBureauCore();
+            this.currentUser = user;
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('userEmail').textContent = user.email;
+            this.loadData();
             feather.replace();
         } else {
-            this.activeNodeUser = null;
-            document.getElementById('authScreen').classList.remove('hidden');
-            document.getElementById('bureauInterface').classList.add('hidden');
+            this.currentUser = null;
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
         }
     },
 
-    toggleInterface(targetPane, element) {
-        document.querySelectorAll('.tab-trigger').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-        element.classList.add('active');
-        document.getElementById('pane-' + targetPane).classList.add('active');
+    // ── NAV ──
+    switchTab(tabName, btn) {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + tabName).classList.add('active');
+        if (tabName === 'dashboard') this.updateDashboard();
+        if (tabName === 'portfolio') this.loadPortfolio();
         feather.replace();
     },
 
-    // ── DATABASE ROUTINES (GLOBAL REGISTRY ARCHITECTURE) ──
-    async synchronizeBureauCore() {
-        // Fetch Global Configurations
-        const configSnap = await realTimeDatabase.ref(`bureauSystem/globalRules`).once('value');
-        if (configSnap.exists()) {
-            this.merchantRules = configSnap.val();
-            document.getElementById('cfgApproveFloor').value = this.merchantRules.approveFloor;
-            document.getElementById('cfgRejectCeiling').value = this.merchantRules.rejectCeiling;
+    // ── DATA ──
+    async loadData() {
+        const uid = this.currentUser.uid;
+
+        // Settings
+        const sSnap = await db.ref(`users/${uid}/settings`).once('value');
+        if (sSnap.exists()) {
+            this.settings = sSnap.val();
+            document.getElementById('threshApprove').value = this.settings.approveThreshold;
+            document.getElementById('threshReject').value = this.settings.rejectThreshold;
+            this.updateThresholdDisplay();
         }
 
-        const templateSnap = await realTimeDatabase.ref(`bureauSystem/promptTemplate`).once('value');
-        if (templateSnap.exists()) {
-            this.systemContextPrompt = templateSnap.val();
-            document.getElementById('cfgSystemTemplate').value = this.systemContextPrompt;
+        // System context
+        const cSnap = await db.ref(`users/${uid}/systemContext`).once('value');
+        if (cSnap.exists()) {
+            this.systemContext = cSnap.val();
+            document.getElementById('systemContext').value = this.systemContext;
         } else {
-            this.systemContextPrompt = document.getElementById('cfgSystemTemplate').value;
+            this.systemContext = document.getElementById('systemContext').value;
         }
 
-        const keyCache = localStorage.getItem('bureau_grok_key');
-        if (keyCache) document.getElementById('bureauGrokApiKey').value = keyCache;
+        // API key
+        const savedKey = localStorage.getItem('xai_api_key');
+        if (savedKey) document.getElementById('apiKeyInput').value = savedKey;
 
-        // Sync with Shared Global Pool Instead of User-Isolates
-        realTimeDatabase.ref(`bureauSystem/globalSharedRegistry`).on('value', snap => {
-            if (snap.exists()) {
-                this.cachedNetworkBureauRegistry = Object.values(snap.val()).sort((x, y) => y.timestamp - x.timestamp);
-                this.renderDashboardMetrics();
-                this.populateSharedPoolTable();
-            }
-        });
-    },
-
-    renderDashboardMetrics() {
-        const total = this.cachedNetworkBureauRegistry.length;
-        document.getElementById('statGlobalQueries').textContent = total;
-
-        const dynamicSum = this.cachedNetworkBureauRegistry.reduce((acc, obj) => acc + obj.calculatedCreditScore, 0);
-        document.getElementById('statAvgScore').textContent = total > 0 ? Math.round(dynamicSum / total) : 'N/A';
-
-        const rawRejects = this.cachedNetworkBureauRegistry.filter(obj => obj.bureauRecommendation === 'REJECT').length;
-        document.getElementById('statRepudiationRate').textContent = total > 0 ? Math.round((rawRejects / total) * 100) + '%' : '0%';
-
-        const segment = this.cachedNetworkBureauRegistry.slice(0, 6);
-        document.getElementById('liveNetworkFeed').innerHTML = segment.length > 0
-            ? segment.map(obj => `
-                <tr>
-                    <td>${new Date(obj.timestamp).toLocaleTimeString()}</td>
-                    <td><code>${obj.nationalIdRef}</code></td>
-                    <td><strong>${obj.entityName}</strong></td>
-                    <td>${obj.sectorContext}</td>
-                    <td><strong style="color:var(--bureau-blue);">${obj.calculatedCreditScore}</strong></td>
-                    <td><span class="badge-status status-${obj.bureauRecommendation.toLowerCase()}">${obj.bureauRecommendation}</span></td>
-                    <td><small>${obj.performingMerchantNode}</small></td>
-                </tr>`).join('')
-            : '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);">No current bureau traffic.</td></tr>';
-    },
-
-    populateSharedPoolTable() {
-        const targetBody = document.getElementById('bureauRegistryBody');
-        if (this.cachedNetworkBureauRegistry.length === 0) {
-            targetBody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:24px;">No historical data available.</td></tr>';
-            return;
+        // Assessments
+        const aSnap = await db.ref(`users/${uid}/assessments`).once('value');
+        if (aSnap.exists()) {
+            this.assessments = Object.values(aSnap.val()).sort((a, b) => b.timestamp - a.timestamp);
         }
-        this.renderRegistryView(this.cachedNetworkBureauRegistry);
+
+        this.updateDashboard();
     },
 
-    renderRegistryView(dataset) {
-        document.getElementById('bureauRegistryBody').innerHTML = dataset.map(obj => `
-            <tr>
-                <td><code>B-RUN-${obj.timestamp}</code></td>
-                <td><strong>${obj.entityName}</strong></td>
-                <td><code>${obj.nationalIdRef}</code></td>
-                <td><strong>${obj.calculatedCreditScore} / 850</strong></td>
-                <td><span class="badge-status status-${obj.bureauRecommendation.toLowerCase()}">${obj.bureauRecommendation}</span></td>
-                <td>${new Date(obj.timestamp).toLocaleDateString('en-ZA')}</td>
-            </tr>`).join('');
+    // ── DASHBOARD ──
+    updateDashboard() {
+        const total = this.assessments.length;
+        const approved = this.assessments.filter(a => a.recommendation === 'APPROVE').length;
+        const avgRisk = total > 0 ? this.assessments.reduce((s, a) => s + a.riskScore, 0) / total : 0;
+
+        document.getElementById('dashTotal').textContent = total;
+        document.getElementById('dashApproval').textContent = total > 0 ? Math.round(approved / total * 100) + '%' : '0%';
+        document.getElementById('dashAvgRisk').textContent = Math.round(avgRisk) + '%';
+
+        const low = this.assessments.filter(a => a.riskScore <= 35).length;
+        const med = this.assessments.filter(a => a.riskScore > 35 && a.riskScore < 60).length;
+        const high = this.assessments.filter(a => a.riskScore >= 60).length;
+        document.getElementById('countLow').textContent = low;
+        document.getElementById('countMedium').textContent = med;
+        document.getElementById('countHigh').textContent = high;
+        const maxC = Math.max(low, med, high, 1);
+        document.getElementById('barLow').style.width = (low / maxC * 100) + '%';
+        document.getElementById('barMedium').style.width = (med / maxC * 100) + '%';
+        document.getElementById('barHigh').style.width = (high / maxC * 100) + '%';
+
+        const recent = this.assessments.slice(0, 5);
+        document.getElementById('recentActivity').innerHTML = recent.length > 0
+            ? recent.map(a => `
+                <div style="padding:10px 0;border-bottom:1px solid var(--border);font-size:0.85rem;">
+                    <strong>${a.applicantName}</strong> — ${a.businessName}<br>
+                    <span style="color:var(--text-muted);">Risk: ${a.riskScore}% · 
+                    <span class="badge badge-${a.recommendation.toLowerCase()}">${a.recommendation}</span></span>
+                </div>`).join('')
+            : '<p style="color:var(--text-muted);font-size:0.88rem;">No assessments yet</p>';
+        feather.replace();
     },
 
-    executeBureauLookup() {
-        const searchVal = document.getElementById('bureauSearchInput').value.trim().toLowerCase();
-        if (!searchVal) {
-            this.populateSharedPoolTable();
-            return;
+    // ── PDF HANDLING ──
+    async handlePdfUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        this.currentPdfFile = file;
+        document.getElementById('pdfName').textContent = `✅ ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        document.getElementById('assessBtn').disabled = false;
+    },
+
+    async parsePdf(file) {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let fullText = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const tc = await page.getTextContent();
+            fullText += tc.items.map(item => item.str).join(' ') + ' ';
         }
-        const filtered = this.cachedNetworkBureauRegistry.filter(a => 
-            a.entityName.toLowerCase().includes(searchVal) || 
-            a.nationalIdRef.toLowerCase().includes(searchVal)
-        );
-        this.renderRegistryView(filtered);
+        return this.extractTransactions(fullText);
     },
 
-    // ── FINANCIAL RAW PARSE OPERATIONS ──
-    processFileImport(event) {
-        const targetFile = event.target.files[0];
-        if (!targetFile) return;
-        this.committedFile = targetFile;
-        document.getElementById('targetFileNameDisplay').textContent = `✓ Document Stack Registered: ${targetFile.name}`;
-        document.getElementById('triggerScoringBtn').disabled = false;
-    },
-
-    async parseExtractionLoop(file) {
-        const buffer = await file.arrayBuffer();
-        const documentReference = await pdfjsLib.getDocument({ data: buffer }).promise;
-        let runningTextBlob = '';
-        for (let idx = 1; idx <= documentReference.numPages; idx++) {
-            const pageRef = await documentReference.getPage(idx);
-            const contentStructure = await pageRef.getTextContent();
-            runningTextBlob += contentStructure.items.map(i => i.str).join(' ') + ' ';
-        }
-        return this.generateBureauVectors(runningTextBlob);
-    },
-
-    generateBureauVectors(rawText) {
-        // Advanced extraction regex algorithms mapped directly to commercial risk calculations
-        const lineSplits = rawText.split(/\r?\n/).filter(line => line.trim());
-        const discoveredTransactions = [];
+    extractTransactions(text) {
+        const lines = text.split(/\r?\n/).filter(l => l.trim());
+        const transactions = [];
         const balances = [];
-        
-        for (const line of lineSplits) {
-            const multiValueMatches = [...line.matchAll(/-?R?\s?([0-9,]+\.\d{2})/g)].map(m => parseFloat(m[1].replace(/,/g, '')));
-            if (multiValueMatches.length > 0) {
-                balances.push(multiValueMatches[multiValueMatches.length - 1]);
-                discoveredTransactions.push({
-                    description: line.substring(0, 50),
-                    amount: multiValueMatches[0]
+        const datePattern = /(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/;
+
+        for (const line of lines) {
+            const amounts = [...line.matchAll(/-?R?\s?([0-9,]+\.\d{2})/g)].map(m => parseFloat(m[1].replace(/,/g, '')));
+            const dateMatch = line.match(datePattern);
+            if (amounts.length > 0 && dateMatch) {
+                const isDebit = /debit|dr\b|-R/i.test(line);
+                transactions.push({
+                    date: dateMatch[1],
+                    description: line.substring(0, 60).trim(),
+                    amount: amounts[amounts.length - 1],
+                    type: isDebit ? 'debit' : 'credit'
                 });
             }
+            const bMatch = line.match(/balance[\s:]+R?\s?([0-9,]+\.\d{2})/i);
+            if (bMatch) balances.push(parseFloat(bMatch[1].replace(/,/g, '')));
         }
+        return { transactions, balances };
+    },
 
-        const baselineLength = discoveredTransactions.length || 1;
-        const failureKeywords = ['reversal','returned','insufficient','nsf','dishonour','bounce','unpaid','overdrawn'];
-        const matchesCount = discoveredTransactions.filter(t => failureKeywords.some(keyword => t.description.toLowerCase().includes(keyword))).length;
+    calculateFeatures({ transactions, balances }) {
+        if (transactions.length === 0) throw new Error('No transactions found in PDF. The format may not be supported.');
 
-        // Calculate analytical risk vectors normalized between 0.00 and 1.00
+        const dailyFlows = {};
+        transactions.forEach(t => {
+            dailyFlows[t.date] = (dailyFlows[t.date] || 0) + (t.type === 'credit' ? t.amount : -t.amount);
+        });
+        const flows = Object.values(dailyFlows);
+        const mean = flows.reduce((a, b) => a + b, 0) / flows.length;
+        const variance = flows.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / flows.length;
+        const volatility = Math.min(Math.sqrt(variance) / (Math.abs(mean) + 1), 1);
+
+        const totalDebits = transactions.filter(t => t.type === 'debit').reduce((s, t) => s + t.amount, 0);
+        const totalCredits = transactions.filter(t => t.type === 'credit').reduce((s, t) => s + t.amount, 0);
+        const debitCreditRatio = totalCredits > 0 ? Math.min(totalDebits / totalCredits, 2) / 2 : 1;
+
+        const balanceTrend = balances.length > 1
+            ? Math.min(Math.max((balances[balances.length - 1] - balances[0]) / (Math.abs(balances[0]) + 1), -1), 1)
+            : 0;
+        const normalizedTrend = (balanceTrend + 1) / 2;
+
+        const reversalKw = ['reversal','returned','insufficient','nsf','dishonour','bounce','unpaid'];
+        const reversalCount = transactions.filter(t => reversalKw.some(k => t.description.toLowerCase().includes(k))).length;
+        const reversalRatio = Math.min(reversalCount / transactions.length * 5, 1);
+
+        const weekendRatio = 0.2; // placeholder without full timestamps
+
+        const credits = transactions.filter(t => t.type === 'credit').map(t => t.amount).sort((a, b) => a - b);
+        let regularDeposits = 0;
+        if (credits.length >= 3) {
+            const clusters = [];
+            let curr = [credits[0]];
+            for (let i = 1; i < credits.length; i++) {
+                if (Math.abs(credits[i] - curr[0]) / (curr[0] + 1) < 0.15) curr.push(credits[i]);
+                else { clusters.push(curr); curr = [credits[i]]; }
+            }
+            clusters.push(curr);
+            const largest = clusters.reduce((m, c) => c.length > m.length ? c : m, clusters[0]);
+            regularDeposits = largest.reduce((a, b) => a + b, 0);
+        }
+        const salaryMix = Math.min(regularDeposits / (totalCredits + 1), 1);
+
+        const maxDeposit = Math.max(...credits, 0);
+        const largestDepositRatio = totalCredits > 0 ? Math.min(maxDeposit / totalCredits, 1) : 0;
+
+        const zeroBalanceDays = balances.filter(b => b <= 0).length / Math.max(balances.length, 1);
+
         return {
-            affordabilityRatio: parseFloat(Math.random().toFixed(2)), // Debt-To-Income Proxy calculation placeholder
-            liquidityVolatility: parseFloat((matchesCount / baselineLength * 4).toFixed(2)),
-            balanceStabilityIndex: balances.length > 2 ? parseFloat((Math.max(...balances) / (balances[balances.length - 1] + 1) / 10).toFixed(2)) : 0.5,
-            behavioralDefaults: matchesCount
+            features: {
+                cashFlowVolatility: +volatility.toFixed(3),
+                balanceTrend: +normalizedTrend.toFixed(3),
+                debitCreditRatio: +debitCreditRatio.toFixed(3),
+                weekendEveningPct: +weekendRatio.toFixed(3),
+                reversalFrequency: +reversalRatio.toFixed(3),
+                salaryRevenueMix: +salaryMix.toFixed(3),
+                largestDepositPct: +largestDepositRatio.toFixed(3),
+                zeroBalanceDays: +zeroBalanceDays.toFixed(3)
+            },
+            raw: {
+                totalTransactions: transactions.length,
+                totalDebits: +totalDebits.toFixed(2),
+                totalCredits: +totalCredits.toFixed(2),
+                avgBalance: balances.length > 0 ? +(balances.reduce((a, b) => a + b, 0) / balances.length).toFixed(2) : 0,
+                reversalCount
+            }
         };
     },
 
-    // ── REMOTE INTELLIGENCE CORE CALLS ──
-    async callBureauIntelligenceCore(vectors, profile) {
-        const targetApiKey = localStorage.getItem('bureau_grok_key');
-        if (!targetApiKey) throw new Error("Security Infrastructure Failure: Missing Remote Node Integration Token.");
+    // ── GROK AI ASSESSMENT ──
+    async callGrokAPI(features, raw, applicantName, businessName, loanAmount, sector) {
+        const apiKey = localStorage.getItem('xai_api_key');
+        if (!apiKey) throw new Error('No xAI API key found. Please add your key in the AI Context tab.');
 
-        const queryPrompt = `
-You are an advanced commercial credit scoring model working within a South African Credit Bureau environment.
-Evaluate the structured banking telemetry vectors alongside the merchant input parameters to determine a comprehensive risk rating.
+        const systemPrompt = this.systemContext || document.getElementById('systemContext').value;
 
-## TARGET PROFILE INDICES
-- Legal Entity / Subject Name: ${profile.name}
-- Identity / Registration Number: ${profile.idNumber}
-- Requested Exposure Limit: R${parseInt(profile.exposure).toLocaleString()}
-- Sector Profiling Classification: ${profile.sector}
+        const userMessage = `
+Please analyse this SME loan application and provide a detailed credit risk assessment.
 
-## ACQUIRED STRUCTURAL VECTORS
-- Verified Debt-To-Income / Affordability Variance: ${(vectors.affordabilityRatio * 100).toFixed(0)}%
-- Liquidity Volatility Coefficient: ${(vectors.liquidityVolatility * 100).toFixed(0)}%
-- Asset Run-Rate Stability Index: ${(vectors.balanceStabilityIndex * 100).toFixed(0)}%
-- Technical Behavioral Infractions (NSF/Bounces): ${vectors.behavioralDefaults} occurrences
+## Applicant
+- **Name:** ${applicantName}
+- **Business:** ${businessName}
+- **Sector:** ${sector || 'Not specified'}
+- **Loan Amount Requested:** R${parseInt(loanAmount).toLocaleString()}
 
-## MANDATED RESPONSE OUTPUT SCHEMA
-Your textual evaluations will undergo immediate programmatic parsing. Return your outputs using precise structures containing:
-1. "BUREAU ASSESSMENT CREDIT SCORE: [Value between 300 and 850]"
-2. "BUREAU DECISION EXECUTION: [APPROVE, MANUAL REVIEW, or REJECT]"
-3. A detailed technical risk paragraph explaining the structural credit history findings.`;
+## Extracted Bank Statement Features (normalised 0–1)
+- Cash Flow Volatility: ${(features.cashFlowVolatility * 100).toFixed(1)}% (higher = more volatile/risky)
+- Balance Trend: ${(features.balanceTrend * 100).toFixed(1)}% (higher = improving balance)
+- Debit/Credit Ratio: ${(features.debitCreditRatio * 100).toFixed(1)}% (higher = spending more than earning)
+- Weekend/Evening Transactions: ${(features.weekendEveningPct * 100).toFixed(1)}%
+- Reversal/NSF Frequency: ${(features.reversalFrequency * 100).toFixed(1)}% (higher = more bounced payments)
+- Salary vs Revenue Mix: ${(features.salaryRevenueMix * 100).toFixed(1)}% (higher = more salary-like regular income)
+- Largest Single Deposit %: ${(features.largestDepositPct * 100).toFixed(1)}% (higher = more revenue concentration)
+- Zero/Near-Zero Balance Days: ${(features.zeroBalanceDays * 100).toFixed(1)}%
 
-        const responseObj = await fetch(`${REMOTE_AI_GATEWAY}/chat/completions`, {
+## Raw Stats
+- Total transactions analysed: ${raw.totalTransactions}
+- Total debits: R${raw.totalDebits.toLocaleString()}
+- Total credits: R${raw.totalCredits.toLocaleString()}
+- Average balance: R${raw.avgBalance.toLocaleString()}
+- Reversal/NSF events: ${raw.reversalCount}
+
+## Your Task
+1. Estimate the **default probability as a percentage (0–100%)** based on these signals.
+2. Identify the **top 3 risk factors** present in this application.
+3. Identify any **positive signals** that reduce risk.
+4. Give a **lending recommendation**: APPROVE, MANUAL REVIEW, or REJECT.
+5. Suggest an appropriate **maximum loan amount** if not the full amount requested.
+6. Provide a brief **explanation** suitable for a credit file.
+
+Respond in clear, structured markdown with headers. Be direct and specific.`;
+
+        const response = await fetch(`${XAI_BASE}/chat/completions`, {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${targetApiKey}`, 'Content-Type': 'application/json' },
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
                 model: 'grok-3-fast',
                 messages: [
-                    { role: 'system', content: this.systemContextPrompt },
-                    { role: 'user', content: queryPrompt }
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: userMessage }
                 ],
-                max_tokens: 1000
+                max_tokens: 1200
             })
         });
 
-        if (!responseObj.ok) throw new Error(`Remote Gateway Refusal: ${await responseObj.text()}`);
-        const parsedPayload = await responseObj.json();
-        return parsedPayload.choices[0].message.content;
-    },
-
-    parseBureauIntelligenceScore(aiText) {
-        const matchingFormats = [
-            /CREDIT SCORE[:\s]+(\d+)/i,
-            /score[:\s]+(\d+)/i,
-            /(\d{3})\s*\/\s*850/
-        ];
-        for (const format of matchingFormats) {
-            const matchedIndex = aiText.match(format);
-            if (matchedIndex) return Math.min(850, Math.max(300, parseInt(matchedIndex[1])));
+        if (!response.ok) {
+            const err = await response.text();
+            throw new Error(`Grok API error: ${err}`);
         }
-        return 550; // Neutral default baseline score allocation
+
+        const data = await response.json();
+        return data.choices[0].message.content;
     },
 
-    parseBureauMarkdownToHtml(markdownBlob) {
-        return markdownBlob
-            .replace(/### (.*$)/gim, '<h4 style="color:var(--bureau-blue);margin-top:12px;">$1</h4>')
-            .replace(/## (.*$)/gim, '<h3 style="color:var(--bureau-blue);margin-top:16px;">$1</h3>')
+    parseRiskScore(aiResponse) {
+        // Extract percentage from AI response
+        const patterns = [
+            /default probability[:\s]+(\d+(?:\.\d+)?)\s*%/i,
+            /(\d+(?:\.\d+)?)\s*%\s*(?:default|probability|risk|chance)/i,
+            /probability[:\s]+(\d+(?:\.\d+)?)\s*%/i,
+            /(\d+(?:\.\d+)?)\s*%/
+        ];
+        for (const p of patterns) {
+            const m = aiResponse.match(p);
+            if (m) return Math.min(100, Math.max(0, parseFloat(m[1])));
+        }
+        return 50; // fallback
+    },
+
+    parseMarkdown(text) {
+        if (!text) return '';
+        let html = text
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/^### (.*$)/gim, '<h4>$1</h4>')
+            .replace(/^## (.*$)/gim, '<h3>$1</h3>')
+            .replace(/^# (.*$)/gim, '<h3>$1</h3>')
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\n/g, '<br>');
+            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+        const lines = html.split('\n');
+        let result = [], inList = false;
+        for (const line of lines) {
+            const lm = line.match(/^\s*[-*] (.*$)/);
+            if (lm) { if (!inList) { result.push('<ul>'); inList = true; } result.push('<li>' + lm[1] + '</li>'); }
+            else { if (inList) { result.push('</ul>'); inList = false; } result.push(line); }
+        }
+        if (inList) result.push('</ul>');
+        return result.join('\n').split('\n\n').map(p => {
+            p = p.trim();
+            if (!p) return '';
+            if (p.startsWith('<h') || p.startsWith('<ul') || p.startsWith('</ul') || p.startsWith('<li')) return p;
+            return '<p>' + p + '</p>';
+        }).join('\n');
     },
 
-    // ── CORE UNDERWRITING DISPATCHERS ──
-    async runBureauUnderwrite() {
-        const metadata = {
-            idNumber: document.getElementById('targetIdNumber').value.trim(),
-            name: document.getElementById('targetSubjectName').value.trim(),
-            exposure: document.getElementById('targetExposure').value,
-            sector: document.getElementById('targetSector').value
-        };
+    // ── RUN ASSESSMENT ──
+    async runAssessment() {
+        const name = document.getElementById('appName').value.trim();
+        const business = document.getElementById('appBusiness').value.trim();
+        const amount = document.getElementById('appAmount').value;
+        const sector = document.getElementById('appSector').value;
 
-        if (!metadata.idNumber || !metadata.name || !metadata.exposure || !this.committedFile) {
-            alert("Input Parameter Warning: Ensure all registration fields are populated and document stack is committed.");
+        if (!name || !business || !amount || !this.currentPdfFile) {
+            alert('Please fill in all fields and upload a bank statement.');
             return;
         }
 
-        const executingBtn = document.getElementById('triggerScoringBtn');
-        executingBtn.disabled = true;
-        executingBtn.innerHTML = '<span class="spinner"></span> Running Bureau Matrix Analytics...';
+        const btn = document.getElementById('assessBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Parsing PDF...';
 
-        try {
-            const riskVectors = await this.parseExtractionLoop(this.committedFile);
-            const rawAiEvaluationText = await bureauApp.callBureauIntelligenceCore(riskVectors, metadata);
-            bureauApp.processAndCommitScoreResult(riskVectors, metadata, rawAiEvaluationText);
-        } catch (err) {
-            document.getElementById('scoringTargetOutput').innerHTML = `<div style="padding:16px;background:var(--danger-light);color:var(--danger);border-radius:8px;"><strong>Processing Error:</strong> ${err.message}</div>`;
-        } finally {
-            executingBtn.disabled = false;
-            executingBtn.innerHTML = '<i data-feather="shield"></i> Generate Score & Comprehensive Report';
-            feather.replace();
-        }
-    },
-
-    async runMockUnderwrite() {
-        const metadata = {
-            idNumber: document.getElementById('targetIdNumber').value.trim() || "9503025184082",
-            name: document.getElementById('targetSubjectName').value.trim() || "Katlego Frans Logistics Pty",
-            exposure: document.getElementById('targetExposure').value || "250000",
-            sector: document.getElementById('targetSector').value || "Logistics"
-        };
-
-        const syntheticVectors = { affordabilityRatio: 0.34, liquidityVolatility: 0.15, balanceStabilityIndex: 0.72, behavioralDefaults: 1 };
-        const executingBtn = document.getElementById('triggerScoringBtn');
-        executingBtn.disabled = true;
-
-        try {
-            const rawAiEvaluationText = await bureauApp.callBureauIntelligenceCore(syntheticVectors, metadata);
-            bureauApp.processAndCommitScoreResult(syntheticVectors, metadata, rawAiEvaluationText);
-        } catch (err) {
-            alert("Mock Pipeline Refusal: " + err.message);
-        } finally {
-            executingBtn.disabled = false;
-            feather.replace();
-        }
-    },
-
-    async processAndCommitScoreResult(vectors, profile, rawAiResponseText) {
-        const calculatedScore = this.parseBureauIntelligenceScore(rawAiResponseText);
-        
-        let recommendation = 'MANUAL REVIEW';
-        let scoringColor = 'var(--warning)';
-        let classificationText = 'Average Risk';
-
-        if (calculatedScore >= this.merchantRules.approveFloor) {
-            recommendation = 'APPROVE';
-            scoringColor = 'var(--success)';
-            classificationText = 'Excellent Credit Quality';
-        } else if (calculatedScore <= this.merchantRules.rejectCeiling) {
-            recommendation = 'REJECT';
-            scoringColor = 'var(--danger)';
-            classificationText = 'Severe Adverse Risk Tier';
-        }
-
-        document.getElementById('scoringTargetOutput').innerHTML = `
-            <div class="score-dial-box">
-                <div class="score-value" style="color:${scoringColor};">${calculatedScore}</div>
-                <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Aggregated Experian-Equivalent Bureau Index</div>
-                <div class="score-band-badge" style="background:#e2e8f0; color:var(--bureau-blue);">${classificationText}</div>
-            </div>
-            <div style="margin-top:20px; text-align:center;">
-                <span class="badge-status status-${recommendation.toLowerCase()}" style="font-size:1rem; padding:8px 24px;">NETWORK CONSENSUS: ${recommendation}</span>
-            </div>
-            <div class="bureau-report">
-                <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;color:var(--bureau-blue);margin-bottom:8px;">Bureau Analytical Record Narrative</div>
-                ${this.parseBureauMarkdownToHtml(rawAiResponseText)}
+        document.getElementById('assessResult').innerHTML = `
+            <div style="text-align:center;padding:40px 20px;">
+                <p style="font-weight:600;color:var(--primary);font-size:1rem;">
+                    Analysing bank statement
+                    <span class="thinking-dots"><span></span><span></span><span></span></span>
+                </p>
+                <p style="color:var(--text-muted);font-size:0.85rem;margin-top:8px;">Grok AI is reviewing the financial signals...</p>
             </div>`;
 
-        document.getElementById('bureauVectorCard').style.display = 'block';
-        const interfaceMatrixMapping = [
-            ['Affordability Ratio', `${(vectors.affordabilityRatio * 100).toFixed(0)}%`, vectors.affordabilityRatio > 0.6 ? 'risk-high' : 'risk-low'],
-            ['Liquidity Variance', `${(vectors.liquidityVolatility * 100).toFixed(0)}%`, vectors.liquidityVolatility > 0.5 ? 'risk-high' : 'risk-low'],
-            ['Balance Sustainability', `${(vectors.balanceStabilityIndex * 100).toFixed(0)}%`, vectors.balanceStabilityIndex < 0.4 ? 'risk-high' : 'risk-low'],
-            ['Technical Defalcations', `${vectors.behavioralDefaults} Events`, vectors.behavioralDefaults > 2 ? 'risk-high' : 'risk-low']
-        ];
+        try {
+            const txData = await this.parsePdf(this.currentPdfFile);
+            const featureData = this.calculateFeatures(txData);
 
-        document.getElementById('bureauVectorGrid').innerHTML = interfaceMatrixMapping.map(([label, metric, styleClass]) => `
-            <div class="matrix-cell ${styleClass}">
-                <div class="matrix-title">${label}</div>
-                <div class="matrix-data">${metric}</div>
-            </div>`).join('');
+            btn.innerHTML = '<span class="spinner"></span> Asking Grok AI...';
 
-        // Commit Real-time Record Object to the Shared Bureau Registry Network Map
-        const sharedBureauRegistryRecord = {
-            timestamp: Date.now(),
-            nationalIdRef: profile.idNumber,
-            entityName: profile.name,
-            sectorContext: profile.sector,
-            calculatedCreditScore: calculatedScore,
-            bureauRecommendation: recommendation,
-            performingMerchantNode: this.activeNodeUser.email
-        };
+            const aiResponse = await this.callGrokAPI(
+                featureData.features, featureData.raw,
+                name, business, amount, sector
+            );
 
-        await realTimeDatabase.ref(`bureauSystem/globalSharedRegistry/B-RUN-${sharedBureauRegistryRecord.timestamp}`).set(sharedBureauRegistryRecord);
+            const riskScore = this.parseRiskScore(aiResponse);
+            const thresh = this.settings;
+            let recommendation, badgeClass;
+            if (riskScore <= thresh.approveThreshold) { recommendation = 'APPROVE'; badgeClass = 'approve'; }
+            else if (riskScore >= thresh.rejectThreshold) { recommendation = 'REJECT'; badgeClass = 'reject'; }
+            else { recommendation = 'REVIEW'; badgeClass = 'review'; }
+
+            const scoreColor = riskScore <= 35 ? 'var(--success)' : riskScore < 60 ? 'var(--warning)' : 'var(--danger)';
+
+            document.getElementById('assessResult').innerHTML = `
+                <div class="risk-score-display">
+                    <div class="risk-number" style="color:${scoreColor};">${Math.round(riskScore)}%</div>
+                    <div style="margin-bottom:12px;font-size:0.82rem;color:var(--text-muted);">Estimated Default Probability</div>
+                    <span class="badge badge-${badgeClass}" style="font-size:0.88rem;padding:8px 20px;">${recommendation}</span>
+                </div>
+                <div style="padding:0 4px 4px;">
+                    <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:6px;">
+                        <span style="color:var(--text-muted);">Risk Level</span>
+                        <span style="font-weight:700;">${riskScore <= 35 ? 'Low' : riskScore < 60 ? 'Medium' : 'High'}</span>
+                    </div>
+                    <div class="progress-bar" style="height:10px;">
+                        <div class="progress-fill" style="width:${riskScore}%;background:${scoreColor};"></div>
+                    </div>
+                </div>
+                <div class="ai-analysis">
+                    <div class="ai-label">Grok AI Analysis</div>
+                    ${this.parseMarkdown(aiResponse)}
+                </div>`;
+
+            // Show features
+            document.getElementById('featuresCard').style.display = 'block';
+            const fNames = [
+                ['Cash Flow Volatility', 'cashFlowVolatility'],
+                ['Balance Trend', 'balanceTrend'],
+                ['Debit/Credit Ratio', 'debitCreditRatio'],
+                ['Weekend/Evening %', 'weekendEveningPct'],
+                ['Reversal/NSF Freq', 'reversalFrequency'],
+                ['Salary/Revenue Mix', 'salaryRevenueMix'],
+                ['Largest Deposit %', 'largestDepositPct'],
+                ['Zero Balance Days', 'zeroBalanceDays']
+            ];
+            document.getElementById('featureList').innerHTML = fNames.map(([label, key]) => {
+                const val = featureData.features[key];
+                return `<div class="feature-item">
+                    <div>
+                        <div class="feature-name">${label}</div>
+                        <div class="feature-bar"><div class="feature-bar-fill" style="width:${val * 100}%;"></div></div>
+                    </div>
+                    <div class="feature-value">${(val * 100).toFixed(1)}%</div>
+                </div>`;
+            }).join('');
+
+            // Save to Firebase
+            const assessment = {
+                id: Date.now().toString(),
+                timestamp: Date.now(),
+                applicantName: name,
+                businessName: business,
+                sector: sector || 'N/A',
+                loanAmount: parseFloat(amount),
+                riskScore: Math.round(riskScore),
+                recommendation,
+                aiAnalysis: aiResponse,
+                features: featureData.features,
+                rawStats: featureData.raw,
+                status: 'PENDING'
+            };
+            await db.ref(`users/${this.currentUser.uid}/assessments/${assessment.id}`).set(assessment);
+            this.assessments.unshift(assessment);
+            this.updateDashboard();
+
+            this.currentPdfFile = null;
+            document.getElementById('pdfName').textContent = '';
+            document.getElementById('pdfFile').value = '';
+            document.getElementById('assessBtn').disabled = true;
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById('assessResult').innerHTML = `
+                <div class="alert alert-danger">
+                    <strong>❌ Error:</strong> ${err.message}<br>
+                    <small style="margin-top:6px;display:block;">
+                        ${err.message.includes('API key') ? 'Go to the <strong>AI Context</strong> tab and add your xAI Grok API key.' : 'The PDF parser may not support this bank statement format. Try another statement.'}
+                    </small>
+                </div>`;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i data-feather="zap" style="width:15px;height:15px;"></i> Run AI Assessment';
+            feather.replace();
+        }
     },
 
-    // ── MERCHANT RULE ADMINISTRATION SETTINGS ──
-    async commitSystemConfiguration() {
-        this.merchantRules.approveFloor = parseInt(document.getElementById('cfgApproveFloor').value);
-        this.merchantRules.rejectCeiling = parseInt(document.getElementById('cfgRejectCeiling').value);
-        this.systemContextPrompt = document.getElementById('cfgSystemTemplate').value;
+    // ── DEMO ASSESSMENT ──
+    async runDemoAssessment() {
+        document.getElementById('appName').value = document.getElementById('appName').value || 'Thabo Mokoena';
+        document.getElementById('appBusiness').value = document.getElementById('appBusiness').value || 'Mokoena Logistics Pty Ltd';
+        document.getElementById('appAmount').value = document.getElementById('appAmount').value || '75000';
+        document.getElementById('appSector').value = 'Logistics & Transport';
 
-        await realTimeDatabase.ref(`bureauSystem/globalRules`).set(this.merchantRules);
-        await realTimeDatabase.ref(`bureauSystem/promptTemplate`).set(this.systemContextPrompt);
-        alert("✓ System Matrix Protocols Successfully Distributed to Registry Clusters.");
+        const apiKey = localStorage.getItem('xai_api_key');
+        if (!apiKey) {
+            alert('Please add your xAI Grok API key in the AI Context tab first.');
+            return;
+        }
+
+        const btn = document.getElementById('assessBtn');
+        btn.disabled = true;
+
+        document.getElementById('assessResult').innerHTML = `
+            <div style="text-align:center;padding:40px 20px;">
+                <p style="font-weight:600;color:var(--primary);font-size:1rem;">
+                    Running demo assessment
+                    <span class="thinking-dots"><span></span><span></span><span></span></span>
+                </p>
+                <p style="color:var(--text-muted);font-size:0.85rem;margin-top:8px;">Grok AI is analysing simulated financial signals...</p>
+            </div>`;
+
+        try {
+            const demoFeatures = {
+                cashFlowVolatility: 0.38,
+                balanceTrend: 0.62,
+                debitCreditRatio: 0.44,
+                weekendEveningPct: 0.30,
+                reversalFrequency: 0.08,
+                salaryRevenueMix: 0.25,
+                largestDepositPct: 0.22,
+                zeroBalanceDays: 0.05
+            };
+            const demoRaw = { totalTransactions: 87, totalDebits: 148350, totalCredits: 162800, avgBalance: 24600, reversalCount: 2 };
+
+            const aiResponse = await this.callGrokAPI(
+                demoFeatures, demoRaw,
+                document.getElementById('appName').value,
+                document.getElementById('appBusiness').value,
+                document.getElementById('appAmount').value,
+                'Logistics & Transport'
+            );
+
+            const riskScore = this.parseRiskScore(aiResponse);
+            const thresh = this.settings;
+            let recommendation, badgeClass;
+            if (riskScore <= thresh.approveThreshold) { recommendation = 'APPROVE'; badgeClass = 'approve'; }
+            else if (riskScore >= thresh.rejectThreshold) { recommendation = 'REJECT'; badgeClass = 'reject'; }
+            else { recommendation = 'REVIEW'; badgeClass = 'review'; }
+            const scoreColor = riskScore <= 35 ? 'var(--success)' : riskScore < 60 ? 'var(--warning)' : 'var(--danger)';
+
+            document.getElementById('assessResult').innerHTML = `
+                <div class="alert alert-info" style="margin-bottom:12px;font-size:0.82rem;">ℹ️ Demo — simulated bank statement data</div>
+                <div class="risk-score-display">
+                    <div class="risk-number" style="color:${scoreColor};">${Math.round(riskScore)}%</div>
+                    <div style="margin-bottom:12px;font-size:0.82rem;color:var(--text-muted);">Estimated Default Probability</div>
+                    <span class="badge badge-${badgeClass}" style="font-size:0.88rem;padding:8px 20px;">${recommendation}</span>
+                </div>
+                <div style="padding:0 4px 4px;">
+                    <div class="progress-bar" style="height:10px;">
+                        <div class="progress-fill" style="width:${riskScore}%;background:${scoreColor};"></div>
+                    </div>
+                </div>
+                <div class="ai-analysis">
+                    <div class="ai-label">Grok AI Analysis</div>
+                    ${this.parseMarkdown(aiResponse)}
+                </div>`;
+
+            document.getElementById('featuresCard').style.display = 'block';
+            const fNames = [
+                ['Cash Flow Volatility', 'cashFlowVolatility'], ['Balance Trend', 'balanceTrend'],
+                ['Debit/Credit Ratio', 'debitCreditRatio'], ['Weekend/Evening %', 'weekendEveningPct'],
+                ['Reversal/NSF Freq', 'reversalFrequency'], ['Salary/Revenue Mix', 'salaryRevenueMix'],
+                ['Largest Deposit %', 'largestDepositPct'], ['Zero Balance Days', 'zeroBalanceDays']
+            ];
+            document.getElementById('featureList').innerHTML = fNames.map(([label, key]) => {
+                const val = demoFeatures[key];
+                return `<div class="feature-item">
+                    <div><div class="feature-name">${label}</div>
+                    <div class="feature-bar"><div class="feature-bar-fill" style="width:${val * 100}%;"></div></div></div>
+                    <div class="feature-value">${(val * 100).toFixed(1)}%</div>
+                </div>`;
+            }).join('');
+
+        } catch (err) {
+            document.getElementById('assessResult').innerHTML = `<div class="alert alert-danger"><strong>❌ Error:</strong> ${err.message}</div>`;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i data-feather="zap" style="width:15px;height:15px;"></i> Run AI Assessment';
+            feather.replace();
+        }
     },
 
-    commitApiKeyLocal() {
-        const rawKeyValue = document.getElementById('bureauGrokApiKey').value.trim();
-        if (!rawKeyValue) return;
-        localStorage.setItem('bureau_grok_key', rawKeyValue);
-        alert("✓ Local Node Hardware Context Tokens Initialized Safely.");
+    // ── PORTFOLIO ──
+    loadPortfolio() {
+        const tbody = document.getElementById('portfolioTable');
+        if (this.assessments.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:28px;">No assessments yet</td></tr>';
+            return;
+        }
+        tbody.innerHTML = this.assessments.map(a => {
+            const date = new Date(a.timestamp).toLocaleDateString('en-ZA');
+            const bc = a.recommendation === 'APPROVE' ? 'approve' : a.recommendation === 'REJECT' ? 'reject' : 'review';
+            return `<tr>
+                <td>${date}</td>
+                <td><strong>${a.applicantName}</strong></td>
+                <td>${a.businessName}</td>
+                <td>${a.sector || '—'}</td>
+                <td>R${a.loanAmount.toLocaleString()}</td>
+                <td><strong>${a.riskScore}%</strong></td>
+                <td><span class="badge badge-${bc}">${a.recommendation}</span></td>
+            </tr>`;
+        }).join('');
+    },
+
+    // ── SETTINGS ──
+    async saveSettings() {
+        this.settings.approveThreshold = parseInt(document.getElementById('threshApprove').value);
+        this.settings.rejectThreshold = parseInt(document.getElementById('threshReject').value);
+        this.updateThresholdDisplay();
+        await db.ref(`users/${this.currentUser.uid}/settings`).set(this.settings);
+        alert('✅ Settings saved!');
+    },
+
+    updateThresholdDisplay() {
+        document.getElementById('reviewLow').textContent = this.settings.approveThreshold + '%';
+        document.getElementById('reviewHigh').textContent = this.settings.rejectThreshold + '%';
+    },
+
+    async saveContext() {
+        const ctx = document.getElementById('systemContext').value;
+        this.systemContext = ctx;
+        await db.ref(`users/${this.currentUser.uid}/systemContext`).set(ctx);
+        alert('✅ AI context saved!');
+    },
+
+    saveApiKey() {
+        const key = document.getElementById('apiKeyInput').value.trim();
+        if (!key) { alert('Please enter an API key.'); return; }
+        localStorage.setItem('xai_api_key', key);
+        alert('✅ API key saved locally!');
+    },
+
+    exportData() {
+        if (this.assessments.length === 0) { alert('No data to export'); return; }
+        const headers = ['Date','Applicant','Business','Sector','Amount','RiskScore','Recommendation'];
+        const rows = this.assessments.map(a => [
+            new Date(a.timestamp).toISOString(), a.applicantName, a.businessName,
+            a.sector || '', a.loanAmount, a.riskScore, a.recommendation
+        ]);
+        const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const el = document.createElement('a');
+        el.href = url;
+        el.download = `sme-assessments-${new Date().toISOString().split('T')[0]}.csv`;
+        el.click();
+        URL.revokeObjectURL(url);
+    },
+
+    async clearAssessments() {
+        if (!confirm('Delete all assessment data? This cannot be undone.')) return;
+        await db.ref(`users/${this.currentUser.uid}/assessments`).remove();
+        this.assessments = [];
+        this.updateDashboard();
+        this.loadPortfolio();
+        alert('All assessments cleared.');
+    },
+
+    showAlert(id, msg, type) {
+        const el = document.getElementById(id);
+        el.className = `alert alert-${type}`;
+        el.textContent = msg;
+        setTimeout(() => { el.className = ''; el.textContent = ''; }, 5000);
     }
 };
 
-// ── BIND SYSTEM LISTENERS ──
-securityAuth.onAuthStateChanged(u => bureauApp.handleAuthStateShift(u));
+// ── AUTH LISTENER ──
+auth.onAuthStateChanged(user => app.onAuthStateChanged(user));
 
+// ── DRAG AND DROP ──
 document.addEventListener('DOMContentLoaded', () => {
     feather.replace();
-    const surface = document.getElementById('dragDropSurface');
-    if (surface) {
-        surface.addEventListener('dragover', e => { e.preventDefault(); surface.style.background = "var(--bureau-light)"; });
-        surface.addEventListener('dragleave', () => surface.style.background = "#faffff");
-        surface.addEventListener('drop', e => {
+    const uploadArea = document.getElementById('pdfUpload');
+    if (uploadArea) {
+        uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        uploadArea.addEventListener('drop', e => {
             e.preventDefault();
-            surface.style.background = "#faffff";
-            const droppedStack = e.dataTransfer.files;
-            if (droppedStack.length > 0) {
-                document.getElementById('bureauPdfFile').files = droppedStack;
-                bureauApp.processFileImport({ target: { files: droppedStack } });
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('pdfFile').files = files;
+                app.handlePdfUpload({ target: { files } });
             }
         });
     }
+
+    // Update threshold display on change
+    ['threshApprove', 'threshReject'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', () => app.updateThresholdDisplay());
+    });
 });
 </script>
 </body>
