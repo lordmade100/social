@@ -1,1345 +1,1279 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SME Risk Engine - SA Microlender AI</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#F0F4F9" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Steward AI" />
+  <title>Steward | Rare Grade Tech</title>
 
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./icon-192x192.png" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/feather-icons"></script>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+  <style>
+    /* ══════════════════════════════════════════
+       THEME SYSTEM - GEMINI INSPIRED
+    ══════════════════════════════════════════ */
+    :root {
+        --bg-main: #FFFFFF;
+        --bg-sidebar: #F0F4F9;
+        --bg-input: #F0F4F9;
+        --bg-user-msg: #F0F4F9;
+        --bg-hover: #E1E5EA;
+        --text-primary: #1F1F1F;
+        --text-secondary: #444746;
+        --text-muted: #8E918F;
+        --border-color: #E3E3E3;
+        --brand-blue: #0A56D9; /* Google Blue */
+        --brand-red: #E63946;
+        --gemini-gradient: linear-gradient(74deg, #4285f4 0, #9b72cb 9%, #d96570 20%, #d96570 24%, #9b72cb 35%, #4285f4 44%, #9b72cb 50%, #d96570 56%, #1F1F1F 75%, #1F1F1F 100%);
+        --code-bg: #F0F4F9;
+        --shadow-color: rgba(0,0,0,0.08);
+        --success: #1E8E3E;
+        --warning: #F9AB00;
+        --radius-pill: 32px;
+        --radius-card: 24px;
+    }
 
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+    [data-theme="dark"] {
+        --bg-main: #131314;
+        --bg-sidebar: #1E1F20;
+        --bg-input: #1E1F20;
+        --bg-user-msg: #2C2C2C;
+        --bg-hover: #333537;
+        --text-primary: #E3E3E3;
+        --text-secondary: #C4C7C5;
+        --text-muted: #8E918F;
+        --border-color: #444746;
+        --brand-blue: #A8C7FA;
+        --brand-red: #F28B82;
+        --gemini-gradient: linear-gradient(74deg, #A8C7FA 0, #D0BCFF 9%, #F2B8B5 20%, #F2B8B5 24%, #D0BCFF 35%, #A8C7FA 44%, #D0BCFF 50%, #F2B8B5 56%, #E3E3E3 75%, #E3E3E3 100%);
+        --code-bg: #1E1F20;
+        --shadow-color: rgba(0,0,0,0.3);
+        --success: #81C995;
+        --warning: #FDE293;
+    }
 
-        :root {
-            --primary: #1a5f7a;
-            --primary-dark: #134b61;
-            --secondary: #c84b31;
-            --success: #1e8e3e;
-            --warning: #f9ab00;
-            --danger: #e63946;
-            --bg: #f4f6f9;
-            --card: #ffffff;
-            --text: #1f2937;
-            --text-muted: #6b7280;
-            --border: #e5e7eb;
-            --shadow: 0 2px 12px rgba(0,0,0,0.07);
-            --radius: 14px;
-        }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg-main);
+      color: var(--text-primary);
+      height: 100svh;
+      display: flex;
+      overflow: hidden;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
 
-        body {
-            font-family: 'DM Sans', -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-        }
+    /* ════ SPLASH SCREEN ════ */
+    #splashScreen {
+      position: fixed; inset: 0; background: var(--bg-main); z-index: 9999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 32px;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      cursor: pointer;
+    }
+    #splashScreen.hide { opacity: 0; transform: scale(1.02); pointer-events: none; }
+    .splash-logo-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
+    .splash-logo { width: 100px; height: 100px; object-fit: contain; position: relative; z-index: 2; animation: logoPop 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    @keyframes logoPop { 0% { opacity: 0; transform: scale(0.8) translateY(10px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
 
-        /* ── LOGIN ── */
-        .login-screen {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-        }
-        .login-box {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-            width: 100%;
-            max-width: 400px;
-        }
-        .login-box h2 { text-align: center; margin-bottom: 6px; color: var(--primary-dark); font-size: 1.4rem; }
-        .login-box p { text-align: center; color: var(--text-muted); margin-bottom: 28px; font-size: 0.9rem; }
+    /* ════ SIDEBAR ════ */
+    .sidebar { width: 300px; background: var(--bg-sidebar); display: flex; flex-direction: column; padding: 16px; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; border-right: 1px solid transparent; }
+    [data-theme="light"] .sidebar { border-right-color: var(--border-color); }
+    
+    .new-chat-btn { 
+      display: flex; align-items: center; gap: 12px; background: var(--bg-main); 
+      border: 1px solid var(--border-color); padding: 14px 20px; border-radius: var(--radius-pill); 
+      font-family: inherit; font-size: 0.95rem; font-weight: 600; color: var(--text-primary); 
+      cursor: pointer; transition: all 0.2s; margin-bottom: 24px; box-shadow: 0 2px 6px var(--shadow-color);
+    }
+    .new-chat-btn:hover { background: var(--bg-hover); transform: translateY(-1px); box-shadow: 0 4px 12px var(--shadow-color); }
+    
+    .sidebar-history { flex: 1; overflow-y: auto; padding-right: 4px; }
+    .sidebar-title { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 12px; padding-left: 12px; display: flex; align-items: center; justify-content: space-between; }
+    
+    .history-item { 
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px; 
+      border-radius: var(--radius-pill); cursor: pointer; color: var(--text-secondary); 
+      font-size: 0.95rem; font-weight: 500; transition: background 0.2s; margin-bottom: 4px;
+    }
+    .history-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .history-item .history-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .history-actions { display: none; gap: 4px; }
+    .history-item:hover .history-actions { display: flex; }
+    .history-action-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 6px; border-radius: 50%; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+    .history-action-btn:hover { color: var(--text-primary); background: var(--bg-main); }
 
-        /* ── HEADER ── */
-        header {
-            background: var(--primary);
-            color: white;
-            padding: 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 16px rgba(0,0,0,0.15);
-        }
-        .header-inner {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 24px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .header-brand { display: flex; align-items: center; gap: 10px; }
-        .header-brand h1 { font-size: 1.15rem; font-weight: 700; }
-        .header-brand p { font-size: 0.78rem; opacity: 0.8; }
-        .header-right { display: flex; align-items: center; gap: 10px; }
-        .user-pill { background: rgba(255,255,255,0.15); border-radius: 50px; padding: 6px 14px; font-size: 0.82rem; }
+    .sidebar-search { margin-bottom: 20px; position: relative; }
+    .sidebar-search input { width: 100%; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-pill); padding: 12px 16px 12px 40px; font-family: inherit; font-size: 0.9rem; color: var(--text-primary); outline: none; transition: border-color 0.2s; }
+    .sidebar-search input:focus { border-color: var(--brand-blue); }
+    .sidebar-search i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 16px; height: 16px; }
 
-        /* ── LAYOUT ── */
-        .container { max-width: 1280px; margin: 0 auto; padding: 24px; }
+    /* ════ MAIN CONTENT ════ */
+    .main-wrapper { flex: 1; display: flex; flex-direction: column; position: relative; }
+    .header { height: 64px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; position: absolute; top: 0; left: 0; right: 0; z-index: 10; background: transparent; }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .menu-toggle { background: none; border: none; cursor: pointer; color: var(--text-secondary); display: none; padding: 8px; border-radius: 50%; }
+    .brand-logo { height: 32px; object-fit: contain; }
+    
+    .header-right { display: flex; align-items: center; gap: 8px; background: var(--bg-input); padding: 4px; border-radius: var(--radius-pill); border: 1px solid var(--border-color); }
+    .theme-toggle { background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s, color 0.2s; }
+    .theme-toggle:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .profile-btn { background: none; border: none; padding: 0; cursor: pointer; border-radius: 50%; margin-left: 4px; transition: transform 0.2s; }
+    .profile-btn:hover { transform: scale(1.05); }
+    .header-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--brand-blue); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; object-fit: cover; }
 
-        /* ── TABS ── */
-        .nav-tabs {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 24px;
-            background: white;
-            border-radius: var(--radius);
-            padding: 6px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-        }
-        .nav-tab {
-            padding: 10px 20px;
-            background: none;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            color: var(--text-muted);
-            transition: all 0.2s;
-            font-size: 0.88rem;
-            font-family: inherit;
-            display: flex;
-            align-items: center;
-            gap: 7px;
-        }
-        .nav-tab:hover { color: var(--primary); background: var(--bg); }
-        .nav-tab.active { color: var(--primary); background: var(--bg); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+    .scroll-area { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 80px 20px 140px 20px; scroll-behavior: smooth; }
+    .content-container { width: 100%; max-width: 840px; display: flex; flex-direction: column; }
+    
+    .welcome-screen { margin-top: 15vh; width: 100%; padding: 0 20px; }
+    .greeting { font-size: 3.5rem; font-weight: 500; letter-spacing: -0.02em; line-height: 1.1; background: var(--gemini-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; background-size: 400% 100%; margin-bottom: 12px; display: flex; align-items: center; flex-wrap: wrap; }
+    .verified-badge { width: 38px; height: 38px; margin-left: 12px; margin-top: 4px; }
+    .subtitle { font-size: 2.5rem; font-weight: 500; letter-spacing: -0.02em; color: var(--text-muted); line-height: 1.2; margin-bottom: 48px; }
+    
+    .suggestions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .suggestion-card { background: var(--bg-sidebar); padding: 20px; border-radius: var(--radius-card); cursor: pointer; min-height: 130px; transition: background 0.2s ease, transform 0.2s ease; border: 1px solid transparent; display: flex; flex-direction: column; justify-content: space-between; transform-style: preserve-3d; }
+    .suggestion-card:hover { background: var(--bg-hover); transform: translateY(-2px); }
+    .suggestion-card p { font-size: 1rem; color: var(--text-secondary); line-height: 1.4; margin: 0; font-weight: 500; }
+    .suggestion-card .icon { align-self: flex-end; background: var(--bg-main); padding: 10px; border-radius: 50%; display: flex; color: var(--brand-blue); box-shadow: 0 2px 6px var(--shadow-color); }
 
-        /* ── CARDS ── */
-        .card {
-            background: var(--card);
-            border-radius: var(--radius);
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-        }
-        .card-title {
-            font-size: 1rem;
-            font-weight: 700;
-            margin-bottom: 18px;
-            color: var(--primary-dark);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    /* ════ CHAT AREA ════ */
+    .chat-container { display: none; flex-direction: column; gap: 32px; width: 100%; }
+    .message-row { display: flex; gap: 16px; max-width: 100%; }
+    .message-row.user { justify-content: flex-end; }
+    .msg-bubble.user { background: var(--bg-user-msg); padding: 14px 20px; border-radius: 24px; font-size: 1rem; color: var(--text-primary); max-width: 75%; line-height: 1.6; border-bottom-right-radius: 4px; position: relative; }
+    
+    .message-row.ai { align-items: flex-start; }
+    .ai-avatar { width: 32px; height: 32px; flex-shrink: 0; border-radius: 50%; object-fit: contain; margin-top: 4px; }
+    .msg-bubble.ai { padding: 4px 0; font-size: 1.05rem; color: var(--text-primary); max-width: 100%; line-height: 1.7; flex: 1; min-width: 0; }
+    
+    .message-time { font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; text-align: right; opacity: 0; transition: opacity 0.2s; padding: 0 8px; }
+    .message-row:hover .message-time { opacity: 1; }
+    .message-row.user .message-time { text-align: left; }
+    
+    .msg-bubble.ai p { margin-bottom: 16px; }
+    .msg-bubble.ai p:last-child { margin-bottom: 0; }
+    .msg-bubble.ai h1, .msg-bubble.ai h2, .msg-bubble.ai h3 { margin-top: 24px; margin-bottom: 12px; color: var(--text-primary); font-weight: 600; letter-spacing: -0.01em; }
+    .msg-bubble.ai h3 { font-size: 1.2rem; }
+    .msg-bubble.ai ul, .msg-bubble.ai ol { margin-left: 24px; margin-bottom: 16px; }
+    .msg-bubble.ai li { display: list-item; margin-bottom: 8px; padding-left: 8px; }
+    .msg-bubble.ai strong { color: var(--text-primary); font-weight: 700; }
+    
+    .msg-bubble.ai pre { background: var(--code-bg); border-radius: 16px; padding: 16px 20px; overflow-x: auto; margin-bottom: 16px; border: 1px solid var(--border-color); font-size: 0.9rem; }
+    .msg-bubble.ai code { font-family: 'Menlo', 'Monaco', 'Courier New', monospace; }
+    .msg-bubble.ai :not(pre) > code { background: var(--bg-hover); padding: 4px 8px; border-radius: 6px; color: var(--text-primary); font-size: 0.9em; }
+    
+    .code-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
+    .code-lang { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em; }
+    .copy-code-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
+    .copy-code-btn:hover { color: var(--text-primary); }
+    
+    .thinking-container { display: flex; align-items: center; gap: 12px; color: var(--brand-blue); font-weight: 600; font-size: 0.95rem; }
+    .loader-inline { display: flex; gap: 6px; }
+    .dot { width: 6px; height: 6px; background: var(--brand-blue); border-radius: 50%; animation: pulse 1.4s infinite; }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse { 0%, 100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } }
+    
+    .message-actions { display: flex; gap: 8px; margin-top: 12px; opacity: 0; transition: opacity 0.2s; }
+    .message-row.ai:hover .message-actions { opacity: 1; }
+    .msg-action-btn { background: var(--bg-input); border: 1px solid transparent; cursor: pointer; color: var(--text-secondary); font-size: 0.8rem; font-weight: 500; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: var(--radius-pill); transition: all 0.2s; }
+    .msg-action-btn:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-color); }
 
-        /* ── FORMS ── */
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-weight: 600; font-size: 0.82rem; margin-bottom: 6px; color: var(--text); text-transform: uppercase; letter-spacing: 0.03em; }
-        input[type="text"], input[type="email"], input[type="password"], input[type="number"] {
-            width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
-            border-radius: 10px; font-size: 0.95rem; font-family: inherit;
-            transition: border 0.2s; background: white; color: var(--text);
-        }
-        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,95,122,0.1); }
+    .retry-card { background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; text-align: center; max-width: 400px; }
+    .retry-card p { color: var(--text-secondary); margin-bottom: 16px; font-size: 0.95rem; }
+    .callback-card { background: linear-gradient(135deg, rgba(10,86,217,0.08) 0%, rgba(230,57,70,0.06) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; margin-top: 8px; animation: gateSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .callback-icon { width: 44px; height: 44px; background: var(--brand-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0; }
+    .callback-content strong { display: block; color: var(--text-primary); margin-bottom: 4px; }
+    .callback-content p { color: var(--text-secondary); font-size: 0.9rem; margin: 0; }
+    .callback-status { display: inline-block; margin-top: 6px; padding: 2px 10px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+    .callback-status.pending { background: rgba(249, 171, 0, 0.15); color: var(--warning); }
 
-        /* ── BUTTONS ── */
-        .btn {
-            padding: 11px 22px; border: none; border-radius: 50px;
-            font-weight: 600; cursor: pointer; transition: all 0.2s;
-            font-size: 0.9rem; display: inline-flex; align-items: center; gap: 7px;
-            font-family: inherit;
-        }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
-        .btn-success { background: var(--success); color: white; }
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-secondary { background: var(--border); color: var(--text); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
-        .btn-full { width: 100%; justify-content: center; }
+    /* ════ FLOATING INPUT AREA ════ */
+    .input-wrapper { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(transparent, var(--bg-main) 40%, var(--bg-main) 100%); padding: 32px 20px 24px; display: flex; justify-content: center; z-index: 500; flex-direction: column; align-items: center; pointer-events: none; }
+    .input-box { width: 100%; max-width: 840px; background: var(--bg-input); border-radius: var(--radius-pill); display: flex; align-items: flex-end; padding: 12px 16px; gap: 12px; border: 1px solid var(--border-color); transition: border-color 0.2s, box-shadow 0.2s, background 0.2s; pointer-events: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+    .input-box:focus-within { border-color: transparent; background: var(--bg-main); box-shadow: 0 4px 24px var(--shadow-color); }
+    
+    .action-btn { background: var(--bg-hover); border: none; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; transition: all 0.2s; flex-shrink: 0; margin-bottom: 2px; }
+    .action-btn:hover { background: var(--border-color); color: var(--text-primary); }
+    
+    .chat-input { flex: 1; border: none; background: transparent; font-size: 1.05rem; color: var(--text-primary); font-family: inherit; outline: none; padding: 10px 4px; resize: none; min-height: 24px; max-height: 200px; line-height: 1.5; }
+    .chat-input::placeholder { color: var(--text-muted); }
+    
+    .send-btn { background: transparent; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; transition: all 0.2s; flex-shrink: 0; margin-bottom: 0px; }
+    .send-btn.active { color: var(--brand-blue); background: var(--bg-hover); }
 
-        /* ── ALERTS ── */
-        .alert { padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 0.88rem; }
-        .alert-info { background: #eff6ff; color: #1e40af; border-left: 3px solid #3b82f6; }
-        .alert-success { background: #f0fdf4; color: #166534; border-left: 3px solid var(--success); }
-        .alert-warning { background: #fffbeb; color: #92400e; border-left: 3px solid var(--warning); }
-        .alert-danger { background: #fef2f2; color: #991b1b; border-left: 3px solid var(--danger); }
+    .input-lock-hint { display: none; text-align: center; font-size: 0.85rem; font-weight: 500; color: var(--text-muted); margin-bottom: 12px; pointer-events: auto; }
+    .input-lock-hint.visible { display: block; }
+    
+    .image-preview { display: flex; gap: 12px; width: 100%; max-width: 840px; margin-bottom: 12px; pointer-events: auto; }
+    .image-preview-item { position: relative; width: 72px; height: 72px; border-radius: 16px; overflow: hidden; border: 2px solid var(--border-color); box-shadow: 0 4px 12px var(--shadow-color); }
+    .image-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+    .image-preview-item button { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.7); border: none; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; transition: background 0.2s; }
+    .image-preview-item button:hover { background: rgba(0,0,0,0.9); }
 
-        /* ── GRIDS ── */
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-        @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+    /* ════ AUTH MODAL ════ */
+    .auth-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
+    .auth-container { background: var(--bg-main); padding: 40px 30px; border-radius: 24px; width: 90%; max-width: 420px; text-align: center; position: relative; transform: translateY(30px); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+    .close-auth-btn { position: absolute; top: 16px; right: 16px; background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+    .close-auth-btn:hover { background: var(--bg-input); }
+    .auth-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; color: var(--text-primary); }
+    .auth-subtitle { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 30px; line-height: 1.5; }
+    .google-btn { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; padding: 14px; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 50px; font-family: inherit; font-size: 1rem; font-weight: 500; cursor: pointer; color: var(--text-primary); box-shadow: 0 2px 6px var(--shadow-color); transition: background 0.2s, box-shadow 0.2s; }
+    .google-btn:hover { background: var(--bg-sidebar); box-shadow: 0 4px 12px var(--shadow-color); }
+    .google-btn img { width: 24px; height: 24px; }
 
-        /* ── METRIC ── */
-        .metric-card { text-align: center; padding: 24px; }
-        .metric-value { font-size: 2.2rem; font-weight: 800; color: var(--primary); }
-        .metric-label { font-size: 0.82rem; color: var(--text-muted); margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+    /* ════ CUSTOM DIALOGS ════ */
+    .dialog-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 2000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
+    .dialog-container { background: var(--bg-main); padding: 24px 24px 20px 24px; border-radius: 20px; width: 90%; max-width: 340px; text-align: center; position: relative; transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .dialog-title { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+    .dialog-message { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; }
+    .dialog-actions { display: flex; gap: 12px; justify-content: center; }
+    .dialog-btn { flex: 1; padding: 10px 16px; border-radius: 50px; border: none; font-family: inherit; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: background 0.2s, color 0.2s; }
+    .dialog-btn.secondary { background: var(--bg-input); color: var(--text-primary); }
+    .dialog-btn.secondary:hover { background: var(--bg-hover); }
+    .dialog-btn.primary { background: var(--brand-red); color: white; }
+    .dialog-btn.primary:hover { background: #c82333; }
+    .dialog-btn.primary-blue { background: var(--brand-blue); color: white; }
+    .dialog-btn.primary-blue:hover { background: #084298; }
 
-        /* ── STATUS BADGES ── */
-        .badge { display: inline-block; padding: 4px 12px; border-radius: 50px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
-        .badge-approve { background: #dcfce7; color: var(--success); }
-        .badge-review { background: #fef9c3; color: #854d0e; }
-        .badge-reject { background: #fee2e2; color: var(--danger); }
+    /* ════ AUTH GATE CARD ════ */
+    .auth-gate-row { width: 100%; animation: gateSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    @keyframes gateSlideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .auth-gate-card { background: linear-gradient(135deg, rgba(10,86,217,0.08) 0%, rgba(230,57,70,0.06) 100%); border: 1px solid var(--border-color); border-radius: 20px; padding: 28px 24px 24px; text-align: center; position: relative; overflow: hidden; }
+    .auth-gate-card::before { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(10,86,217,0.05) 0%, rgba(230,57,70,0.04) 100%); pointer-events: none; }
+    .gate-lock-icon { width: 52px; height: 52px; background: linear-gradient(135deg, var(--brand-blue), #4285f4); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; box-shadow: 0 4px 16px rgba(10,86,217,0.25); }
+    .auth-gate-card h3 { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+    .auth-gate-card p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px; max-width: 300px; margin-left: auto; margin-right: auto; }
+    .gate-sign-in-btn { display: inline-flex; align-items: center; gap: 10px; background: var(--brand-blue); color: white; border: none; border-radius: 50px; padding: 12px 28px; font-family: inherit; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.15s, box-shadow 0.2s; box-shadow: 0 4px 14px rgba(10,86,217,0.3); }
+    .gate-sign-in-btn:hover { background: #084298; transform: translateY(-1px); }
+    .input-box.locked { opacity: 0.5; pointer-events: none; }
 
-        /* ── PROGRESS ── */
-        .progress-bar { height: 8px; background: var(--border); border-radius: 50px; overflow: hidden; }
-        .progress-fill { height: 100%; border-radius: 50px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+    /* Scroll to bottom button */
+    .scroll-bottom-btn { position: fixed; bottom: 120px; right: 32px; width: 48px; height: 48px; border-radius: 50%; background: var(--bg-main); color: var(--text-secondary); border: 1px solid var(--border-color); cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 8px 24px var(--shadow-color); z-index: 400; transition: transform 0.2s, background 0.2s; }
+    .scroll-bottom-btn.visible { display: flex; animation: fadeUp 0.3s ease; }
+    .scroll-bottom-btn:hover { background: var(--bg-hover); color: var(--text-primary); transform: translateY(-2px); }
 
-        /* ── TABLE ── */
-        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-        th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); }
-        th { font-weight: 700; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
-        tr:hover td { background: #f9fafb; }
+    /* ════════════════════════════════════════════
+       LIVE CHAT 
+    ════════════════════════════════════════════ */
+    .live-chat-fab { position: fixed; bottom: 24px; right: 24px; background: var(--brand-blue); color: white; border: none; border-radius: 50px; padding: 12px 24px; display: flex; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 8px 24px rgba(10,86,217,0.3); z-index: 1000; transition: transform 0.2s, background 0.2s; font-family: inherit; font-weight: 500; font-size: 0.95rem; }
+    .live-chat-fab:hover { transform: translateY(-3px); background: #084298; }
+    .live-chat-fab i { width: 20px; height: 20px; }
 
-        /* ── UPLOAD AREA ── */
-        .upload-area {
-            border: 2px dashed var(--border);
-            border-radius: var(--radius);
-            padding: 36px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .upload-area:hover { border-color: var(--primary); background: #f0f7fa; }
-        .upload-area.dragover { border-color: var(--primary); background: rgba(26,95,122,0.06); }
-        .upload-icon { font-size: 2.5rem; margin-bottom: 10px; }
+    .live-chat-modal { position: fixed; bottom: 90px; right: 24px; width: 380px; height: 580px; background: var(--bg-main); border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px var(--border-color); display: none; flex-direction: column; overflow: hidden; z-index: 1000; animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(24px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-        /* ── RISK RESULT ── */
-        .risk-score-display {
-            text-align: center;
-            padding: 32px 20px 24px;
-        }
-        .risk-number {
-            font-size: 5rem;
-            font-weight: 800;
-            line-height: 1;
-            margin-bottom: 8px;
-        }
-        .risk-verdict {
-            font-size: 1.1rem;
-            font-weight: 700;
-            padding: 8px 24px;
-            border-radius: 50px;
-            display: inline-block;
-            margin-bottom: 16px;
-        }
+    .live-chat-header { padding: 0 16px; height: 64px; background: var(--brand-blue); color: white; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .lc-header-left { display: flex; align-items: center; gap: 10px; }
+    .consultant-info { display: none; align-items: center; gap: 10px; }
+    .consultant-info.visible { display: flex; }
+    .consultant-avatar-wrap { position: relative; flex-shrink: 0; }
+    .consultant-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.35); background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; color: white; overflow: hidden; }
+    .consultant-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .consultant-online-dot { position: absolute; bottom: 1px; right: 1px; width: 10px; height: 10px; background: #34a853; border-radius: 50%; border: 2px solid var(--brand-blue); }
+    .consultant-text { line-height: 1.25; }
+    .consultant-name { font-weight: 700; font-size: 0.92rem; }
+    .consultant-role { font-size: 0.73rem; opacity: 0.8; }
+    .default-header-info { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.95rem; }
+    .default-header-info.hidden { display: none; }
+    .status-dot.online { width: 8px; height: 8px; background: #34a853; border-radius: 50%; box-shadow: 0 0 0 2px rgba(52,168,83,0.3); animation: onlinePulse 2s infinite; }
+    @keyframes onlinePulse { 0%,100% { box-shadow: 0 0 0 2px rgba(52,168,83,0.3); } 50% { box-shadow: 0 0 0 5px rgba(52,168,83,0); } }
 
-        /* ── AI ANALYSIS ── */
-        .ai-analysis {
-            background: linear-gradient(135deg, #f0f7fa 0%, #e8f4f8 100%);
-            border-radius: var(--radius);
-            padding: 20px;
-            margin-top: 16px;
-            border: 1px solid #c9dde5;
-            font-size: 0.9rem;
-            line-height: 1.7;
-            color: var(--text);
-        }
-        .ai-analysis h3, .ai-analysis h4 { color: var(--primary-dark); margin-top: 12px; margin-bottom: 6px; font-size: 0.95rem; }
-        .ai-analysis h3:first-child, .ai-analysis h4:first-child { margin-top: 0; }
-        .ai-analysis ul { margin-left: 20px; }
-        .ai-analysis li { margin-bottom: 4px; }
-        .ai-analysis strong { color: var(--primary-dark); }
-        .ai-analysis p { margin-bottom: 8px; }
-        .ai-analysis p:last-child { margin-bottom: 0; }
-        .ai-label { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--primary); margin-bottom: 12px; }
-        .ai-label::before { content: ''; width: 24px; height: 2px; background: var(--primary); border-radius: 2px; }
-        .ai-label::after { content: ''; width: 24px; height: 2px; background: var(--primary); border-radius: 2px; }
+    .close-chat-btn { background: rgba(255,255,255,0.15); border: none; color: white; cursor: pointer; display: flex; width: 32px; height: 32px; align-items: center; justify-content: center; border-radius: 50%; transition: background 0.2s; flex-shrink: 0; }
+    .close-chat-btn:hover { background: rgba(255,255,255,0.25); }
 
-        /* ── FEATURE GRID ── */
-        .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .feature-item { background: var(--bg); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border); }
-        .feature-name { font-size: 0.82rem; color: var(--text-muted); font-weight: 500; }
-        .feature-value { font-size: 0.9rem; font-weight: 700; color: var(--primary); }
-        .feature-bar { width: 48px; height: 4px; background: var(--border); border-radius: 2px; margin-top: 4px; overflow: hidden; }
-        .feature-bar-fill { height: 100%; border-radius: 2px; background: var(--primary); }
+    .live-chat-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .chat-state-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; text-align: center; }
+    .waiting-icon-wrap { position: relative; margin-bottom: 28px; display: flex; align-items: center; justify-content: center; width: 72px; height: 72px; }
+    .pulse-ring { position: absolute; width: 64px; height: 64px; border: 2px solid var(--brand-blue); border-radius: 50%; animation: pulseRing 1.5s infinite; }
+    @keyframes pulseRing { 0% { transform: scale(0.8); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
+    .waiting-icon { width: 36px; height: 36px; color: var(--brand-blue); z-index: 2; }
+    .chat-state-container h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+    .chat-state-container p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; max-width: 260px; }
+    .primary-chat-btn { margin-top: 24px; background: var(--brand-blue); color: white; border: none; padding: 12px 32px; border-radius: 50px; cursor: pointer; font-weight: 600; font-family: inherit; font-size: 0.95rem; transition: background 0.2s, transform 0.15s; box-shadow: 0 4px 14px rgba(10,86,217,0.25); }
+    .primary-chat-btn:hover:not(:disabled) { background: #084298; transform: translateY(-1px); }
+    .primary-chat-btn:disabled { background: var(--text-muted); cursor: not-allowed; box-shadow: none; }
 
-        /* ── SPINNER ── */
-        .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+    #activeChat { display: none; flex-direction: column; overflow: hidden; flex: 1; }
+    .live-messages-list { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .live-msg-row { display: flex; gap: 8px; align-items: flex-end; animation: liveMsg 0.2s ease both; }
+    @keyframes liveMsg { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .live-msg-row.user { justify-content: flex-end; }
+    .live-msg-row.consultant { justify-content: flex-start; }
+    .live-msg-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--brand-blue); display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; color: white; flex-shrink: 0; overflow: hidden; border: 1.5px solid var(--border-color); }
+    .live-msg-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .live-msg-bubble { max-width: 75%; padding: 10px 14px; border-radius: 20px; font-size: 0.92rem; line-height: 1.45; word-break: break-word; }
+    .live-msg-row.user .live-msg-bubble { background: var(--brand-blue); color: white; border-bottom-right-radius: 6px; }
+    .live-msg-row.consultant .live-msg-bubble { background: var(--bg-sidebar); color: var(--text-primary); border-bottom-left-radius: 6px; border: 1px solid var(--border-color); }
+    .live-msg-time { font-size: 0.68rem; color: var(--text-muted); margin-top: 3px; padding: 0 4px; }
+    .live-msg-row.user .live-msg-time { text-align: right; }
+    .live-msg-row.consultant .live-msg-time { text-align: left; }
 
-        /* ── THINKING DOTS ── */
-        .thinking-dots { display: inline-flex; gap: 5px; margin-left: 8px; vertical-align: middle; }
-        .thinking-dots span { width: 7px; height: 7px; background: var(--primary); border-radius: 50%; animation: tdot 1.4s infinite; }
-        .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes tdot { 0%,100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } }
+    .live-system-msg { text-align: center; font-size: 0.78rem; color: var(--text-muted); padding: 4px 0; font-style: italic; }
+    .live-input-wrapper { padding: 10px 12px 14px; background: var(--bg-main); border-top: 1px solid var(--border-color); flex-shrink: 0; }
+    .live-input-box { display: flex; align-items: flex-end; gap: 8px; background: var(--bg-input); border-radius: 28px; padding: 8px 8px 8px 16px; border: 1px solid transparent; transition: border-color 0.2s, box-shadow 0.2s; }
+    .live-input-box:focus-within { border-color: var(--brand-blue); box-shadow: 0 0 0 3px rgba(10,86,217,0.1); }
+    .live-chat-textarea { flex: 1; border: none; background: transparent; font-family: inherit; font-size: 0.95rem; color: var(--text-primary); outline: none; resize: none; min-height: 22px; max-height: 120px; line-height: 1.5; padding: 6px 0; }
+    .live-chat-textarea::placeholder { color: var(--text-secondary); }
+    .live-send-btn { background: var(--brand-blue); color: white; border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s, transform 0.15s; margin-bottom: 1px; }
+    .live-send-btn:hover { background: #084298; transform: scale(1.05); }
+    .live-send-btn:disabled { background: var(--text-muted); cursor: not-allowed; transform: none; }
+    .live-send-btn i { width: 16px; height: 16px; }
+    .live-typing-indicator { display: none; align-items: center; gap: 6px; padding: 0 4px 4px; font-size: 0.78rem; color: var(--text-muted); }
+    .live-typing-indicator.visible { display: flex; }
+    .typing-dots { display: flex; gap: 3px; }
+    .typing-dot { width: 5px; height: 5px; background: var(--text-muted); border-radius: 50%; animation: pulse 1.2s infinite; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
-        /* ── AI STATUS INDICATOR ── */
-        .ai-status-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: linear-gradient(90deg, rgba(26,95,122,0.1) 0%, rgba(26,95,122,0.05) 100%);
-            border: 1px solid rgba(26,95,122,0.2);
-            border-radius: 50px; padding: 4px 12px; font-size: 0.78rem;
-            font-weight: 600; color: var(--primary); margin-bottom: 16px;
-        }
-        .ai-status-dot { width: 7px; height: 7px; background: var(--success); border-radius: 50%; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%,100% { box-shadow: 0 0 0 2px rgba(30,142,62,0.2); } 50% { box-shadow: 0 0 0 5px rgba(30,142,62,0); } }
+    #chatEndedState { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 28px 24px; text-align: center; flex-shrink: 0; border-top: 1px solid var(--border-color); background: var(--bg-main); animation: fadeUp 0.4s ease both; }
+    #chatEndedState.visible { display: flex; }
+    .ended-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(142,145,143,0.12); color: var(--text-muted); border-radius: 50px; padding: 5px 14px; font-size: 0.78rem; font-weight: 600; margin-bottom: 14px; letter-spacing: 0.04em; }
+    .ended-badge-dot { width: 6px; height: 6px; background: var(--text-muted); border-radius: 50%; }
+    #chatEndedState p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px; }
+    .new-session-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--brand-blue); color: white; border: none; border-radius: 50px; padding: 10px 22px; font-family: inherit; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.15s; box-shadow: 0 4px 12px rgba(10,86,217,0.2); }
+    .new-session-btn:hover { background: #084298; transform: translateY(-1px); }
+    .new-session-btn i { width: 14px; height: 14px; }
+    .live-input-box.ended { opacity: 0.4; pointer-events: none; }
+    .live-ended-hint { text-align: center; font-size: 0.78rem; color: var(--text-muted); padding-top: 4px; display: none; }
+    .live-ended-hint.visible { display: block; }
 
-        /* ── SECTION TITLE ── */
-        .section-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); font-weight: 700; margin: 20px 0 10px; }
+    /* PWA Banner */
+    #pwa-install-popup { position: fixed; top: calc(env(safe-area-inset-top) + 72px); left: 0; right: 0; z-index: 49; pointer-events: none; display: none; opacity: 0; transform: translateY(-110%); transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease; }
+    #pwa-install-popup.show { display: block; opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .pwa-banner-inner { margin: 0 16px; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 20px; box-shadow: 0 8px 32px var(--shadow-color); padding: 12px 16px; display: flex; align-items: center; gap: 12px; touch-action: none; }
+    .pwa-banner-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #4285f4, #9b72cb, #d96570); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .pwa-banner-icon img { width: 24px; height: 24px; object-fit: contain; filter: brightness(0) invert(1); }
+    .pwa-banner-content { flex: 1; min-width: 0; }
+    .pwa-banner-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+    .pwa-banner-subtitle { font-size: 0.7rem; color: var(--text-muted); line-height: 1.3; margin-top: 2px; }
+    .pwa-banner-install { background: var(--brand-blue); color: white; border: none; border-radius: 50px; padding: 8px 16px; font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.15s; flex-shrink: 0; }
+    .pwa-banner-install:hover { background: #084298; transform: translateY(-1px); }
+    .pwa-banner-close { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 6px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: color 0.2s, background 0.2s; flex-shrink: 0; }
+    .pwa-banner-close:hover { color: var(--text-primary); background: var(--bg-hover); }
 
-        /* ── CONTEXT EDITOR ── */
-        .context-textarea {
-            width: 100%; padding: 14px; border: 1.5px solid var(--border);
-            border-radius: 10px; font-size: 0.88rem; font-family: 'DM Sans', monospace;
-            resize: vertical; min-height: 140px; line-height: 1.6; color: var(--text);
-        }
-        .context-textarea:focus { outline: none; border-color: var(--primary); }
+    /* ════ RESPONSIVE ════ */
+    @media (max-width: 768px) {
+      .sidebar { position: fixed; left: 0; top: 0; bottom: 0; transform: translateX(-100%); width: 280px; }
+      .sidebar.open { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,0.15); }
+      .menu-toggle { display: block; }
+      .greeting, .subtitle { font-size: 2.2rem; }
+      .welcome-screen { margin-top: 10vh; }
+      .input-wrapper { padding: 16px; background: var(--bg-main); }
+      .auth-overlay { align-items: flex-end; }
+      .auth-container { width: 100%; max-width: 100%; border-radius: 28px 28px 0 0; transform: translateY(100%); padding-bottom: calc(120px + env(safe-area-inset-bottom)); }
+      .suggestion-card { transform: none !important; box-shadow: none !important; }
+      .verified-badge { width: 30px; height: 30px; margin-left: 8px; }
+      .message-actions { opacity: 1; }
+      .history-actions { display: flex; }
+      .message-time { opacity: 1; }
+      .live-chat-modal { bottom: 0; right: 0; width: 100vw; height: 100vh; border-radius: 0; z-index: 3000; }
+      .live-chat-fab { bottom: calc(80px + env(safe-area-inset-bottom)); }
+    }
 
-        .hidden { display: none !important; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+      .suggestion-card:hover { transform: none !important; }
+    }
 
-        /* ── NAV MOBILE ── */
-        @media (max-width: 768px) {
-            .nav-tabs { overflow-x: auto; padding: 4px; }
-            .nav-tab { padding: 9px 14px; font-size: 0.82rem; }
-            .container { padding: 16px; }
-        }
-
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-    </style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 10px; opacity: 0.5; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+  </style>
+  <base target="_blank">
 </head>
 <body>
 
-<!-- ══ LOGIN ══ -->
-<div id="loginScreen" class="login-screen">
-    <div class="login-box">
-        <h2>🏦 SME Risk Engine</h2>
-        <p>AI-powered credit risk scoring for South African SMEs</p>
-        <div id="loginAlert"></div>
-        <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="loginEmail" placeholder="lender@example.com">
-        </div>
-        <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="loginPassword" placeholder="••••••••">
-        </div>
-        <button class="btn btn-primary btn-full" onclick="app.login()">
-            <span id="loginBtnText">Sign In</span>
-        </button>
-        <p style="text-align:center;margin-top:14px;font-size:0.82rem;color:var(--text-muted);">
-            Demo: <code>demo@lender.co.za / password123</code>
-        </p>
+  <div id="pwa-install-popup">
+    <div class="pwa-banner-inner">
+      <div class="pwa-banner-icon">
+        <img src="https://i.postimg.cc/tRMK3mNK/Steward-logo.png" alt="Steward">
+      </div>
+      <div class="pwa-banner-content">
+        <p class="pwa-banner-title">Install Steward AI</p>
+        <p class="pwa-banner-subtitle">Add to home screen for quick access</p>
+      </div>
+      <button class="pwa-banner-install" id="pwaInstallBtn">Install</button>
+      <button class="pwa-banner-close" id="pwaDismissBtn">
+        <i data-feather="x" style="width:18px;height:18px;"></i>
+      </button>
     </div>
-</div>
+  </div>
 
-<!-- ══ MAIN APP ══ -->
-<div id="mainApp" class="hidden">
-    <header>
-        <div class="header-inner">
-            <div class="header-brand">
-                <div>
-                    <h1>🏦 SME Risk Engine</h1>
-                    <p>Powered by Grok AI · South African Microlender</p>
-                </div>
-            </div>
-            <div class="header-right">
-                <span class="user-pill" id="userEmail"></span>
-                <button class="btn btn-secondary" style="padding:8px 16px;font-size:0.82rem;" onclick="app.logout()">Logout</button>
-            </div>
-        </div>
+  <div id="splashScreen">
+    <div class="splash-logo-wrap">
+      <img src="https://i.postimg.cc/tRMK3mNK/Steward-logo.png" class="splash-logo" alt="Steward">
+    </div>
+  </div>
+
+  <div class="dialog-overlay" id="dialogOverlay">
+    <div class="dialog-container" id="dialogContainer">
+      <h3 class="dialog-title" id="dialogTitle">Title</h3>
+      <p class="dialog-message" id="dialogMessage">Message</p>
+      <div class="dialog-actions" id="dialogActions"></div>
+    </div>
+  </div>
+
+  <div class="auth-overlay" id="authOverlay">
+    <div class="auth-container" id="authContainer">
+      <button class="close-auth-btn" id="closeAuthBtn">
+        <i data-feather="x" style="width:20px;height:20px;"></i>
+      </button>
+      <img src="https://i.postimg.cc/tRMK3mNK/Steward-logo.png" alt="Steward Logo" style="height:54px;margin-bottom:20px;object-fit:contain;">
+      <h2 class="auth-title">Welcome to Rare Grade Tech</h2>
+      <p class="auth-subtitle">Sign in to request repair quotes and save your chat history.</p>
+      <button class="google-btn" id="googleSignInBtn">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+        Continue with Google
+      </button>
+    </div>
+  </div>
+
+  <aside class="sidebar" id="sidebar">
+    <button class="new-chat-btn" id="newChatBtn">
+      <i data-feather="plus" style="width:20px;height:20px;"></i>
+      New chat
+    </button>
+    <div class="sidebar-history">
+      <div class="sidebar-search" id="sidebarSearch" style="display:none;">
+        <i data-feather="search"></i>
+        <input type="text" placeholder="Search..." id="historySearchInput">
+      </div>
+      <div class="sidebar-title">Recent</div>
+      <div id="sidebarHistoryList"></div>
+    </div>
+  </aside>
+
+  <main class="main-wrapper">
+    <header class="header" id="mainHeader">
+      <div class="header-left">
+        <button class="menu-toggle" id="menuToggle"><i data-feather="menu"></i></button>
+      </div>
+      <div class="header-right">
+        <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+          <i data-feather="moon" id="themeIcon"></i>
+        </button>
+        <button class="profile-btn" id="profileBtn">
+          <img id="header-avatar" class="header-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='background-color:%23E3E3E3'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E">
+        </button>
+      </div>
     </header>
 
-    <div class="container">
-        <!-- TABS -->
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="app.switchTab('dashboard', this)">
-                <i data-feather="bar-chart-2" style="width:16px;height:16px;"></i> Dashboard
-            </button>
-            <button class="nav-tab" onclick="app.switchTab('assess', this)">
-                <i data-feather="file-text" style="width:16px;height:16px;"></i> New Assessment
-            </button>
-            <button class="nav-tab" onclick="app.switchTab('context', this)">
-                <i data-feather="sliders" style="width:16px;height:16px;"></i> AI Context
-            </button>
-            <button class="nav-tab" onclick="app.switchTab('portfolio', this)">
-                <i data-feather="briefcase" style="width:16px;height:16px;"></i> Portfolio
-            </button>
-            <button class="nav-tab" onclick="app.switchTab('settings', this)">
-                <i data-feather="settings" style="width:16px;height:16px;"></i> Settings
-            </button>
+    <div class="scroll-area" id="mainScroll">
+      <div class="content-container">
+        <div class="welcome-screen" id="welcomeScreen">
+          <h1 class="greeting" id="greetingText">Hello there</h1>
+          <h2 class="subtitle">How can I help with your PC today?</h2>
+          <div class="suggestions-grid" id="suggestionsGrid">
+            <div class="suggestion-card" data-prompt="My computer is running very slow and freezing. How can I fix this?">
+              <p>Troubleshoot a slow or freezing computer</p>
+              <div class="icon"><i data-feather="cpu" style="width:20px;height:20px;"></i></div>
+            </div>
+            <div class="suggestion-card" data-prompt="I need a quote to replace a shattered laptop screen.">
+              <p>Get a quote for a laptop screen replacement</p>
+              <div class="icon"><i data-feather="monitor" style="width:20px;height:20px;"></i></div>
+            </div>
+            <div class="suggestion-card" data-prompt="My laptop keeps turning off randomly. What could be the issue?">
+              <p>Diagnose sudden power or battery issues</p>
+              <div class="icon"><i data-feather="battery-charging" style="width:20px;height:20px;"></i></div>
+            </div>
+            <div class="suggestion-card" data-prompt="How do I remove a virus or malware from my Windows PC?">
+              <p>Help removing viruses and malware</p>
+              <div class="icon"><i data-feather="shield" style="width:20px;height:20px;"></i></div>
+            </div>
+          </div>
         </div>
-
-        <!-- ══ DASHBOARD ══ -->
-        <div id="tab-dashboard" class="tab-content active">
-            <div class="grid-3">
-                <div class="card metric-card">
-                    <div class="metric-value" id="dashTotal">0</div>
-                    <div class="metric-label">Total Assessments</div>
-                </div>
-                <div class="card metric-card">
-                    <div class="metric-value" id="dashApproval">0%</div>
-                    <div class="metric-label">Approval Rate</div>
-                </div>
-                <div class="card metric-card">
-                    <div class="metric-value" id="dashAvgRisk">0%</div>
-                    <div class="metric-label">Avg Default Risk</div>
-                </div>
-            </div>
-
-            <div class="grid-2">
-                <div class="card">
-                    <div class="card-title"><i data-feather="activity" style="width:16px;height:16px;"></i> Risk Distribution</div>
-                    <div style="margin-bottom:14px;">
-                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.85rem;">
-                            <span>Low Risk (0–35%)</span><span id="countLow" style="font-weight:700;">0</span>
-                        </div>
-                        <div class="progress-bar"><div class="progress-fill" id="barLow" style="width:0%;background:var(--success);"></div></div>
-                    </div>
-                    <div style="margin-bottom:14px;">
-                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.85rem;">
-                            <span>Medium Risk (35–60%)</span><span id="countMedium" style="font-weight:700;">0</span>
-                        </div>
-                        <div class="progress-bar"><div class="progress-fill" id="barMedium" style="width:0%;background:var(--warning);"></div></div>
-                    </div>
-                    <div>
-                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.85rem;">
-                            <span>High Risk (60%+)</span><span id="countHigh" style="font-weight:700;">0</span>
-                        </div>
-                        <div class="progress-bar"><div class="progress-fill" id="barHigh" style="width:0%;background:var(--danger);"></div></div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-title"><i data-feather="clock" style="width:16px;height:16px;"></i> Recent Activity</div>
-                    <div id="recentActivity"><p style="color:var(--text-muted);font-size:0.88rem;">No recent assessments</p></div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title"><i data-feather="cpu" style="width:16px;height:16px;"></i> AI Engine Status</div>
-                <div class="ai-status-badge">
-                    <div class="ai-status-dot"></div>
-                    Grok AI · Ready for assessments
-                </div>
-                <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.6;">
-                    This engine uses the <strong>xAI Grok API</strong> to analyse bank statement features and produce detailed credit risk assessments. 
-                    No model training required — Grok reasons directly over extracted financial signals to estimate default probability, explain risk factors, and recommend a lending decision.
-                </p>
-            </div>
-        </div>
-
-        <!-- ══ ASSESS ══ -->
-        <div id="tab-assess" class="tab-content">
-            <div class="grid-2">
-                <div>
-                    <div class="card">
-                        <div class="card-title"><i data-feather="upload" style="width:16px;height:16px;"></i> Applicant Details</div>
-                        <div class="form-group">
-                            <label>Applicant Name</label>
-                            <input type="text" id="appName" placeholder="e.g. Thabo Mokoena">
-                        </div>
-                        <div class="form-group">
-                            <label>Business Name</label>
-                            <input type="text" id="appBusiness" placeholder="e.g. Mokoena Logistics">
-                        </div>
-                        <div class="form-group">
-                            <label>Loan Amount (R)</label>
-                            <input type="number" id="appAmount" placeholder="e.g. 50000">
-                        </div>
-                        <div class="form-group">
-                            <label>Business Sector</label>
-                            <select id="appSector" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:0.95rem;color:var(--text);">
-                                <option value="">Select sector...</option>
-                                <option>Retail</option>
-                                <option>Logistics & Transport</option>
-                                <option>Food & Hospitality</option>
-                                <option>Construction</option>
-                                <option>Professional Services</option>
-                                <option>Agriculture</option>
-                                <option>Manufacturing</option>
-                                <option>Other</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-title"><i data-feather="file" style="width:16px;height:16px;"></i> Bank Statement PDF</div>
-                        <div class="alert alert-info">Upload a 3-month bank statement. We'll extract financial signals and send them to Grok AI for risk analysis.</div>
-                        <div class="upload-area" id="pdfUpload" onclick="document.getElementById('pdfFile').click()">
-                            <div class="upload-icon">📤</div>
-                            <p style="font-weight:600;margin-bottom:4px;">Click to upload PDF</p>
-                            <p style="font-size:0.82rem;color:var(--text-muted);">or drag and drop · PDF only</p>
-                        </div>
-                        <input type="file" id="pdfFile" accept=".pdf" style="display:none;" onchange="app.handlePdfUpload(event)">
-                        <p id="pdfName" style="margin-top:10px;font-size:0.82rem;color:var(--text-muted);"></p>
-
-                        <div style="margin-top:16px;display:flex;gap:10px;">
-                            <button class="btn btn-primary" id="assessBtn" onclick="app.runAssessment()" disabled>
-                                <i data-feather="zap" style="width:15px;height:15px;"></i>
-                                Run AI Assessment
-                            </button>
-                            <button class="btn btn-secondary" onclick="app.runDemoAssessment()">
-                                <i data-feather="play" style="width:15px;height:15px;"></i>
-                                Try Demo
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="card" style="min-height:340px;">
-                        <div class="card-title"><i data-feather="target" style="width:16px;height:16px;"></i> Risk Assessment Result</div>
-                        <div id="assessResult">
-                            <div style="text-align:center;padding:50px 20px;color:var(--text-muted);">
-                                <i data-feather="shield" style="width:48px;height:48px;opacity:0.2;margin-bottom:12px;"></i>
-                                <p style="font-size:0.9rem;">Upload a bank statement and click<br><strong>Run AI Assessment</strong> to see results.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card" id="featuresCard" style="display:none;">
-                        <div class="card-title"><i data-feather="list" style="width:16px;height:16px;"></i> Extracted Financial Signals</div>
-                        <div class="feature-grid" id="featureList"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ══ AI CONTEXT ══ -->
-        <div id="tab-context" class="tab-content">
-            <div class="grid-2">
-                <div class="card">
-                    <div class="card-title"><i data-feather="edit-3" style="width:16px;height:16px;"></i> AI System Context</div>
-                    <div class="alert alert-info">
-                        Customise the instructions given to Grok AI when it analyses applications. Add your lending policy, risk appetite, sector-specific notes, or blacklist criteria.
-                    </div>
-                    <div class="form-group">
-                        <label>System Prompt / Lending Policy</label>
-                        <textarea class="context-textarea" id="systemContext" rows="10">You are a senior credit risk analyst at a South African microlending institution. Your role is to evaluate SME loan applications based on extracted bank statement features.
-
-Lending Policy:
-- Max loan amount: R500,000
-- Minimum 3 months business banking history required
-- High reversals/NSF are red flags for cash flow problems
-- Stable or growing balance trends preferred
-- Diversified revenue streams reduce concentration risk
-
-South African Context:
-- Consider load-shedding impact on business cash flows
-- Weekend/evening transactions may indicate informal sector business (normal for SA SMEs)
-- Salary inflows alongside business revenue are common for owner-managed businesses</textarea>
-                    </div>
-                    <button class="btn btn-primary" onclick="app.saveContext()">
-                        <i data-feather="save" style="width:15px;height:15px;"></i>
-                        Save Context
-                    </button>
-                </div>
-
-                <div class="card">
-                    <div class="card-title"><i data-feather="info" style="width:16px;height:16px;"></i> How It Works</div>
-                    <div style="font-size:0.88rem;color:var(--text);line-height:1.9;">
-                        <div style="display:flex;gap:12px;margin-bottom:16px;">
-                            <div style="width:28px;height:28px;background:var(--primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">1</div>
-                            <div><strong>PDF Parsing</strong> — Bank statement is parsed with PDF.js. Transactions, balances, and keywords are extracted.</div>
-                        </div>
-                        <div style="display:flex;gap:12px;margin-bottom:16px;">
-                            <div style="width:28px;height:28px;background:var(--primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">2</div>
-                            <div><strong>Feature Calculation</strong> — 8 normalised risk features are computed: volatility, balance trend, debit/credit ratio, reversal frequency, etc.</div>
-                        </div>
-                        <div style="display:flex;gap:12px;margin-bottom:16px;">
-                            <div style="width:28px;height:28px;background:var(--primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">3</div>
-                            <div><strong>Grok AI Analysis</strong> — Features + applicant context are sent to the Grok API, which reasons over the data, estimates default probability, and provides a detailed explanation.</div>
-                        </div>
-                        <div style="display:flex;gap:12px;">
-                            <div style="width:28px;height:28px;background:var(--primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">4</div>
-                            <div><strong>Decision + Storage</strong> — Result (APPROVE / REVIEW / REJECT) and AI reasoning are saved to Firebase for your portfolio.</div>
-                        </div>
-                    </div>
-
-                    <div style="margin-top:20px;">
-                        <div class="card-title" style="margin-bottom:12px;"><i data-feather="key" style="width:16px;height:16px;"></i> API Key</div>
-                        <div class="form-group">
-                            <label>xAI Grok API Key</label>
-                            <input type="password" id="apiKeyInput" placeholder="xai-...">
-                            <p style="font-size:0.78rem;color:var(--text-muted);margin-top:5px;">Stored locally in your browser. Never sent to our servers.</p>
-                        </div>
-                        <button class="btn btn-primary" onclick="app.saveApiKey()">
-                            <i data-feather="save" style="width:15px;height:15px;"></i>
-                            Save API Key
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ══ PORTFOLIO ══ -->
-        <div id="tab-portfolio" class="tab-content">
-            <div class="card">
-                <div class="card-title"><i data-feather="briefcase" style="width:16px;height:16px;"></i> All Assessments</div>
-                <div style="overflow-x:auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Applicant</th>
-                                <th>Business</th>
-                                <th>Sector</th>
-                                <th>Amount</th>
-                                <th>Risk Score</th>
-                                <th>Decision</th>
-                            </tr>
-                        </thead>
-                        <tbody id="portfolioTable">
-                            <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:28px;">No assessments yet</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- ══ SETTINGS ══ -->
-        <div id="tab-settings" class="tab-content">
-            <div class="grid-2">
-                <div class="card">
-                    <div class="card-title"><i data-feather="sliders" style="width:16px;height:16px;"></i> Risk Thresholds</div>
-                    <div class="form-group">
-                        <label>Auto-Approve Below (%)</label>
-                        <input type="number" id="threshApprove" value="35" min="0" max="100">
-                        <p style="font-size:0.78rem;color:var(--text-muted);margin-top:5px;">AI scores below this go straight to APPROVE.</p>
-                    </div>
-                    <div class="form-group">
-                        <label>Auto-Reject Above (%)</label>
-                        <input type="number" id="threshReject" value="60" min="0" max="100">
-                        <p style="font-size:0.78rem;color:var(--text-muted);margin-top:5px;">AI scores above this go straight to REJECT.</p>
-                    </div>
-                    <div class="alert alert-info" style="margin-bottom:16px;">
-                        Between <strong id="reviewLow">35%</strong> and <strong id="reviewHigh">60%</strong> = Manual Review
-                    </div>
-                    <button class="btn btn-primary" onclick="app.saveSettings()">Save Thresholds</button>
-                </div>
-
-                <div class="card">
-                    <div class="card-title"><i data-feather="shield" style="width:16px;height:16px;"></i> POPIA Compliance</div>
-                    <div class="alert alert-info" style="margin-bottom:16px;">This system processes personal financial data. Ensure compliance with POPIA.</div>
-                    <ul style="font-size:0.88rem;line-height:2.2;list-style:none;">
-                        <li>✅ Raw PDFs are parsed in-browser and immediately discarded</li>
-                        <li>✅ Only extracted features and scores are stored in Firebase</li>
-                        <li>✅ Data is encrypted in transit and at rest</li>
-                        <li>✅ Access is authenticated and logged</li>
-                        <li>⚠️ Register an Information Officer with the SA Information Regulator</li>
-                    </ul>
-                    <div style="display:flex;gap:10px;margin-top:16px;">
-                        <button class="btn btn-secondary" onclick="app.exportData()">
-                            <i data-feather="download" style="width:15px;height:15px;"></i> Export CSV
-                        </button>
-                        <button class="btn btn-danger" onclick="app.clearAssessments()">
-                            <i data-feather="trash-2" style="width:15px;height:15px;"></i> Clear All
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div class="chat-container" id="chatContainer"></div>
+      </div>
     </div>
-</div>
 
-<script>
-// ══════════════════════════════════════════
-// FIREBASE CONFIG
-// ══════════════════════════════════════════
-const firebaseConfig = {
-    apiKey: "AIzaSyCh7Ute6LeSAxcNDEQwZg5m0cA4ujnLCfg",
-    authDomain: "test-17881.firebaseapp.com",
-    databaseURL: "https://test-17881-default-rtdb.firebaseio.com",
-    projectId: "test-17881",
-    storageBucket: "test-17881.firebasestorage.app",
-    messagingSenderId: "1057428047643",
-    appId: "1:1057428047643:web:f3801c0d933225a5cd35be"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const auth = firebase.auth();
-
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-// xAI Grok API
-const XAI_BASE = "https://api.x.ai/v1";
-
-// ══════════════════════════════════════════
-// APP STATE
-// ══════════════════════════════════════════
-const app = {
-    currentUser: null,
-    assessments: [],
-    settings: { approveThreshold: 35, rejectThreshold: 60 },
-    currentPdfFile: null,
-    systemContext: '',
-
-    // ── AUTH ──
-    async login() {
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-        if (!email || !password) { app.showAlert('loginAlert', 'Please enter email and password.', 'danger'); return; }
-        try {
-            await auth.signInWithEmailAndPassword(email, password);
-        } catch (err) {
-            if (err.code === 'auth/user-not-found' && email === 'demo@lender.co.za') {
-                try { await auth.createUserWithEmailAndPassword(email, password); }
-                catch (e) { app.showAlert('loginAlert', e.message, 'danger'); }
-            } else {
-                app.showAlert('loginAlert', err.message, 'danger');
-            }
-        }
-    },
-
-    logout() { auth.signOut(); },
-
-    onAuthStateChanged(user) {
-        if (user) {
-            this.currentUser = user;
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('hidden');
-            document.getElementById('userEmail').textContent = user.email;
-            this.loadData();
-            feather.replace();
-        } else {
-            this.currentUser = null;
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('mainApp').classList.add('hidden');
-        }
-    },
-
-    // ── NAV ──
-    switchTab(tabName, btn) {
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('tab-' + tabName).classList.add('active');
-        if (tabName === 'dashboard') this.updateDashboard();
-        if (tabName === 'portfolio') this.loadPortfolio();
-        feather.replace();
-    },
-
-    // ── DATA ──
-    async loadData() {
-        const uid = this.currentUser.uid;
-
-        // Settings
-        const sSnap = await db.ref(`users/${uid}/settings`).once('value');
-        if (sSnap.exists()) {
-            this.settings = sSnap.val();
-            document.getElementById('threshApprove').value = this.settings.approveThreshold;
-            document.getElementById('threshReject').value = this.settings.rejectThreshold;
-            this.updateThresholdDisplay();
-        }
-
-        // System context
-        const cSnap = await db.ref(`users/${uid}/systemContext`).once('value');
-        if (cSnap.exists()) {
-            this.systemContext = cSnap.val();
-            document.getElementById('systemContext').value = this.systemContext;
-        } else {
-            this.systemContext = document.getElementById('systemContext').value;
-        }
-
-        // API key
-        const savedKey = localStorage.getItem('xai_api_key');
-        if (savedKey) document.getElementById('apiKeyInput').value = savedKey;
-
-        // Assessments
-        const aSnap = await db.ref(`users/${uid}/assessments`).once('value');
-        if (aSnap.exists()) {
-            this.assessments = Object.values(aSnap.val()).sort((a, b) => b.timestamp - a.timestamp);
-        }
-
-        this.updateDashboard();
-    },
-
-    // ── DASHBOARD ──
-    updateDashboard() {
-        const total = this.assessments.length;
-        const approved = this.assessments.filter(a => a.recommendation === 'APPROVE').length;
-        const avgRisk = total > 0 ? this.assessments.reduce((s, a) => s + a.riskScore, 0) / total : 0;
-
-        document.getElementById('dashTotal').textContent = total;
-        document.getElementById('dashApproval').textContent = total > 0 ? Math.round(approved / total * 100) + '%' : '0%';
-        document.getElementById('dashAvgRisk').textContent = Math.round(avgRisk) + '%';
-
-        const low = this.assessments.filter(a => a.riskScore <= 35).length;
-        const med = this.assessments.filter(a => a.riskScore > 35 && a.riskScore < 60).length;
-        const high = this.assessments.filter(a => a.riskScore >= 60).length;
-        document.getElementById('countLow').textContent = low;
-        document.getElementById('countMedium').textContent = med;
-        document.getElementById('countHigh').textContent = high;
-        const maxC = Math.max(low, med, high, 1);
-        document.getElementById('barLow').style.width = (low / maxC * 100) + '%';
-        document.getElementById('barMedium').style.width = (med / maxC * 100) + '%';
-        document.getElementById('barHigh').style.width = (high / maxC * 100) + '%';
-
-        const recent = this.assessments.slice(0, 5);
-        document.getElementById('recentActivity').innerHTML = recent.length > 0
-            ? recent.map(a => `
-                <div style="padding:10px 0;border-bottom:1px solid var(--border);font-size:0.85rem;">
-                    <strong>${a.applicantName}</strong> — ${a.businessName}<br>
-                    <span style="color:var(--text-muted);">Risk: ${a.riskScore}% · 
-                    <span class="badge badge-${a.recommendation.toLowerCase()}">${a.recommendation}</span></span>
-                </div>`).join('')
-            : '<p style="color:var(--text-muted);font-size:0.88rem;">No assessments yet</p>';
-        feather.replace();
-    },
-
-    // ── PDF HANDLING ──
-    async handlePdfUpload(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        this.currentPdfFile = file;
-        document.getElementById('pdfName').textContent = `✅ ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-        document.getElementById('assessBtn').disabled = false;
-    },
-
-    async parsePdf(file) {
-        const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        let fullText = '';
-        for (let i = 1; i <= pdf.numPages; i++) {
-            const page = await pdf.getPage(i);
-            const tc = await page.getTextContent();
-            fullText += tc.items.map(item => item.str).join(' ') + ' ';
-        }
-        return this.extractTransactions(fullText);
-    },
-
-    extractTransactions(text) {
-        const lines = text.split(/\r?\n/).filter(l => l.trim());
-        const transactions = [];
-        const balances = [];
-        const datePattern = /(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/;
-
-        for (const line of lines) {
-            const amounts = [...line.matchAll(/-?R?\s?([0-9,]+\.\d{2})/g)].map(m => parseFloat(m[1].replace(/,/g, '')));
-            const dateMatch = line.match(datePattern);
-            if (amounts.length > 0 && dateMatch) {
-                const isDebit = /debit|dr\b|-R/i.test(line);
-                transactions.push({
-                    date: dateMatch[1],
-                    description: line.substring(0, 60).trim(),
-                    amount: amounts[amounts.length - 1],
-                    type: isDebit ? 'debit' : 'credit'
-                });
-            }
-            const bMatch = line.match(/balance[\s:]+R?\s?([0-9,]+\.\d{2})/i);
-            if (bMatch) balances.push(parseFloat(bMatch[1].replace(/,/g, '')));
-        }
-        return { transactions, balances };
-    },
-
-    calculateFeatures({ transactions, balances }) {
-        if (transactions.length === 0) throw new Error('No transactions found in PDF. The format may not be supported.');
-
-        const dailyFlows = {};
-        transactions.forEach(t => {
-            dailyFlows[t.date] = (dailyFlows[t.date] || 0) + (t.type === 'credit' ? t.amount : -t.amount);
-        });
-        const flows = Object.values(dailyFlows);
-        const mean = flows.reduce((a, b) => a + b, 0) / flows.length;
-        const variance = flows.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / flows.length;
-        const volatility = Math.min(Math.sqrt(variance) / (Math.abs(mean) + 1), 1);
-
-        const totalDebits = transactions.filter(t => t.type === 'debit').reduce((s, t) => s + t.amount, 0);
-        const totalCredits = transactions.filter(t => t.type === 'credit').reduce((s, t) => s + t.amount, 0);
-        const debitCreditRatio = totalCredits > 0 ? Math.min(totalDebits / totalCredits, 2) / 2 : 1;
-
-        const balanceTrend = balances.length > 1
-            ? Math.min(Math.max((balances[balances.length - 1] - balances[0]) / (Math.abs(balances[0]) + 1), -1), 1)
-            : 0;
-        const normalizedTrend = (balanceTrend + 1) / 2;
-
-        const reversalKw = ['reversal','returned','insufficient','nsf','dishonour','bounce','unpaid'];
-        const reversalCount = transactions.filter(t => reversalKw.some(k => t.description.toLowerCase().includes(k))).length;
-        const reversalRatio = Math.min(reversalCount / transactions.length * 5, 1);
-
-        const weekendRatio = 0.2; // placeholder without full timestamps
-
-        const credits = transactions.filter(t => t.type === 'credit').map(t => t.amount).sort((a, b) => a - b);
-        let regularDeposits = 0;
-        if (credits.length >= 3) {
-            const clusters = [];
-            let curr = [credits[0]];
-            for (let i = 1; i < credits.length; i++) {
-                if (Math.abs(credits[i] - curr[0]) / (curr[0] + 1) < 0.15) curr.push(credits[i]);
-                else { clusters.push(curr); curr = [credits[i]]; }
-            }
-            clusters.push(curr);
-            const largest = clusters.reduce((m, c) => c.length > m.length ? c : m, clusters[0]);
-            regularDeposits = largest.reduce((a, b) => a + b, 0);
-        }
-        const salaryMix = Math.min(regularDeposits / (totalCredits + 1), 1);
-
-        const maxDeposit = Math.max(...credits, 0);
-        const largestDepositRatio = totalCredits > 0 ? Math.min(maxDeposit / totalCredits, 1) : 0;
-
-        const zeroBalanceDays = balances.filter(b => b <= 0).length / Math.max(balances.length, 1);
-
-        return {
-            features: {
-                cashFlowVolatility: +volatility.toFixed(3),
-                balanceTrend: +normalizedTrend.toFixed(3),
-                debitCreditRatio: +debitCreditRatio.toFixed(3),
-                weekendEveningPct: +weekendRatio.toFixed(3),
-                reversalFrequency: +reversalRatio.toFixed(3),
-                salaryRevenueMix: +salaryMix.toFixed(3),
-                largestDepositPct: +largestDepositRatio.toFixed(3),
-                zeroBalanceDays: +zeroBalanceDays.toFixed(3)
-            },
-            raw: {
-                totalTransactions: transactions.length,
-                totalDebits: +totalDebits.toFixed(2),
-                totalCredits: +totalCredits.toFixed(2),
-                avgBalance: balances.length > 0 ? +(balances.reduce((a, b) => a + b, 0) / balances.length).toFixed(2) : 0,
-                reversalCount
-            }
-        };
-    },
-
-    // ── GROK AI ASSESSMENT ──
-    async callGrokAPI(features, raw, applicantName, businessName, loanAmount, sector) {
-        const apiKey = localStorage.getItem('xai_api_key');
-        if (!apiKey) throw new Error('No xAI API key found. Please add your key in the AI Context tab.');
-
-        const systemPrompt = this.systemContext || document.getElementById('systemContext').value;
-
-        const userMessage = `
-Please analyse this SME loan application and provide a detailed credit risk assessment.
-
-## Applicant
-- **Name:** ${applicantName}
-- **Business:** ${businessName}
-- **Sector:** ${sector || 'Not specified'}
-- **Loan Amount Requested:** R${parseInt(loanAmount).toLocaleString()}
-
-## Extracted Bank Statement Features (normalised 0–1)
-- Cash Flow Volatility: ${(features.cashFlowVolatility * 100).toFixed(1)}% (higher = more volatile/risky)
-- Balance Trend: ${(features.balanceTrend * 100).toFixed(1)}% (higher = improving balance)
-- Debit/Credit Ratio: ${(features.debitCreditRatio * 100).toFixed(1)}% (higher = spending more than earning)
-- Weekend/Evening Transactions: ${(features.weekendEveningPct * 100).toFixed(1)}%
-- Reversal/NSF Frequency: ${(features.reversalFrequency * 100).toFixed(1)}% (higher = more bounced payments)
-- Salary vs Revenue Mix: ${(features.salaryRevenueMix * 100).toFixed(1)}% (higher = more salary-like regular income)
-- Largest Single Deposit %: ${(features.largestDepositPct * 100).toFixed(1)}% (higher = more revenue concentration)
-- Zero/Near-Zero Balance Days: ${(features.zeroBalanceDays * 100).toFixed(1)}%
-
-## Raw Stats
-- Total transactions analysed: ${raw.totalTransactions}
-- Total debits: R${raw.totalDebits.toLocaleString()}
-- Total credits: R${raw.totalCredits.toLocaleString()}
-- Average balance: R${raw.avgBalance.toLocaleString()}
-- Reversal/NSF events: ${raw.reversalCount}
-
-## Your Task
-1. Estimate the **default probability as a percentage (0–100%)** based on these signals.
-2. Identify the **top 3 risk factors** present in this application.
-3. Identify any **positive signals** that reduce risk.
-4. Give a **lending recommendation**: APPROVE, MANUAL REVIEW, or REJECT.
-5. Suggest an appropriate **maximum loan amount** if not the full amount requested.
-6. Provide a brief **explanation** suitable for a credit file.
-
-Respond in clear, structured markdown with headers. Be direct and specific.`;
-
-        const response = await fetch(`${XAI_BASE}/chat/completions`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${apiKey}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                model: 'grok-3-fast',
-                messages: [
-                    { role: 'system', content: systemPrompt },
-                    { role: 'user', content: userMessage }
-                ],
-                max_tokens: 1200
-            })
-        });
-
-        if (!response.ok) {
-            const err = await response.text();
-            throw new Error(`Grok API error: ${err}`);
-        }
-
-        const data = await response.json();
-        return data.choices[0].message.content;
-    },
-
-    parseRiskScore(aiResponse) {
-        // Extract percentage from AI response
-        const patterns = [
-            /default probability[:\s]+(\d+(?:\.\d+)?)\s*%/i,
-            /(\d+(?:\.\d+)?)\s*%\s*(?:default|probability|risk|chance)/i,
-            /probability[:\s]+(\d+(?:\.\d+)?)\s*%/i,
-            /(\d+(?:\.\d+)?)\s*%/
-        ];
-        for (const p of patterns) {
-            const m = aiResponse.match(p);
-            if (m) return Math.min(100, Math.max(0, parseFloat(m[1])));
-        }
-        return 50; // fallback
-    },
-
-    parseMarkdown(text) {
-        if (!text) return '';
-        let html = text
-            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-            .replace(/^### (.*$)/gim, '<h4>$1</h4>')
-            .replace(/^## (.*$)/gim, '<h3>$1</h3>')
-            .replace(/^# (.*$)/gim, '<h3>$1</h3>')
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>');
-        const lines = html.split('\n');
-        let result = [], inList = false;
-        for (const line of lines) {
-            const lm = line.match(/^\s*[-*] (.*$)/);
-            if (lm) { if (!inList) { result.push('<ul>'); inList = true; } result.push('<li>' + lm[1] + '</li>'); }
-            else { if (inList) { result.push('</ul>'); inList = false; } result.push(line); }
-        }
-        if (inList) result.push('</ul>');
-        return result.join('\n').split('\n\n').map(p => {
-            p = p.trim();
-            if (!p) return '';
-            if (p.startsWith('<h') || p.startsWith('<ul') || p.startsWith('</ul') || p.startsWith('<li')) return p;
-            return '<p>' + p + '</p>';
-        }).join('\n');
-    },
-
-    // ── RUN ASSESSMENT ──
-    async runAssessment() {
-        const name = document.getElementById('appName').value.trim();
-        const business = document.getElementById('appBusiness').value.trim();
-        const amount = document.getElementById('appAmount').value;
-        const sector = document.getElementById('appSector').value;
-
-        if (!name || !business || !amount || !this.currentPdfFile) {
-            alert('Please fill in all fields and upload a bank statement.');
-            return;
-        }
-
-        const btn = document.getElementById('assessBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner"></span> Parsing PDF...';
-
-        document.getElementById('assessResult').innerHTML = `
-            <div style="text-align:center;padding:40px 20px;">
-                <p style="font-weight:600;color:var(--primary);font-size:1rem;">
-                    Analysing bank statement
-                    <span class="thinking-dots"><span></span><span></span><span></span></span>
-                </p>
-                <p style="color:var(--text-muted);font-size:0.85rem;margin-top:8px;">Grok AI is reviewing the financial signals...</p>
-            </div>`;
-
-        try {
-            const txData = await this.parsePdf(this.currentPdfFile);
-            const featureData = this.calculateFeatures(txData);
-
-            btn.innerHTML = '<span class="spinner"></span> Asking Grok AI...';
-
-            const aiResponse = await this.callGrokAPI(
-                featureData.features, featureData.raw,
-                name, business, amount, sector
-            );
-
-            const riskScore = this.parseRiskScore(aiResponse);
-            const thresh = this.settings;
-            let recommendation, badgeClass;
-            if (riskScore <= thresh.approveThreshold) { recommendation = 'APPROVE'; badgeClass = 'approve'; }
-            else if (riskScore >= thresh.rejectThreshold) { recommendation = 'REJECT'; badgeClass = 'reject'; }
-            else { recommendation = 'REVIEW'; badgeClass = 'review'; }
-
-            const scoreColor = riskScore <= 35 ? 'var(--success)' : riskScore < 60 ? 'var(--warning)' : 'var(--danger)';
-
-            document.getElementById('assessResult').innerHTML = `
-                <div class="risk-score-display">
-                    <div class="risk-number" style="color:${scoreColor};">${Math.round(riskScore)}%</div>
-                    <div style="margin-bottom:12px;font-size:0.82rem;color:var(--text-muted);">Estimated Default Probability</div>
-                    <span class="badge badge-${badgeClass}" style="font-size:0.88rem;padding:8px 20px;">${recommendation}</span>
-                </div>
-                <div style="padding:0 4px 4px;">
-                    <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:6px;">
-                        <span style="color:var(--text-muted);">Risk Level</span>
-                        <span style="font-weight:700;">${riskScore <= 35 ? 'Low' : riskScore < 60 ? 'Medium' : 'High'}</span>
-                    </div>
-                    <div class="progress-bar" style="height:10px;">
-                        <div class="progress-fill" style="width:${riskScore}%;background:${scoreColor};"></div>
-                    </div>
-                </div>
-                <div class="ai-analysis">
-                    <div class="ai-label">Grok AI Analysis</div>
-                    ${this.parseMarkdown(aiResponse)}
-                </div>`;
-
-            // Show features
-            document.getElementById('featuresCard').style.display = 'block';
-            const fNames = [
-                ['Cash Flow Volatility', 'cashFlowVolatility'],
-                ['Balance Trend', 'balanceTrend'],
-                ['Debit/Credit Ratio', 'debitCreditRatio'],
-                ['Weekend/Evening %', 'weekendEveningPct'],
-                ['Reversal/NSF Freq', 'reversalFrequency'],
-                ['Salary/Revenue Mix', 'salaryRevenueMix'],
-                ['Largest Deposit %', 'largestDepositPct'],
-                ['Zero Balance Days', 'zeroBalanceDays']
-            ];
-            document.getElementById('featureList').innerHTML = fNames.map(([label, key]) => {
-                const val = featureData.features[key];
-                return `<div class="feature-item">
-                    <div>
-                        <div class="feature-name">${label}</div>
-                        <div class="feature-bar"><div class="feature-bar-fill" style="width:${val * 100}%;"></div></div>
-                    </div>
-                    <div class="feature-value">${(val * 100).toFixed(1)}%</div>
-                </div>`;
-            }).join('');
-
-            // Save to Firebase
-            const assessment = {
-                id: Date.now().toString(),
-                timestamp: Date.now(),
-                applicantName: name,
-                businessName: business,
-                sector: sector || 'N/A',
-                loanAmount: parseFloat(amount),
-                riskScore: Math.round(riskScore),
-                recommendation,
-                aiAnalysis: aiResponse,
-                features: featureData.features,
-                rawStats: featureData.raw,
-                status: 'PENDING'
-            };
-            await db.ref(`users/${this.currentUser.uid}/assessments/${assessment.id}`).set(assessment);
-            this.assessments.unshift(assessment);
-            this.updateDashboard();
-
-            this.currentPdfFile = null;
-            document.getElementById('pdfName').textContent = '';
-            document.getElementById('pdfFile').value = '';
-            document.getElementById('assessBtn').disabled = true;
-
-        } catch (err) {
-            console.error(err);
-            document.getElementById('assessResult').innerHTML = `
-                <div class="alert alert-danger">
-                    <strong>❌ Error:</strong> ${err.message}<br>
-                    <small style="margin-top:6px;display:block;">
-                        ${err.message.includes('API key') ? 'Go to the <strong>AI Context</strong> tab and add your xAI Grok API key.' : 'The PDF parser may not support this bank statement format. Try another statement.'}
-                    </small>
-                </div>`;
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i data-feather="zap" style="width:15px;height:15px;"></i> Run AI Assessment';
-            feather.replace();
-        }
-    },
-
-    // ── DEMO ASSESSMENT ──
-    async runDemoAssessment() {
-        document.getElementById('appName').value = document.getElementById('appName').value || 'Thabo Mokoena';
-        document.getElementById('appBusiness').value = document.getElementById('appBusiness').value || 'Mokoena Logistics Pty Ltd';
-        document.getElementById('appAmount').value = document.getElementById('appAmount').value || '75000';
-        document.getElementById('appSector').value = 'Logistics & Transport';
-
-        const apiKey = localStorage.getItem('xai_api_key');
-        if (!apiKey) {
-            alert('Please add your xAI Grok API key in the AI Context tab first.');
-            return;
-        }
-
-        const btn = document.getElementById('assessBtn');
-        btn.disabled = true;
-
-        document.getElementById('assessResult').innerHTML = `
-            <div style="text-align:center;padding:40px 20px;">
-                <p style="font-weight:600;color:var(--primary);font-size:1rem;">
-                    Running demo assessment
-                    <span class="thinking-dots"><span></span><span></span><span></span></span>
-                </p>
-                <p style="color:var(--text-muted);font-size:0.85rem;margin-top:8px;">Grok AI is analysing simulated financial signals...</p>
-            </div>`;
-
-        try {
-            const demoFeatures = {
-                cashFlowVolatility: 0.38,
-                balanceTrend: 0.62,
-                debitCreditRatio: 0.44,
-                weekendEveningPct: 0.30,
-                reversalFrequency: 0.08,
-                salaryRevenueMix: 0.25,
-                largestDepositPct: 0.22,
-                zeroBalanceDays: 0.05
-            };
-            const demoRaw = { totalTransactions: 87, totalDebits: 148350, totalCredits: 162800, avgBalance: 24600, reversalCount: 2 };
-
-            const aiResponse = await this.callGrokAPI(
-                demoFeatures, demoRaw,
-                document.getElementById('appName').value,
-                document.getElementById('appBusiness').value,
-                document.getElementById('appAmount').value,
-                'Logistics & Transport'
-            );
-
-            const riskScore = this.parseRiskScore(aiResponse);
-            const thresh = this.settings;
-            let recommendation, badgeClass;
-            if (riskScore <= thresh.approveThreshold) { recommendation = 'APPROVE'; badgeClass = 'approve'; }
-            else if (riskScore >= thresh.rejectThreshold) { recommendation = 'REJECT'; badgeClass = 'reject'; }
-            else { recommendation = 'REVIEW'; badgeClass = 'review'; }
-            const scoreColor = riskScore <= 35 ? 'var(--success)' : riskScore < 60 ? 'var(--warning)' : 'var(--danger)';
-
-            document.getElementById('assessResult').innerHTML = `
-                <div class="alert alert-info" style="margin-bottom:12px;font-size:0.82rem;">ℹ️ Demo — simulated bank statement data</div>
-                <div class="risk-score-display">
-                    <div class="risk-number" style="color:${scoreColor};">${Math.round(riskScore)}%</div>
-                    <div style="margin-bottom:12px;font-size:0.82rem;color:var(--text-muted);">Estimated Default Probability</div>
-                    <span class="badge badge-${badgeClass}" style="font-size:0.88rem;padding:8px 20px;">${recommendation}</span>
-                </div>
-                <div style="padding:0 4px 4px;">
-                    <div class="progress-bar" style="height:10px;">
-                        <div class="progress-fill" style="width:${riskScore}%;background:${scoreColor};"></div>
-                    </div>
-                </div>
-                <div class="ai-analysis">
-                    <div class="ai-label">Grok AI Analysis</div>
-                    ${this.parseMarkdown(aiResponse)}
-                </div>`;
-
-            document.getElementById('featuresCard').style.display = 'block';
-            const fNames = [
-                ['Cash Flow Volatility', 'cashFlowVolatility'], ['Balance Trend', 'balanceTrend'],
-                ['Debit/Credit Ratio', 'debitCreditRatio'], ['Weekend/Evening %', 'weekendEveningPct'],
-                ['Reversal/NSF Freq', 'reversalFrequency'], ['Salary/Revenue Mix', 'salaryRevenueMix'],
-                ['Largest Deposit %', 'largestDepositPct'], ['Zero Balance Days', 'zeroBalanceDays']
-            ];
-            document.getElementById('featureList').innerHTML = fNames.map(([label, key]) => {
-                const val = demoFeatures[key];
-                return `<div class="feature-item">
-                    <div><div class="feature-name">${label}</div>
-                    <div class="feature-bar"><div class="feature-bar-fill" style="width:${val * 100}%;"></div></div></div>
-                    <div class="feature-value">${(val * 100).toFixed(1)}%</div>
-                </div>`;
-            }).join('');
-
-        } catch (err) {
-            document.getElementById('assessResult').innerHTML = `<div class="alert alert-danger"><strong>❌ Error:</strong> ${err.message}</div>`;
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i data-feather="zap" style="width:15px;height:15px;"></i> Run AI Assessment';
-            feather.replace();
-        }
-    },
-
-    // ── PORTFOLIO ──
-    loadPortfolio() {
-        const tbody = document.getElementById('portfolioTable');
-        if (this.assessments.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:28px;">No assessments yet</td></tr>';
-            return;
-        }
-        tbody.innerHTML = this.assessments.map(a => {
-            const date = new Date(a.timestamp).toLocaleDateString('en-ZA');
-            const bc = a.recommendation === 'APPROVE' ? 'approve' : a.recommendation === 'REJECT' ? 'reject' : 'review';
-            return `<tr>
-                <td>${date}</td>
-                <td><strong>${a.applicantName}</strong></td>
-                <td>${a.businessName}</td>
-                <td>${a.sector || '—'}</td>
-                <td>R${a.loanAmount.toLocaleString()}</td>
-                <td><strong>${a.riskScore}%</strong></td>
-                <td><span class="badge badge-${bc}">${a.recommendation}</span></td>
-            </tr>`;
-        }).join('');
-    },
-
-    // ── SETTINGS ──
-    async saveSettings() {
-        this.settings.approveThreshold = parseInt(document.getElementById('threshApprove').value);
-        this.settings.rejectThreshold = parseInt(document.getElementById('threshReject').value);
-        this.updateThresholdDisplay();
-        await db.ref(`users/${this.currentUser.uid}/settings`).set(this.settings);
-        alert('✅ Settings saved!');
-    },
-
-    updateThresholdDisplay() {
-        document.getElementById('reviewLow').textContent = this.settings.approveThreshold + '%';
-        document.getElementById('reviewHigh').textContent = this.settings.rejectThreshold + '%';
-    },
-
-    async saveContext() {
-        const ctx = document.getElementById('systemContext').value;
-        this.systemContext = ctx;
-        await db.ref(`users/${this.currentUser.uid}/systemContext`).set(ctx);
-        alert('✅ AI context saved!');
-    },
-
-    saveApiKey() {
-        const key = document.getElementById('apiKeyInput').value.trim();
-        if (!key) { alert('Please enter an API key.'); return; }
-        localStorage.setItem('xai_api_key', key);
-        alert('✅ API key saved locally!');
-    },
-
-    exportData() {
-        if (this.assessments.length === 0) { alert('No data to export'); return; }
-        const headers = ['Date','Applicant','Business','Sector','Amount','RiskScore','Recommendation'];
-        const rows = this.assessments.map(a => [
-            new Date(a.timestamp).toISOString(), a.applicantName, a.businessName,
-            a.sector || '', a.loanAmount, a.riskScore, a.recommendation
-        ]);
-        const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
-        const el = document.createElement('a');
-        el.href = url;
-        el.download = `sme-assessments-${new Date().toISOString().split('T')[0]}.csv`;
-        el.click();
-        URL.revokeObjectURL(url);
-    },
-
-    async clearAssessments() {
-        if (!confirm('Delete all assessment data? This cannot be undone.')) return;
-        await db.ref(`users/${this.currentUser.uid}/assessments`).remove();
-        this.assessments = [];
-        this.updateDashboard();
-        this.loadPortfolio();
-        alert('All assessments cleared.');
-    },
-
-    showAlert(id, msg, type) {
-        const el = document.getElementById(id);
-        el.className = `alert alert-${type}`;
-        el.textContent = msg;
-        setTimeout(() => { el.className = ''; el.textContent = ''; }, 5000);
+    <button class="scroll-bottom-btn" id="scrollBottomBtn">
+      <i data-feather="arrow-down" style="width:20px;height:20px;"></i>
+    </button>
+
+    <div class="input-wrapper">
+      <p class="input-lock-hint" id="inputLockHint">🔒 Sign in to keep the conversation going</p>
+      <div class="image-preview" id="imagePreview"></div>
+      <div class="input-box" id="inputBox">
+        <input type="file" id="fileInput" accept="image/*" style="display:none;">
+        <button class="action-btn" id="imageBtn" title="Attach image">
+          <i data-feather="plus" style="width:22px;height:22px;"></i>
+        </button>
+        <textarea class="chat-input" id="userInput" placeholder="Ask Steward..." rows="1" autocomplete="off"></textarea>
+        <button class="send-btn" id="sendBtn" title="Send message">
+          <i data-feather="send" style="width:20px;height:20px;"></i>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <button id="liveChatFab" class="live-chat-fab" onclick="window.toggleLiveChat()">
+    <i data-feather="message-circle"></i>
+    <span class="fab-label">Live Chat</span>
+  </button>
+
+  <div id="liveChatModal" class="live-chat-modal">
+
+    <div class="live-chat-header">
+      <div class="lc-header-left">
+        <div class="default-header-info" id="defaultHeaderInfo">
+          <div class="status-dot online"></div>
+          <span>Live Support</span>
+        </div>
+        <div class="consultant-info" id="consultantInfo">
+          <div class="consultant-avatar-wrap">
+            <div class="consultant-avatar" id="consultantAvatarEl"></div>
+            <div class="consultant-online-dot"></div>
+          </div>
+          <div class="consultant-text">
+            <div class="consultant-name" id="consultantNameEl">Consultant</div>
+            <div class="consultant-role">Rare Grade Tech · Support Agent</div>
+          </div>
+        </div>
+      </div>
+      <button onclick="window.toggleLiveChat()" class="close-chat-btn">
+        <i data-feather="x" style="width:18px;height:18px;"></i>
+      </button>
+    </div>
+
+    <div id="liveChatContent" class="live-chat-content">
+      <div id="waitingRoom" class="chat-state-container">
+        <div class="waiting-icon-wrap">
+          <div class="pulse-ring"></div>
+          <i data-feather="headphones" class="waiting-icon"></i>
+        </div>
+        <h3>Request a Consultant</h3>
+        <p>A human agent will be with you shortly to assist with your technical queries.</p>
+        <button id="startRequestBtn" class="primary-chat-btn" onclick="window.requestConsultant()">
+          Request to Chat
+        </button>
+      </div>
+
+      <div id="activeChat">
+        <div id="liveMessagesList" class="live-messages-list"></div>
+
+        <div id="chatEndedState">
+          <div class="ended-badge">
+            <div class="ended-badge-dot"></div>
+            Chat Ended
+          </div>
+          <p>This session has been closed by the consultant. Start a new session if you need further help.</p>
+          <button class="new-session-btn" onclick="window.startNewLiveSession()">
+            <i data-feather="plus-circle"></i>
+            New Session
+          </button>
+        </div>
+
+        <div class="live-input-wrapper" id="liveInputWrapper">
+          <div class="live-typing-indicator" id="liveTypingIndicator">
+            <div class="typing-dots">
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+            </div>
+            <span id="typingConsultantName">Consultant</span> is typing...
+          </div>
+          <div class="live-input-box" id="liveInputBox">
+            <textarea id="liveChatTextarea" class="live-chat-textarea" placeholder="Type a message..." rows="1"></textarea>
+            <button id="liveSendBtn" class="live-send-btn" onclick="window.sendLiveMessage()">
+              <i data-feather="send"></i>
+            </button>
+          </div>
+          <div class="live-ended-hint" id="liveEndedHint">This chat has ended</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getDatabase, ref, get, push, set, serverTimestamp, onValue, onChildAdded } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getRemoteConfig, fetchAndActivate, getValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-remote-config.js";
+
+    // ════ SPLASH ════
+    const splash = document.getElementById('splashScreen');
+    let splashDismissed = false;
+    function dismissSplash() {
+      if (splashDismissed) return;
+      splashDismissed = true;
+      splash.classList.add('hide');
+      setTimeout(() => splash.remove(), 600);
     }
-};
-
-// ── AUTH LISTENER ──
-auth.onAuthStateChanged(user => app.onAuthStateChanged(user));
-
-// ── DRAG AND DROP ──
-document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(dismissSplash, 1500);
+    splash.addEventListener('click', dismissSplash);
     feather.replace();
-    const uploadArea = document.getElementById('pdfUpload');
-    if (uploadArea) {
-        uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
-        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
-        uploadArea.addEventListener('drop', e => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                document.getElementById('pdfFile').files = files;
-                app.handlePdfUpload({ target: { files } });
-            }
+
+    // ════ PWA ════
+    let deferredPrompt;
+    const pwaPopup = document.getElementById('pwa-install-popup');
+    const pwaInstallBtn = document.getElementById('pwaInstallBtn');
+    const pwaDismissBtn = document.getElementById('pwaDismissBtn');
+    let pwaStartY = 0;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (!localStorage.getItem('pwa_installed')) setTimeout(() => pwaPopup.classList.add('show'), 2000);
+    });
+    window.addEventListener('appinstalled', () => { localStorage.setItem('pwa_installed','true'); dismissPwaPopup(true); });
+    pwaInstallBtn.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        dismissPwaPopup(outcome === 'accepted');
+        deferredPrompt = null;
+      } else dismissPwaPopup(false);
+    });
+    pwaDismissBtn.addEventListener('click', () => dismissPwaPopup(false));
+    const pwaBannerInner = pwaPopup.querySelector('.pwa-banner-inner');
+    pwaBannerInner.addEventListener('touchstart', (e) => { pwaStartY = e.touches[0].clientY; pwaPopup.style.transition = 'none'; }, { passive: true });
+    pwaBannerInner.addEventListener('touchmove', (e) => { const d = e.touches[0].clientY - pwaStartY; if (d < 0) { pwaPopup.style.transform = `translateY(${d}px)`; pwaPopup.style.opacity = Math.max(0, 1 + d/80).toString(); } }, { passive: true });
+    pwaBannerInner.addEventListener('touchend', (e) => { const d = e.changedTouches[0].clientY - pwaStartY; pwaPopup.style.transition = 'transform 0.35s cubic-bezier(0.22,1,0.36,1),opacity 0.35s ease'; if (d < -40) dismissPwaPopup(false); else { pwaPopup.style.transform = ''; pwaPopup.style.opacity = ''; } }, { passive: true });
+    function dismissPwaPopup(permanent = false) {
+      if (permanent) localStorage.setItem('pwa_installed','true');
+      pwaPopup.style.transition = 'transform 0.35s cubic-bezier(0.22,1,0.36,1),opacity 0.35s ease';
+      pwaPopup.style.transform = 'translateY(-110%)'; pwaPopup.style.opacity = '0'; pwaPopup.style.pointerEvents = 'none';
+      setTimeout(() => { pwaPopup.classList.remove('show'); pwaPopup.style.transform = pwaPopup.style.opacity = pwaPopup.style.transition = pwaPopup.style.pointerEvents = ''; }, 360);
+    }
+    if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+
+    // ════ THEME ════
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    function updateThemeIcon() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      themeIcon.setAttribute('data-feather', isDark ? 'sun' : 'moon');
+      feather.replace();
+    }
+    const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon();
+    themeToggle.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      updateThemeIcon();
+    });
+
+    // ════ UI REFS ════
+    const sidebar = document.getElementById('sidebar');
+    const menuToggle = document.getElementById('menuToggle');
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const chatContainer = document.getElementById('chatContainer');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const mainScroll = document.getElementById('mainScroll');
+    const newChatBtn = document.getElementById('newChatBtn');
+    const sidebarHistoryList = document.getElementById('sidebarHistoryList');
+    const mainHeader = document.getElementById('mainHeader');
+    const scrollBottomBtn = document.getElementById('scrollBottomBtn');
+    const inputBox = document.getElementById('inputBox');
+    const inputLockHint = document.getElementById('inputLockHint');
+    const imageBtn = document.getElementById('imageBtn');
+    const fileInput = document.getElementById('fileInput');
+    const imagePreview = document.getElementById('imagePreview');
+
+    menuToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !menuToggle.contains(e.target)) sidebar.classList.remove('open');
+    });
+    mainScroll.addEventListener('scroll', () => {
+      mainHeader.classList.toggle('scrolled', mainScroll.scrollTop > 10);
+      const notBottom = mainScroll.scrollHeight - mainScroll.scrollTop - mainScroll.clientHeight > 100;
+      scrollBottomBtn.classList.toggle('visible', notBottom && chatContainer.style.display === 'flex' && chatContainer.children.length > 2);
+    });
+    scrollBottomBtn.addEventListener('click', () => mainScroll.scrollTo({ top: mainScroll.scrollHeight, behavior: 'smooth' }));
+
+    // 3D Parallax
+    function initParallaxCards() {
+      if (window.innerWidth <= 768) return;
+      document.querySelectorAll('.suggestion-card').forEach(card => {
+        card.addEventListener('mousemove', e => {
+          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          card.classList.remove('reset');
+          const rect = card.getBoundingClientRect();
+          const rx = ((e.clientY - rect.top - rect.height/2) / (rect.height/2)) * -12;
+          const ry = ((e.clientX - rect.left - rect.width/2) / (rect.width/2)) * 12;
+          card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) scale3d(1.02,1.02,1.02)`;
+          card.style.boxShadow = `${-ry}px ${rx}px 20px var(--shadow-color)`;
         });
+        card.addEventListener('mouseleave', () => {
+          card.classList.add('reset');
+          card.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1,1,1)';
+          card.style.boxShadow = 'none';
+        });
+      });
+    }
+    initParallaxCards();
+
+    document.querySelectorAll('.suggestion-card').forEach(card => {
+      card.addEventListener('click', () => { const p = card.getAttribute('data-prompt'); if (p) { userInput.value = p; window.handleSend(); } });
+    });
+
+    // ════ DIALOG ════
+    const dialogOverlay = document.getElementById('dialogOverlay');
+    const dialogContainer = document.getElementById('dialogContainer');
+    window.showDialog = function(title, message, buttons) {
+      document.getElementById('dialogTitle').innerText = title;
+      document.getElementById('dialogMessage').innerText = message;
+      const actions = document.getElementById('dialogActions');
+      actions.innerHTML = '';
+      buttons.forEach(btn => {
+        const b = document.createElement('button');
+        b.className = `dialog-btn ${btn.type || 'secondary'}`;
+        b.innerText = btn.text;
+        b.onclick = () => { window.closeDialog(); if (btn.onClick) btn.onClick(); };
+        actions.appendChild(b);
+      });
+      dialogOverlay.style.display = 'flex';
+      setTimeout(() => { dialogOverlay.style.opacity = '1'; dialogContainer.style.transform = 'scale(1)'; }, 10);
+    };
+    window.closeDialog = function() {
+      dialogOverlay.style.opacity = '0'; dialogContainer.style.transform = 'scale(0.95)';
+      setTimeout(() => { dialogOverlay.style.display = 'none'; }, 300);
+    };
+
+    // ════ FIREBASE ════
+    const firebaseConfig = {
+      apiKey: "AIzaSyCh7Ute6LeSAxcNDEQwZg5m0cA4ujnLCfg",
+      authDomain: "test-17881.firebaseapp.com",
+      databaseURL: "https://test-17881-default-rtdb.firebaseio.com",
+      projectId: "test-17881",
+      storageBucket: "test-17881.firebasestorage.app",
+      messagingSenderId: "1057428047643",
+      appId: "1:1057428047643:web:f3801c0d933225a5cd35be"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const remoteConfig = getRemoteConfig(app);
+    remoteConfig.settings.minimumFetchIntervalMillis = 0;
+
+    // ════ AUTH ════
+    const authOverlay = document.getElementById('authOverlay');
+    const authContainer = document.getElementById('authContainer');
+    const closeAuthBtn = document.getElementById('closeAuthBtn');
+    const profileBtn = document.getElementById('profileBtn');
+    const googleSignInBtn = document.getElementById('googleSignInBtn');
+
+    let currentUser = null;
+    let guestPromptCount = 0;
+    let currentChatId = null;
+    let pendingImage = null;
+
+    // ════════════════════════════════════════════════════════
+    // SYSTEM PROMPT
+    // ════════════════════════════════════════════════════════
+    const SYSTEM_PROMPT = {
+      role: "system",
+      content: `You are Steward, a professional technical support and IT repair consultant from Rare Grade Tech.
+
+YOUR GOALS:
+1. Greet users warmly and assist with computer-related tech support, software troubleshooting, or hardware repair quotes.
+2. If a user asks about non-computer topics, politely decline and provide the support number: +27 0800 123 456.
+3. CALLBACK FEATURE: If a user explicitly asks for a callback, phone call, or to be called back, ask for:
+   - Their phone number
+   - A brief description of their issue
+4. IMPORTANT — Only output the hidden callback tag when the user has EXPLICITLY provided their phone number in their message. Do NOT output this tag at any other time.
+5. When the user provides their phone number, confirm their callback has been registered and let them know an agent will call them shortly.
+6. When the user has provided their phone number, append this EXACT tag at the very end of your response:
+   [CALLBACK: <phone_number> | <brief_issue_summary>]
+
+Keep responses clear, professional, empathetic, and well-formatted using markdown.`
+    };
+
+    window.chatHistory = [SYSTEM_PROMPT];
+
+    const DEFAULT_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='background-color:%23E3E3E3'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E";
+    const VERIFIED_BADGE_SVG = `<svg class="verified-badge" viewBox="0 0 24 24" aria-label="Verified account"><path fill="#1D9BF0" d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.918-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.337 2.25c-.416-.165-.866-.25-1.336-.25-2.21 0-3.918 1.79-3.918 4 0 .495.084.965.238 1.4-1.273.65-2.148 2.02-2.148 3.6 0 1.46.827 2.766 2.057 3.465-.056.297-.09.6-.09.914 0 2.21 1.71 4 3.918 4 .556 0 1.082-.114 1.56-.318.572 1.39 1.95 2.37 3.52 2.37s2.948-.98 3.52-2.37c.478.204 1.004.318 1.56.318 2.21 0 3.918-1.79 3.918-4 0-.314-.033-.617-.09-.914 1.23-.698 2.057-2.004 2.057-3.465z"></path><path fill="#FFFFFF" d="M15.34 8.36l-5.8 5.8-2.6-2.6c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4l3.3 3.3c.2.2.5.3.7.3s.5-.1.7-.3l6.5-6.5c.4-.4.4-1 0-1.4s-1-.4-1.4 0z"></path></svg>`;
+
+    window.openAuth = function() {
+      authOverlay.style.display = 'flex';
+      setTimeout(() => { authOverlay.style.opacity = '1'; authContainer.style.transform = 'translateY(0)'; }, 10);
+    };
+    window.closeAuth = function() {
+      authOverlay.style.opacity = '0'; authContainer.style.transform = window.innerWidth <= 768 ? 'translateY(100%)' : 'translateY(30px)';
+      setTimeout(() => { authOverlay.style.display = 'none'; }, 300);
+    };
+    closeAuthBtn.addEventListener('click', window.closeAuth);
+    authOverlay.addEventListener('click', (e) => { if (e.target === authOverlay) window.closeAuth(); });
+    profileBtn.addEventListener('click', () => {
+      if (currentUser) {
+        window.showDialog("Sign Out", "Do you want to sign out of Rare Grade Tech?", [
+          { text: "Cancel", type: "secondary" },
+          { text: "Sign Out", type: "primary", onClick: () => signOut(auth) }
+        ]);
+      } else window.openAuth();
+    });
+    googleSignInBtn.addEventListener('click', async () => {
+      try { await signInWithPopup(auth, new GoogleAuthProvider()); window.closeAuth(); }
+      catch { window.showDialog("Sign In Failed", "We couldn't sign you in. Please try again.", [{ text: "OK", type: "primary-blue" }]); }
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+      const avatarImg = document.getElementById('header-avatar');
+      const greetingText = document.getElementById('greetingText');
+      if (user) {
+        avatarImg.src = user.photoURL || DEFAULT_AVATAR;
+        const firstName = user.displayName ? user.displayName.split(' ')[0] : 'there';
+        greetingText.innerHTML = `Hello, ${firstName} ${VERIFIED_BADGE_SVG}`;
+        guestPromptCount = 0; unlockInput();
+        const gateEl = document.getElementById('auth-gate-card'); if (gateEl) gateEl.remove();
+        loadSidebarChats(user.uid);
+        document.getElementById('sidebarSearch').style.display = 'block';
+      } else {
+        avatarImg.src = DEFAULT_AVATAR;
+        greetingText.innerHTML = `Hello there`;
+        sidebarHistoryList.innerHTML = '';
+        document.getElementById('sidebarSearch').style.display = 'none';
+        guestPromptCount = 0; unlockInput(); startNewChat();
+      }
+    });
+
+    // ════ FIREBASE CHAT HISTORY ════
+    async function loadSidebarChats(uid) {
+      const snap = await get(ref(db, `chats/${uid}`));
+      sidebarHistoryList.innerHTML = '';
+      if (snap.exists()) {
+        const chats = [];
+        snap.forEach(c => chats.push({ id: c.key, ...c.val() }));
+        chats.sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
+        chats.forEach(chat => {
+          const div = document.createElement('div');
+          div.className = 'history-item';
+          div.innerHTML = `<i data-feather="message-square" style="width:16px;height:16px;flex-shrink:0;"></i><span class="history-text">${window.escapeHtml(chat.title||'New Chat')}</span><div class="history-actions"><button class="history-action-btn" title="Rename" onclick="window.editChatTitle('${chat.id}',event)"><i data-feather="edit-2" style="width:14px;height:14px;"></i></button><button class="history-action-btn" title="Delete" onclick="window.deleteChat('${chat.id}',event)"><i data-feather="trash-2" style="width:14px;height:14px;"></i></button></div>`;
+          div.onclick = () => loadSpecificChat(chat.id, uid);
+          sidebarHistoryList.appendChild(div);
+        });
+        feather.replace();
+      }
+    }
+    window.deleteChat = async function(chatId, e) {
+      if (e) e.stopPropagation();
+      window.showDialog("Delete Chat", "Are you sure you want to delete this conversation?", [
+        { text: "Cancel", type: "secondary" },
+        { text: "Delete", type: "primary", onClick: async () => {
+          if (currentUser) { await set(ref(db,`chats/${currentUser.uid}/${chatId}`), null); loadSidebarChats(currentUser.uid); if (currentChatId === chatId) startNewChat(); }
+        }}
+      ]);
+    };
+    window.editChatTitle = async function(chatId, e) {
+      if (e) e.stopPropagation();
+      const snap = await get(ref(db,`chats/${currentUser.uid}/${chatId}`));
+      if (!snap.exists()) return;
+      const newTitle = prompt('Rename conversation:', snap.val().title || 'New Chat');
+      if (newTitle && newTitle.trim()) { await set(ref(db,`chats/${currentUser.uid}/${chatId}/title`), newTitle.trim()); loadSidebarChats(currentUser.uid); }
+    };
+    async function loadSpecificChat(chatId, uid) {
+      if (window.innerWidth <= 768) sidebar.classList.remove('open');
+      const snap = await get(ref(db,`chats/${uid}/${chatId}`));
+      if (snap.exists()) {
+        const chatData = snap.val();
+        currentChatId = chatId;
+        window.chatHistory = chatData.messages || [SYSTEM_PROMPT];
+        welcomeScreen.style.display = 'none'; chatContainer.style.display = 'flex'; chatContainer.innerHTML = '';
+        for (const msg of window.chatHistory) {
+          if (msg.role === 'system') continue;
+          const time = msg.timestamp ? formatTime(msg.timestamp) : '';
+          if (msg.role === 'user') {
+            chatContainer.insertAdjacentHTML('beforeend', `<div class="message-row user"><div><div class="msg-bubble user">${window.escapeHtml(msg.content)}</div>${time ? `<div class="message-time">${time}</div>` : ''}</div></div>`);
+          } else if (msg.role === 'assistant') {
+            const mid = 'msg-' + Math.random().toString(36).substr(2,9);
+            chatContainer.insertAdjacentHTML('beforeend', `<div class="message-row ai"><img src="https://i.postimg.cc/Wz7yBXJQ/steward-icon.png" class="ai-avatar" alt="AI"><div style="flex:1;min-width:0;"><div class="msg-bubble ai" id="${mid}">${window.parseMarkdownToHTML(msg.content)}</div><div class="message-actions"><button class="msg-action-btn" onclick="window.copyMessage('${mid}')"><i data-feather="copy" style="width:14px;height:14px;"></i> Copy</button><button class="msg-action-btn" onclick="window.regenerateResponse()"><i data-feather="refresh-cw" style="width:14px;height:14px;"></i> Retry</button></div>${time ? `<div class="message-time">${time}</div>` : ''}</div></div>`);
+          }
+        }
+        feather.replace(); mainScroll.scrollTop = mainScroll.scrollHeight;
+      }
+    }
+    async function saveCurrentChat() {
+      if (!currentUser) return;
+      if (!currentChatId) { const r = push(ref(db,`chats/${currentUser.uid}`)); currentChatId = r.key; }
+      const userMsg = window.chatHistory.find(m => m.role === 'user');
+      let title = userMsg ? (userMsg.content.substring(0,30) + (userMsg.content.length > 30 ? '...' : '')) : "New Conversation";
+      await set(ref(db,`chats/${currentUser.uid}/${currentChatId}`), { title, updatedAt: serverTimestamp(), messages: window.chatHistory });
+      loadSidebarChats(currentUser.uid);
+    }
+    function startNewChat() {
+      currentChatId = null; window.chatHistory = [SYSTEM_PROMPT];
+      chatContainer.innerHTML = ''; welcomeScreen.style.display = 'block'; chatContainer.style.display = 'none';
+      if (window.innerWidth <= 768) sidebar.classList.remove('open');
+      userInput.value = ''; userInput.style.height = 'auto'; pendingImage = null; imagePreview.innerHTML = '';
+      sendBtn.classList.remove('active');
+    }
+    newChatBtn.onclick = startNewChat;
+
+    // ════ API KEY ════
+    const API_BASE = "https://api.x.ai/v1";
+    let XAI_API_KEY = "";
+    async function loadKey() { try { await fetchAndActivate(remoteConfig); XAI_API_KEY = getValue(remoteConfig,'xai_api_key').asString(); } catch(e) { console.error(e); } }
+    loadKey();
+
+    window.activateChat = () => { welcomeScreen.style.display = 'none'; chatContainer.style.display = 'flex'; };
+    window.setPrompt = (text) => { userInput.value = text; sendBtn.classList.add('active'); window.handleSend(); };
+    window.escapeHtml = (t) => !t ? '' : t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+    window.parseMarkdownToHTML = function(text) {
+      if (!text) return '';
+      let html = window.escapeHtml(text);
+      const codeBlocks = [];
+      html = html.replace(/```(\w*)\n?([\s\S]*?)```/gm, (m, lang, code) => {
+        const id = 'CODE-' + Math.random().toString(36).substr(2,9);
+        codeBlocks.push({ id, lang: lang||'code', code: code.trim() }); return id;
+      });
+      html = html.replace(/^### (.*$)/gim,'<h3>$1</h3>').replace(/^## (.*$)/gim,'<h2>$1</h2>').replace(/^# (.*$)/gim,'<h1>$1</h1>');
+      html = html.replace(/\*\*\*(.*?)\*\*\*/g,'<strong><em>$1</em></strong>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>');
+      const lines = html.split('\n'); let result = []; let inList = false;
+      for (const line of lines) {
+        const lm = line.match(/^\s*[-*] (.*$)/);
+        if (lm) { if (!inList) { result.push('<ul>'); inList = true; } result.push('<li>'+lm[1]+'</li>'); }
+        else { if (inList) { result.push('</ul>'); inList = false; } result.push(line); }
+      }
+      if (inList) result.push('</ul>');
+      html = result.join('\n').replace(/`([^`]+)`/g,'<code>$1</code>');
+      html = html.split('\n\n').map(p => { p = p.trim(); if (!p) return ''; if (p.startsWith('<h')||p.startsWith('<ul')||p.startsWith('</ul')||p.startsWith('<li')||p.startsWith('CODE-')) return p; if (p.startsWith('<')&&!p.startsWith('<code')&&!p.startsWith('<em')&&!p.startsWith('<strong')) return p; return '<p>'+p+'</p>'; }).join('\n');
+      codeBlocks.forEach(({id,lang,code}) => { html = html.replace(id, `<div class="code-header"><span class="code-lang">${lang}</span><button class="copy-code-btn" onclick="window.copyCode(this)"><i data-feather="copy" style="width:14px;height:14px;"></i> Copy</button></div><pre><code>${code}</code></pre>`); });
+      return html;
+    };
+
+    window.copyCode = function(btn) {
+      const pre = btn.closest('.msg-bubble.ai, .code-header').parentElement.querySelector('pre');
+      if (pre) navigator.clipboard.writeText(pre.innerText).then(() => {
+        const orig = btn.innerHTML; btn.innerHTML = '<i data-feather="check" style="width:14px;height:14px;"></i> Copied'; feather.replace();
+        setTimeout(() => { btn.innerHTML = orig; feather.replace(); }, 2000);
+      });
+    };
+    window.copyMessage = function(mid) {
+      const el = document.getElementById(mid);
+      if (el) navigator.clipboard.writeText(el.innerText).then(() => window.showDialog("Copied","Message copied to clipboard.",[{text:"OK",type:"primary-blue"}]));
+    };
+    window.regenerateResponse = async function() {
+      const last = [...window.chatHistory].reverse().find(m => m.role === 'user');
+      if (last) { userInput.value = last.content; sendBtn.classList.add('active'); await window.handleSend(); }
+    };
+    window.typeHTML = async function(element, htmlString, speed = 5) {
+      if (htmlString.includes('<pre')) { element.innerHTML = htmlString; feather.replace(); mainScroll.scrollTop = mainScroll.scrollHeight; return; }
+      element.innerHTML = '';
+      const parts = htmlString.split(/(<[^>]+>)/g);
+      for (const part of parts) {
+        if (!part) continue;
+        if (part.startsWith('<')) { element.innerHTML += part; }
+        else {
+          for (let i = 0; i < part.length; i++) {
+            if (part[i]==='&') { const end = part.indexOf(';',i); if (end!==-1) { element.innerHTML += part.substring(i,end+1); i=end; continue; } }
+            element.innerHTML += part[i]; await new Promise(r => setTimeout(r, speed)); mainScroll.scrollTop = mainScroll.scrollHeight;
+          }
+        }
+      }
+    };
+    function formatTime(ts) { if (!ts) return ''; return new Date(ts).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
+
+    // Textarea auto-resize and Send Button Active State
+    userInput.addEventListener('input', function() { 
+      this.style.height = 'auto'; 
+      this.style.height = Math.min(this.scrollHeight, 200) + 'px'; 
+      if(this.value.trim().length > 0) {
+        sendBtn.classList.add('active');
+      } else {
+        sendBtn.classList.remove('active');
+      }
+    });
+
+    // Image upload
+    imageBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        pendingImage = file;
+        const reader = new FileReader();
+        reader.onload = (ev) => { imagePreview.innerHTML = `<div class="image-preview-item"><img src="${ev.target.result}" alt="Preview"><button onclick="window.clearImage()" title="Remove">×</button></div>`; };
+        reader.readAsDataURL(file);
+      }
+      fileInput.value = '';
+    });
+    window.clearImage = () => { pendingImage = null; imagePreview.innerHTML = ''; };
+
+    function lockInput() { inputBox.classList.add("locked"); inputLockHint.classList.add("visible"); }
+    function unlockInput() { inputBox.classList.remove("locked"); inputLockHint.classList.remove("visible"); }
+
+    function showAuthGateCard() {
+      if (document.getElementById('auth-gate-card')) return;
+      chatContainer.insertAdjacentHTML("beforeend", `<div class="auth-gate-row" id="auth-gate-card"><div class="auth-gate-card"><div class="gate-lock-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div><h3>You have reached your free limit</h3><p>Sign in with Google to keep chatting with Steward and save your conversation history.</p><button class="gate-sign-in-btn" onclick="window.openAuth()"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:20px;height:20px;" alt="Google">Sign in to continue</button></div></div>`);
+      mainScroll.scrollTop = mainScroll.scrollHeight;
     }
 
-    // Update threshold display on change
-    ['threshApprove', 'threshReject'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('input', () => app.updateThresholdDisplay());
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { window.closeDialog(); window.closeAuth(); sidebar.classList.remove('open'); }
+      if (e.key === '/' && document.activeElement !== userInput && document.activeElement !== document.getElementById('liveChatTextarea') && !e.ctrlKey && !e.metaKey) { e.preventDefault(); userInput.focus(); }
     });
-});
-</script>
+    userInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); window.handleSend(); } });
+
+    // ════════════════════════════════════════════════════════
+    // CALLBACK DETECTION
+    // ════════════════════════════════════════════════════════
+    function extractCallbackTag(text) {
+      const pattern = /\[CALLBACK:\s*(\+?[\d\s\-().]{7,20})\s*\|\s*([^\]]{3,})\]/i;
+      const match = text.match(pattern);
+      if (!match) return null;
+      const phone = match[1].trim();
+      const issue = match[2].trim();
+      const digitCount = (phone.match(/\d/g) || []).length;
+      if (digitCount < 7) return null;
+      return { phone, issue, fullMatch: match[0] };
+    }
+
+    // ════ MAIN SEND ════
+    window.handleSend = async function() {
+      let prompt = userInput.value.trim();
+      if (pendingImage) { prompt += `\n\n[User attached image: ${pendingImage.name}]`; pendingImage = null; imagePreview.innerHTML = ''; }
+      if (!prompt || !XAI_API_KEY) return;
+      if (!currentUser && guestPromptCount >= 3) { showAuthGateCard(); lockInput(); return; }
+      
+      activateChat();
+      const userTimestamp = Date.now();
+      chatContainer.insertAdjacentHTML('beforeend', `<div class="message-row user"><div><div class="msg-bubble user">${window.escapeHtml(prompt)}</div><div class="message-time">${formatTime(userTimestamp)}</div></div></div>`);
+      
+      const loaderId = 'loader-' + Date.now();
+      chatContainer.insertAdjacentHTML('beforeend', `<div class="message-row ai" id="${loaderId}"><img src="https://i.postimg.cc/Wz7yBXJQ/steward-icon.png" class="ai-avatar" alt="AI"><div class="msg-bubble ai"><div class="thinking-container"><span id="thinkingText-${loaderId}">Steward is thinking</span><div class="loader-inline"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div></div></div>`);
+      
+      userInput.value = ''; 
+      userInput.style.height = 'auto'; 
+      sendBtn.classList.remove('active');
+      mainScroll.scrollTop = mainScroll.scrollHeight;
+      
+      const ttel = document.getElementById(`thinkingText-${loaderId}`);
+      const timers = [setTimeout(() => { if(ttel) ttel.textContent = 'Steward is researching...'; }, 3000), setTimeout(() => { if(ttel) ttel.textContent = 'Steward is typing...'; }, 8000)];
+      
+      try {
+        chatHistory.push({ role:"user", content:prompt, timestamp:userTimestamp });
+        saveCurrentChat();
+        const res = await fetch(`${API_BASE}/chat/completions`, { method:'POST', headers:{'Authorization':`Bearer ${XAI_API_KEY}`,'Content-Type':'application/json'}, body: JSON.stringify({ model:"grok-4-1-fast-reasoning", messages:chatHistory }) });
+        if (!res.ok) throw new Error(await res.text());
+        const data = await res.json();
+        timers.forEach(clearTimeout);
+        document.getElementById(loaderId)?.remove();
+        let aiMessage = data.choices[0].message.content;
+        const aiTimestamp = Date.now();
+
+        const cbResult = extractCallbackTag(aiMessage);
+        if (cbResult) {
+          aiMessage = aiMessage.replace(cbResult.fullMatch, '').trim();
+          try {
+            await push(ref(db,'callbacks'), {
+              phone: cbResult.phone,
+              issue: cbResult.issue,
+              uid: currentUser?.uid || 'guest',
+              name: currentUser?.displayName || 'Guest User',
+              status: 'pending',
+              timestamp: serverTimestamp()
+            });
+            chatContainer.insertAdjacentHTML('beforeend', `<div class="message-row ai"><div style="width:36px;flex-shrink:0;"></div><div class="callback-card"><div class="callback-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></div><div class="callback-content"><strong>Callback Requested</strong><p>A Rare Grade Tech agent will call you at ${cbResult.phone} shortly.</p><span class="callback-status pending">Pending</span></div></div></div>`);
+            window.showDialog("Callback Requested", `We have sent your request to our admin team. A Rare Grade Tech agent will call you at ${cbResult.phone} shortly.`, [{text:"OK",type:"primary-blue"}]);
+          } catch(e) { console.error(e); }
+        }
+
+        chatHistory.push({ role:"assistant", content:aiMessage, timestamp:aiTimestamp });
+        saveCurrentChat();
+        const mid = 'msg-' + Date.now();
+        chatContainer.insertAdjacentHTML('beforeend', `<div class="message-row ai"><img src="https://i.postimg.cc/Wz7yBXJQ/steward-icon.png" class="ai-avatar" alt="AI"><div style="flex:1;min-width:0;"><div class="msg-bubble ai" id="${mid}"></div><div class="message-actions"><button class="msg-action-btn" onclick="window.copyMessage('${mid}')"><i data-feather="copy" style="width:14px;height:14px;"></i> Copy</button><button class="msg-action-btn" onclick="window.regenerateResponse()"><i data-feather="refresh-cw" style="width:14px;height:14px;"></i> Retry</button></div><div class="message-time">${formatTime(aiTimestamp)}</div></div></div>`);
+        await window.typeHTML(document.getElementById(mid), window.parseMarkdownToHTML(aiMessage), 5);
+        feather.replace();
+        if (!currentUser) { guestPromptCount++; if (guestPromptCount >= 3) { showAuthGateCard(); lockInput(); } }
+      } catch(err) {
+        timers.forEach(clearTimeout);
+        document.getElementById(loaderId)?.remove();
+        const rid = 'retry-' + Date.now();
+        chatContainer.insertAdjacentHTML('beforeend', `<div class="message-row ai" id="${rid}"><img src="https://i.postimg.cc/Wz7yBXJQ/steward-icon.png" class="ai-avatar" alt="AI"><div class="retry-card"><p>Steward lost connection. Would you like to try again?</p><button class="dialog-btn primary-blue" onclick="window.retryLastMessage('${rid}')"><i data-feather="refresh-cw" style="width:14px;height:14px;display:inline;vertical-align:middle;margin-right:6px;"></i> Retry</button></div></div>`);
+        feather.replace();
+      }
+      mainScroll.scrollTop = mainScroll.scrollHeight;
+    };
+    window.retryLastMessage = function(rid) {
+      document.getElementById(rid)?.remove();
+      const li = window.chatHistory.map((m,i) => m.role==='user'?i:-1).filter(i=>i!==-1).pop();
+      if (li !== undefined) { const m = window.chatHistory[li]; window.chatHistory = window.chatHistory.slice(0,li); userInput.value = m.content; sendBtn.classList.add('active'); window.handleSend(); }
+    };
+    sendBtn.onclick = window.handleSend;
+
+    document.getElementById('historySearchInput').addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll('.history-item').forEach(item => {
+        item.style.display = item.querySelector('.history-text').textContent.toLowerCase().includes(term) ? 'flex' : 'none';
+      });
+    });
+
+    // ══════════════════════════════════════════════════════
+    //  LIVE CHAT
+    // ══════════════════════════════════════════════════════
+    window.currentChatSessionId = null;
+    let liveSessionEnded = false;
+
+    window.toggleLiveChat = function() {
+      const modal = document.getElementById('liveChatModal');
+      const isOpen = modal.style.display === 'flex';
+      modal.style.display = isOpen ? 'none' : 'flex';
+      if (!isOpen) feather.replace();
+    };
+
+    window.requestConsultant = async function() {
+      const btn = document.getElementById('startRequestBtn');
+      btn.disabled = true; btn.innerText = "Requesting...";
+      const sessionId = 'chat_' + Date.now();
+      window.currentChatSessionId = sessionId;
+      liveSessionEnded = false;
+      try {
+        await set(ref(db,'live_chats/' + sessionId), {
+          userId: currentUser ? currentUser.uid : 'guest_' + Math.random().toString(36).substr(2,9),
+          userName: currentUser ? currentUser.displayName : 'Client',
+          status: 'pending',
+          createdAt: serverTimestamp()
+        });
+        document.querySelector('#waitingRoom p').innerText = "Looking for an available consultant. Please stay on the line...";
+        window.listenForSessionChanges(sessionId);
+      } catch(err) {
+        console.error(err);
+        btn.disabled = false; btn.innerText = "Retry Request";
+      }
+    };
+
+    window.listenForSessionChanges = function(sessionId) {
+      onValue(ref(db,'live_chats/' + sessionId), (snap) => {
+        const data = snap.val();
+        if (!data) return;
+        if (data.status === 'active' && !liveSessionEnded) {
+          const name = data.consultantName || 'Support Agent';
+          const photo = data.consultantPhoto || null;
+          setConsultantHeader(name, photo);
+          window.showActiveChat();
+          window.listenForMessages(sessionId);
+          document.getElementById('typingConsultantName').textContent = name.split(' ')[0];
+        }
+        if (data.status === 'ended' && !liveSessionEnded) {
+          liveSessionEnded = true;
+          markChatEnded();
+        }
+      });
+    };
+
+    function setConsultantHeader(name, photoUrl) {
+      document.getElementById('defaultHeaderInfo').classList.add('hidden');
+      const ci = document.getElementById('consultantInfo');
+      ci.classList.add('visible');
+      const avatarEl = document.getElementById('consultantAvatarEl');
+      document.getElementById('consultantNameEl').textContent = name;
+      if (photoUrl) {
+        avatarEl.innerHTML = `<img src="${photoUrl}" alt="${name}">`;
+      } else {
+        const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().substring(0,2);
+        avatarEl.textContent = initials;
+      }
+    }
+
+    function resetConsultantHeader() {
+      document.getElementById('defaultHeaderInfo').classList.remove('hidden');
+      const ci = document.getElementById('consultantInfo');
+      ci.classList.remove('visible');
+      document.getElementById('consultantAvatarEl').textContent = '';
+      document.getElementById('consultantNameEl').textContent = 'Consultant';
+    }
+
+    window.showActiveChat = function() {
+      document.getElementById('waitingRoom').style.display = 'none';
+      const ac = document.getElementById('activeChat');
+      ac.style.display = 'flex';
+      feather.replace();
+      appendSystemMessage('You are now connected with a consultant.');
+    };
+
+    function markChatEnded() {
+      const liveInputBox = document.getElementById('liveInputBox');
+      const liveSendBtn = document.getElementById('liveSendBtn');
+      liveInputBox.classList.add('ended');
+      liveSendBtn.disabled = true;
+      document.getElementById('liveEndedHint').classList.add('visible');
+      const endedState = document.getElementById('chatEndedState');
+      endedState.classList.add('visible');
+      appendSystemMessage('This chat session has ended.');
+      document.getElementById('consultantNameEl').textContent += ' · Ended';
+    }
+
+    function appendSystemMessage(text) {
+      const list = document.getElementById('liveMessagesList');
+      const div = document.createElement('div');
+      div.className = 'live-system-msg';
+      div.textContent = text;
+      list.appendChild(div);
+      list.scrollTop = list.scrollHeight;
+    }
+
+    window.sendLiveMessage = async function() {
+      if (liveSessionEnded) return;
+      const textarea = document.getElementById('liveChatTextarea');
+      const text = textarea.value.trim();
+      if (!text || !window.currentChatSessionId) return;
+      await push(ref(db,'live_chat_messages/' + window.currentChatSessionId), {
+        senderId: 'user',
+        senderName: currentUser ? currentUser.displayName : 'Client',
+        text, timestamp: serverTimestamp()
+      });
+      textarea.value = ''; textarea.style.height = 'auto';
+    };
+
+    const liveChatTextarea = document.getElementById('liveChatTextarea');
+    liveChatTextarea.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 120) + 'px'; });
+    liveChatTextarea.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); window.sendLiveMessage(); } });
+
+    window.listenForMessages = function(sessionId) {
+      const msgList = document.getElementById('liveMessagesList');
+      onChildAdded(ref(db,'live_chat_messages/' + sessionId), (snap) => {
+        const msg = snap.val();
+        if (!msg || !msg.text) return;
+        const isUser = msg.senderId === 'user';
+        const time = msg.timestamp ? formatTime(msg.timestamp) : '';
+        const consultantName = document.getElementById('consultantNameEl')?.textContent?.replace(' · Ended','') || 'Agent';
+        const initials = consultantName.split(' ').map(w=>w[0]).join('').toUpperCase().substring(0,2);
+        const row = document.createElement('div');
+        row.className = `live-msg-row ${isUser ? 'user' : 'consultant'}`;
+        if (isUser) {
+          row.innerHTML = `<div style="flex:1;min-width:0;"><div class="live-msg-bubble">${window.escapeHtml(msg.text)}</div>${time ? `<div class="live-msg-time">${time}</div>` : ''}</div>`;
+        } else {
+          row.innerHTML = `<div class="live-msg-avatar">${initials}</div><div style="flex:1;min-width:0;"><div class="live-msg-bubble">${window.escapeHtml(msg.text)}</div>${time ? `<div class="live-msg-time">${time}</div>` : ''}</div>`;
+        }
+        msgList.appendChild(row);
+        msgList.scrollTop = msgList.scrollHeight;
+      });
+    };
+
+    window.startNewLiveSession = function() {
+      liveSessionEnded = false;
+      window.currentChatSessionId = null;
+      resetConsultantHeader();
+      document.getElementById('waitingRoom').style.display = 'flex';
+      document.getElementById('waitingRoom').querySelector('p').innerText = 'A human agent will be with you shortly to assist with your technical queries.';
+      document.getElementById('startRequestBtn').disabled = false;
+      document.getElementById('startRequestBtn').innerText = 'Request to Chat';
+      document.getElementById('activeChat').style.display = 'none';
+      document.getElementById('liveMessagesList').innerHTML = '';
+      document.getElementById('chatEndedState').classList.remove('visible');
+      document.getElementById('liveInputBox').classList.remove('ended');
+      document.getElementById('liveSendBtn').disabled = false;
+      document.getElementById('liveEndedHint').classList.remove('visible');
+      document.getElementById('liveTypingIndicator').classList.remove('visible');
+      document.getElementById('liveChatTextarea').value = '';
+      document.getElementById('liveChatTextarea').style.height = 'auto';
+    };
+
+  </script>
 </body>
 </html>
